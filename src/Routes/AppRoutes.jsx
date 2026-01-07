@@ -122,7 +122,7 @@ const AppRoutes = () => {
       <Route path="/Synoptic" element={<Synoptic />} />
       <Route path="/DistrictWise" element={<DistrictWise />} />
       <Route path="/GenderWise" element={<GenderWise />} />
-      <Route path="/cms" element={<LoginFormCms />} />
+      <Route path="/cms1" element={<LoginFormCms />} />
       <Route path="/Login" element={<LoginForm />} />
       {/* Test Routes */}
       <Route path="/Test" element={<AppsTest />} />
