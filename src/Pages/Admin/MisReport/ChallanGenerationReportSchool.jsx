@@ -1,0 +1,246 @@
+import { useEffect, useState } from "react";
+import AdminAuthenticatedLayout from "../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
+import Loader from "../../../Components/Loader";
+import { useParams } from "react-router-dom";
+import useApi from "../../../Hooks/useApi";
+import LogoutPopup from "../../../Components/LogoutPopup";
+import { toast } from "react-toastify";
+import {
+  phaseYearId,
+  defaultPhaseYear,
+} from "../../../Utils/Constants/Constants";
+
+function ChallanGenerationReportBlock() {
+  const { phaseId, id } = useParams();
+  const phaseDetails = phaseYearId[phaseId] || defaultPhaseYear;
+  const { callApi, showPopup, popupMessage, handleLogout, setShowPopup } =
+    useApi();
+
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    fetchData();
+  }, [phaseId, id]);
+
+  const fetchData = async () => {
+    /////////////////////////////////////////////////////////////////
+    try {
+      setLoading(true);
+      const response = await callApi(
+        "GET",
+        `challan_generation_report_school/${phaseId}/${id}`
+      ); // API call
+      if (response.error) {
+        console.log(JSON.stringify(response));
+        toast(`Failed to fetch data: ${response.message}`);
+      } else {
+        setData(response.data);
+      }
+    } catch (err) {
+      toast(`An unexpected error occurred: ${err}`);
+    } finally {
+      setLoading(false);
+    }
+    ////////////////////////////////////////////////////////////////
+  };
+
+  const boys_musterroll_generated_total = data.reduce((acc, value) => {
+    return acc + value.boys_muster_roll_generated;
+  }, 0);
+
+  const girls_musterroll_generated_total = data.reduce((acc, value) => {
+    return acc + value.girls_muster_roll_generated;
+  }, 0);
+  const total_muster_roll_generated_total = data.reduce((acc, value) => {
+    return acc + value.total_muster_roll_generated;
+  }, 0);
+  const boys_updated_total = data.reduce((acc, value) => {
+    return acc + value.boys_updated;
+  }, 0);
+  const girls_updated_total = data.reduce((acc, value) => {
+    return acc + value.girls_updated;
+  }, 0);
+
+  const total_updated_total = data.reduce((acc, value) => {
+    return acc + value.total_updated;
+  }, 0);
+  const boys_allocation_total = data.reduce((acc, value) => {
+    return acc + parseInt(value.boys_allocation); // (Number(value.boys_allocation) || 0) //change the view or function data type
+  }, 0);
+  const girls_allocation_total = data.reduce((acc, value) => {
+    return acc + parseInt(value.girls_allocation);
+  }, 0);
+  const total_allocation_total = data.reduce((acc, value) => {
+    return acc + parseInt(value.total_allocation);
+  }, 0);
+
+  return (
+    <>
+      <AdminAuthenticatedLayout>
+        <section className="p-4 md:p-8 lg:p-12 bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-300">
+          <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-8 tracking-tight">
+            Challan Generation Report {"("}Phase {phaseDetails.phaseName}
+            {")"}
+          </h1>
+          {/* <p className="text-sm text-gray-600 mt-2">Last updated: {"time"}</p> */}
+          <div className="w-full pb-2 flex justify-end">
+            &nbsp;&nbsp;
+            {/* Download Button */}
+            {/* <button className="absolute right-5 top-2 bg-sky-500 text-white px-4 py-2 rounded-md hover:bg-sky-600 focus:outline-none">
+              Download
+            </button> */}
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-colors duration-300 overflow-x-auto">
+            <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400 border-separate border-spacing-0">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                  <th rowSpan="2" scope="col" className="p-4 rounded-tr-lg">
+                    Serial. No.
+                  </th>
+                  <th rowSpan="2" scope="col" className="p-4">
+                    School Name
+                  </th>
+
+                  <th rowSpan="2" scope="col" className="p-4">
+                    Supplier
+                  </th>
+
+                  <th colSpan="3" scope="col" className="p-4 text-center">
+                    Muster Roll Generated
+                  </th>
+                  <th colSpan="3" scope="col" className="p-4 text-center">
+                    Bicycle Allocated
+                  </th>
+                  <th colSpan="3" scope="col" className="p-4 text-center">
+                    Distribution Record Uploaded
+                  </th>
+                </tr>
+                <tr>
+                  <th scope="col" className="p-4">
+                    Boys
+                  </th>
+                  <th scope="col" className="p-4">
+                    Girls
+                  </th>
+                  <th scope="col" className="p-4">
+                    Total
+                  </th>
+                  <th scope="col" className="p-4">
+                    Boys
+                  </th>
+                  <th scope="col" className="p-4">
+                    Girls
+                  </th>
+                  <th scope="col" className="p-4">
+                    Total
+                  </th>
+                  <th scope="col" className="p-4">
+                    Boys
+                  </th>
+                  <th scope="col" className="p-4">
+                    Girls
+                  </th>
+                  <th scope="col" className="p-4">
+                    Total
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.length === 0 ? (
+                  // Show this row if no student data is available
+                  <tr className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                    <td colSpan="10" className="text-center p-2 text-gray-500">
+                      No records found
+                    </td>
+                  </tr>
+                ) : (
+                  <>
+                    {data.map((value, index) => (
+                      <tr
+                        key={index}
+                        className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                      >
+                        <td className="p-4">{index + 1}</td>
+                        <td className="p-4">{value.school}</td>
+                        <td className="p-4">
+                          {/* {value.supplier} */}
+                          {value.supplier
+                            ? value.supplier
+                            : "No supplier available"}
+                        </td>
+
+                        <td className="p-4">
+                          {value.boys_muster_roll_generated}
+                        </td>
+                        <td className="p-4">
+                          {value.girls_muster_roll_generated}
+                        </td>
+                        <td className="p-4">
+                          {value.total_muster_roll_generated}
+                        </td>
+                        <td className="p-4">{value.boys_allocation}</td>
+                        <td className="p-4">{value.girls_allocation}</td>
+                        <td className="p-4">{value.total_allocation}</td>
+                        <td className="p-4">{value.boys_updated}</td>
+                        <td className="p-4">{value.girls_updated}</td>
+                        <td className="p-4">{value.total_updated}</td>
+                      </tr>
+                    ))}
+                    <tr className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                      <td colSpan="3" className="text-center font-semibold p-4">
+                        Total
+                      </td>
+                      <td className="font-semibold p-4">
+                        {boys_musterroll_generated_total}
+                      </td>
+                      <td className="font-semibold p-4">
+                        {girls_musterroll_generated_total}
+                      </td>
+                      <td className="font-semibold p-4">
+                        {total_muster_roll_generated_total}
+                      </td>
+                      <td className="font-semibold p-4">
+                        {boys_allocation_total}
+                      </td>
+                      <td className="font-semibold p-4">
+                        {girls_allocation_total}
+                      </td>
+                      <td className="font-semibold p-4">
+                        {total_allocation_total}
+                      </td>
+
+                      <td className="font-semibold p-4">
+                        {boys_updated_total}
+                      </td>
+                      <td className="font-semibold p-4">
+                        {girls_updated_total}
+                      </td>
+                      <td className="font-semibold p-4">
+                        {total_updated_total}
+                      </td>
+                    </tr>
+                  </>
+                )}
+              </tbody>
+            </table>
+          </div>
+          {loading && <Loader />} {/* 👈 show the loader component */}
+        </section>
+      </AdminAuthenticatedLayout>
+      {/* Modal section */}
+      {showPopup && (
+        <LogoutPopup
+          message={popupMessage}
+          onConfirm={() => {
+            handleLogout();
+            setShowPopup(false);
+          }}
+        />
+      )}
+      {/* Modal section */}
+    </>
+  );
+}
+
+export default ChallanGenerationReportBlock;
