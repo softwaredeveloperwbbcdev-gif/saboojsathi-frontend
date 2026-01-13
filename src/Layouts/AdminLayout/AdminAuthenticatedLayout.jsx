@@ -101,8 +101,8 @@ function AdminAuthenticatedLayout({ children }) {
 
   const handleLogout = async () => {
     try {
-      // const host = window.location.hostname;
-      const host = `192.168.0.192`;
+      const host = window.location.hostname;
+      //const host = `192.168.0.192`;
       const response = await fetch(`http://${host}:8000/api/logout`, {
         method: "GET", // or "POST" depending on your API
         headers: {

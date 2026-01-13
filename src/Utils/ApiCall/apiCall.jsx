@@ -3,8 +3,8 @@ import axios from "axios";
 
 // Create a new instance of Axios
 const api = axios.create({
-  //baseURL: `http://${window.location.hostname}:8000/api`, // Base URL for your API
-  baseURL: `http://192.168.0.192:8000/api`, // Base URL for your API
+  baseURL: `http://${window.location.hostname}:8000/api`, // Base URL for your API
+  //baseURL: `http://192.168.0.192:8000/api`, // Base URL for your API
   headers: {
     Accept: "application/json",
   },

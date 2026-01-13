@@ -19,7 +19,8 @@ import LoginFormCms from "../Pages/Frontend/LoginFormCms.jsx";
 
 //Admin Pages
 import Dashboard from "../Pages/Frontend/Dashboard.jsx";
-import StudentAdd from "../Pages/Admin/Student/StudentAdd.jsx";
+// import StudentAdd from "../Pages/Admin/Student/StudentAdd.jsx";
+import StudentAdd from "../Pages/Admin/Student/StudentAddTwo.jsx";
 import ViewProfile from "../Pages/Admin/School/ViewProfile.jsx";
 import DownloadDistributionView from "../Pages/Admin/School/DownloadDistributionView.jsx";
 import DistributionUploadView from "../Pages/Admin/School/DistributionUploadView.jsx";
