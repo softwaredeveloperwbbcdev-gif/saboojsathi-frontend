@@ -2,12 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import {
-  HiOutlineAdjustmentsHorizontal,
-  HiOutlineCalendar,
-  HiOutlineFilter,
-  HiCheckBadge,
-} from "react-icons/hi2";
+import { HiCheckBadge } from "react-icons/hi2";
+
+import { HiOutlineFilter } from "react-icons/hi";
 
 import AdminAuthenticatedLayout from "../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
 import SelectInput from "../../../Components/SelectInput";
@@ -127,13 +124,37 @@ function ViewProfile() {
   };
   const viewRejectedCause = (id) => console.log("Rejection cause for:", id);
 
+  const uploadDistributionDetails = async (id) => {
+    setLoading(true);
+    try {
+      // Use the callApi function for the GET request
+      const response = await callApi(
+        "GET",
+        `studentFrameView/${phaseId}/${btoa(id)}`
+      );
+
+      if (response.error) {
+        toast.error("Failed to fetch student details:", response.message);
+        // The useApi hook handles the popup for 401, but we can handle other errors here.
+      } else {
+        setFrameData(response.data);
+        //toast.success("Student details fetched successfully:", response.data);
+      }
+    } catch (err) {
+      toast.error("An unexpected error occurred:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <AdminAuthenticatedLayout>
       <section className="p-4 md:p-10 bg-[#f8fafc] dark:bg-gray-950 min-h-screen">
         {/* Header Section */}
         <div className="mb-8">
           <h1 className="text-2xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            Class IX <span className="text-blue-600">Phase {phaseName}</span>
+            Student List Class IX{" "}
+            <span className="text-blue-600">Phase {phaseName}</span>
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg font-medium">
             {schoolName} • Academic Year {year}
@@ -155,43 +176,13 @@ function ViewProfile() {
               <SelectInput
                 {...register("status_code")}
                 onChange={(e) => handleOnChange("status_code", e.target.value)}
-                className="w-full rounded-2xl border-slate-200 focus:ring-4 focus:ring-blue-100 transition-all dark:bg-gray-800 dark:border-gray-700"
+                className="w-full border-slate-200 transition-all dark:bg-gray-800 dark:border-gray-700"
               >
                 <option value="1">Pending</option>
                 <option value="2">Verified</option>
                 <option value="3">Finalized</option>
                 <option value="4">Approved</option>
                 <option value="5">Rejected</option>
-              </SelectInput>
-            </div>
-
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
-                <HiOutlineCalendar className="text-blue-500" /> Academic Year
-              </label>
-              <SelectInput
-                {...register("year")}
-                className="w-full rounded-2xl border-slate-200 focus:ring-4 focus:ring-blue-100 transition-all dark:bg-gray-800 dark:border-gray-700"
-              >
-                <option value={year}>{year}</option>
-              </SelectInput>
-            </div>
-
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
-                <HiOutlineAdjustmentsHorizontal className="text-blue-500" />{" "}
-                Sort Order
-              </label>
-              <SelectInput
-                {...register("sortField")}
-                onChange={(e) => handleOnChange("sortField", e.target.value)}
-                className="w-full rounded-2xl border-slate-200 focus:ring-4 focus:ring-blue-100 transition-all dark:bg-gray-800 dark:border-gray-700"
-              >
-                <option value="(applicant_section, applicant_roll_no)">
-                  Section & Roll
-                </option>
-                <option value="applicant_id">Applicant ID</option>
-                <option value="applicant_name">Student Name</option>
               </SelectInput>
             </div>
           </form>
@@ -205,6 +196,7 @@ function ViewProfile() {
             editApplicantDetails={editApplicantDetails}
             handleReject={handleReject}
             viewRejectedCause={viewRejectedCause}
+            uploadDistributionDetails={uploadDistributionDetails}
           />
         </div>
 

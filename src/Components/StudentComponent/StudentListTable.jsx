@@ -14,6 +14,7 @@ const StudentListTable = ({
   editApplicantDetails,
   handleReject,
   viewRejectedCause,
+  uploadDistributionDetails,
 }) => {
   // --- Helpers for Status and Source ---
   const getStatusBadge = (status) => {
@@ -49,15 +50,15 @@ const StudentListTable = ({
     );
   };
 
-  const getSourceTag = (source) => (
+  const getSourceTag = (sourceStatus, source) => (
     <div className="flex items-center gap-1.5 text-[11px] font-medium text-gray-500 uppercase tracking-wider">
-      {source == 2 ? (
+      {sourceStatus == 2 ? (
         <>
-          <HiCloudArrowDown className="text-blue-500 text-sm" /> Imported
+          <HiPlusCircle className="text-teal-500 text-sm" /> {source}
         </>
       ) : (
         <>
-          <HiPlusCircle className="text-teal-500 text-sm" /> New Entry
+          <HiCloudArrowDown className="text-blue-500 text-sm" /> {source}
         </>
       )}
     </div>
@@ -123,6 +124,7 @@ const StudentListTable = ({
     {
       name: "Sec / Roll",
       width: "120px",
+      sortable: true,
       center: true,
       cell: (row) => (
         <div className="flex flex-col items-center border-x lg:border-none border-gray-100 dark:border-gray-800 px-4">
@@ -140,7 +142,7 @@ const StudentListTable = ({
       cell: (row) => (
         <div className="space-y-1.5 flex flex-col items-center">
           {getStatusBadge(row.status)}
-          {getSourceTag(row.source)}
+          {getSourceTag(row.source_status, row.source)}
         </div>
       ),
     },
@@ -160,6 +162,7 @@ const StudentListTable = ({
               editApplicantDetails,
               handleReject,
               viewRejectedCause,
+              uploadDistributionDetails,
             }}
           />
         </div>
@@ -172,6 +175,7 @@ const StudentListTable = ({
     table: {
       style: {
         backgroundColor: "transparent",
+        overflow: "visible !important",
       },
     },
     headRow: {
@@ -197,6 +201,7 @@ const StudentListTable = ({
     rows: {
       style: {
         minHeight: "80px",
+        overflow: "visible !important",
         "&:not(:last-child)": {
           borderBottomStyle: "solid",
           borderBottomWidth: "1px",
@@ -211,7 +216,8 @@ const StudentListTable = ({
     cells: {
       style: {
         justifyContent: "center",
-        paddingLeft: "8px", // Reduced padding to allow buttons more room
+        overflow: "visible !important",
+        paddingLeft: "8px",
         paddingRight: "8px",
       },
     },

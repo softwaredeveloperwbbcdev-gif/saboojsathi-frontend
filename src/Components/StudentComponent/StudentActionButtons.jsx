@@ -1,4 +1,5 @@
-import React from "react";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   HiEye,
   HiPencilSquare,
@@ -6,15 +7,47 @@ import {
   HiXCircle,
   HiExclamationTriangle,
   HiEllipsisVertical,
+  HiArrowUpTray,
 } from "react-icons/hi2";
 
 const StudentActionButtons = ({ applicantId, status, id, handlers }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+
+  const buttonRef = useRef(null);
+  const dropdownRef = useRef(null);
+
+  const toggleDropdown = () => {
+    const rect = buttonRef.current.getBoundingClientRect();
+    setDropdownPosition({
+      top: rect.bottom + 8,
+      left: rect.right - 208,
+    });
+    setIsOpen((prev) => !prev);
+  };
+
   const {
     viewApplicantDetails,
     editApplicantDetails,
     handleReject,
     viewRejectedCause,
+    uploadDistributionDetails,
   } = handlers;
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        !buttonRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const getBtnClass = (color) => `
     p-2 rounded-xl transition-all duration-200 active:scale-90 group relative
@@ -65,11 +98,18 @@ const StudentActionButtons = ({ applicantId, status, id, handlers }) => {
       color: "warning",
       onClick: viewRejectedCause,
     },
+    {
+      label: "Upload Distribution Details",
+      icon: HiArrowUpTray,
+      show: status == 4, // APPROVED ONLY
+      color: "emerald",
+      onClick: () => uploadDistributionDetails(applicantId),
+    },
   ];
 
   return (
-    <div className="flex items-center justify-center">
-      {/* DESKTOP VIEW: Visible only above 1280px (xl) */}
+    <>
+      {/* DESKTOP VIEW */}
       <div className="hidden xl:flex items-center gap-1.5">
         {actions.map(
           (action, idx) =>
@@ -81,49 +121,54 @@ const StudentActionButtons = ({ applicantId, status, id, handlers }) => {
                 title={action.label}
               >
                 <action.icon className="text-xl" />
-                <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 shadow-xl">
-                  {action.label}
-                </span>
               </button>
             )
         )}
       </div>
+      {/* Button */}
+      <button
+        ref={buttonRef}
+        onClick={toggleDropdown}
+        className="xl:hidden p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+      >
+        <HiEllipsisVertical className="text-2xl text-gray-600 dark:text-gray-400" />
+      </button>
 
-      {/* COLLAPSED VIEW: Visible below 1280px (xl) */}
-      <div className="xl:hidden relative group">
-        <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none">
-          <HiEllipsisVertical className="text-2xl text-gray-600 dark:text-gray-400" />
-        </button>
+      {/* Portal Dropdown */}
+      {isOpen &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            className="fixed z-[9999] w-52 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border py-2"
+            style={{
+              top: dropdownPosition.top,
+              left: dropdownPosition.left,
+            }}
+          >
+            <div className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase border-b mb-1">
+              Actions
+            </div>
 
-        {/* High Z-Index Dropdown */}
-        <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 py-2 z-[110] invisible group-focus-within:visible opacity-0 group-focus-within:opacity-100 transition-all transform scale-95 group-focus-within:scale-100 origin-top-right">
-          <div className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50 dark:border-gray-800 mb-1">
-            Actions
-          </div>
-          {actions.map(
-            (action, idx) =>
-              action.show && (
-                <button
-                  key={idx}
-                  onClick={action.onClick}
-                  className="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
-                >
-                  <action.icon
-                    className={`text-lg ${
-                      action.color === "red"
-                        ? "text-red-500"
-                        : action.color === "blue"
-                        ? "text-blue-500"
-                        : "text-sky-500"
-                    }`}
-                  />
-                  <span className="font-medium">{action.label}</span>
-                </button>
-              )
-          )}
-        </div>
-      </div>
-    </div>
+            {actions.map(
+              (action, idx) =>
+                action.show && (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      action.onClick();
+                      setIsOpen(false);
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
+                    <action.icon className="text-lg text-sky-500" />
+                    {action.label}
+                  </button>
+                )
+            )}
+          </div>,
+          document.body
+        )}
+    </>
   );
 };
 
