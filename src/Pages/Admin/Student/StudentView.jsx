@@ -1,8 +1,4 @@
-import { FaUser } from "react-icons/fa";
-
 function StudentView({ student, closeHandler }) {
-  console.log(student);
-
   const UserIcon = () => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
