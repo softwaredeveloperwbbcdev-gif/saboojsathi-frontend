@@ -14,6 +14,8 @@ import Modal from "../../../Components/Modal";
 import RejectModal from "../../../Components/RejectModal";
 import StudentView from "../../../Components/StudentComponent/StudentView";
 import StudentListTable from "../../../Components/StudentComponent/StudentListTable";
+import DistributionModal from "../../../Components/DistributionModal";
+
 import {
   phaseYearId,
   defaultPhaseYear,
@@ -32,8 +34,10 @@ function ViewProfile() {
   const [finializeBtn, setFinializeBtn] = useState(false);
   const [applicantId, setApplicantId] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpenUpdate, setIsModalOpenUpdate] = useState(false);
   const [isModalOpenView, setIsModalOpenView] = useState(false);
   const [studentData, setStudentData] = useState([]);
+  const [frameData, setFrameData] = useState({});
 
   const user = JSON.parse(atob(localStorage.getItem("user")));
   const { phase, year, phaseName } = phaseDetails;
@@ -74,7 +78,7 @@ function ViewProfile() {
   const finilize_student = async () => {
     if (
       window.confirm(
-        "Are you sure you want to finalize all verified students? This action cannot be undone."
+        "Are you sure you want to finalize all verified students? This action cannot be undone.",
       )
     ) {
       setLoading(true);
@@ -130,7 +134,7 @@ function ViewProfile() {
       // Use the callApi function for the GET request
       const response = await callApi(
         "GET",
-        `studentFrameView/${phaseId}/${btoa(id)}`
+        `studentFrameView/${phaseId}/${btoa(id)}`,
       );
 
       if (response.error) {
@@ -146,6 +150,59 @@ function ViewProfile() {
       setLoading(false);
     }
   };
+
+  const frameUpdate = async (frameData) => {
+    setLoading(true);
+    console.log(frameData);
+    const updatedFrameData = {
+      ...frameData,
+      phaseId: phaseId,
+      id: frameData.applicant_id,
+    };
+
+    try {
+      const response = await callApi(
+        "POST",
+        "studentFrameUpdate",
+        updatedFrameData,
+      );
+
+      if (response.error) {
+        if (response.message === "Validation Errors") {
+          return { validationErrors: response.errors };
+        } else if (
+          response.message ===
+          "Duplicate frame number and brand already assigned to another applicant."
+        ) {
+          toast.error(response.message);
+        } else {
+          toast.error("Failed to update frame:", response);
+        }
+      } else {
+        toast.success("Distribution Details Uploaded", response);
+        handleCloseModalUpdate();
+        getStudentsDistributionView();
+      }
+    } catch (err) {
+      console.error("An unexpected error occurred:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenModalUpdate = () => {
+    setIsModalOpenUpdate(true);
+  };
+
+  const handleCloseModalUpdate = () => {
+    setIsModalOpenUpdate(false);
+  };
+
+  useEffect(() => {
+    if (frameData && Object.keys(frameData).length > 0) {
+      handleOpenModalUpdate();
+    }
+  }, [frameData]);
 
   return (
     <AdminAuthenticatedLayout>
@@ -243,6 +300,19 @@ function ViewProfile() {
         <StudentView
           student={studentData}
           closeHandler={handleCloseModalView}
+        />
+      </Modal>
+
+      <Modal
+        show={isModalOpenUpdate}
+        onClose={handleCloseModalUpdate}
+        maxWidth="md"
+        closeable={true}
+      >
+        <DistributionModal
+          modaldata={frameData}
+          frameupdate={frameUpdate}
+          onClose={handleCloseModalUpdate}
         />
       </Modal>
 
