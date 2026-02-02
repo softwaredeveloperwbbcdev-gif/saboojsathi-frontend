@@ -1,4 +1,3 @@
-import React from "react";
 import DataTable from "react-data-table-component";
 import {
   HiOutlineUser,
@@ -15,31 +14,40 @@ const StudentListTable = ({
   handleReject,
   viewRejectedCause,
   uploadDistributionDetails,
+  isDarkMode, // Pass this prop from the parent or call useDarkMode() here
 }) => {
   // --- Helpers for Status and Source ---
   const getStatusBadge = (status) => {
     const statusMap = {
       1: {
         text: "Pending",
-        class: "bg-amber-100 text-amber-700 border-amber-200",
+        class:
+          "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800",
       },
       2: {
         text: "Verified",
-        class: "bg-blue-100 text-blue-700 border-blue-200",
+        class:
+          "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800",
       },
       3: {
         text: "Finalized",
-        class: "bg-indigo-100 text-indigo-700 border-indigo-200",
+        class:
+          "bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800",
       },
       4: {
         text: "Approved",
-        class: "bg-emerald-100 text-emerald-700 border-emerald-200",
+        class:
+          "bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800",
       },
-      5: { text: "Rejected", class: "bg-red-100 text-red-700 border-red-200" },
+      5: {
+        text: "Rejected",
+        class:
+          "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800",
+      },
     };
     const config = statusMap[status] || {
       text: "Unknown",
-      class: "bg-gray-100 text-gray-600",
+      class: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
     };
     return (
       <span
@@ -50,8 +58,88 @@ const StudentListTable = ({
     );
   };
 
+  const NoDataMessage = ({ isDarkMode }) => {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "3rem 1rem",
+          textAlign: "center",
+          backgroundColor: isDarkMode ? "#111827" : "#F9FAFB",
+          color: isDarkMode ? "#D1D5DB" : "#6B7280",
+          borderTopLeftRadius: "0.5rem",
+          borderTopRightRadius: "0.5rem",
+          borderBottomLeftRadius: "0",
+          borderBottomRightRadius: "0",
+          border: `1px dashed ${isDarkMode ? "#374151" : "#D1D5DB"}`,
+          transition: "all 0.3s ease-in-out",
+          width: "100%",
+          minHeight: "180px",
+          boxSizing: "border-box",
+        }}
+      >
+        {/* Icon with subtle animation */}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          strokeWidth={1.4}
+          stroke={isDarkMode ? "#9CA3AF" : "#6B7280"}
+          fill="none"
+          style={{
+            width: "44px", // smaller size
+            height: "44px",
+            marginBottom: "1rem",
+            opacity: 0.85,
+            transform: "translateY(0)",
+            transition: "transform 0.3s ease, opacity 0.3s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-4px)";
+            e.currentTarget.style.opacity = "1";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.opacity = "0.85";
+          }}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 8v4m0 4h.01M21 12A9 9 0 1 1 3 12a9 9 0 0 1 18 0z"
+          />
+        </svg>
+
+        <h2
+          style={{
+            fontSize: "1rem",
+            fontWeight: "600",
+            marginBottom: "0.4rem",
+            color: isDarkMode ? "#E5E7EB" : "#374151",
+          }}
+        >
+          No Data Available
+        </h2>
+
+        <p
+          style={{
+            fontSize: "0.875rem",
+            color: isDarkMode ? "#9CA3AF" : "#6B7280",
+            maxWidth: "320px",
+            lineHeight: 1.5,
+          }}
+        >
+          There are currently no records to display. Try adjusting filters or
+          adding new entries.
+        </p>
+      </div>
+    );
+  };
+
   const getSourceTag = (sourceStatus, source) => (
-    <div className="flex items-center gap-1.5 text-[11px] font-medium text-gray-500 uppercase tracking-wider">
+    <div className="flex items-center gap-1.5 text-[11px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
       {sourceStatus == 2 ? (
         <>
           <HiPlusCircle className="text-teal-500 text-sm" /> {source}
@@ -71,7 +159,9 @@ const StudentListTable = ({
       width: "80px",
       center: true,
       cell: (row, index) => (
-        <div className="font-semibold text-gray-500">{index + 1}</div>
+        <div className="font-semibold text-gray-500 dark:text-gray-400">
+          {index + 1}
+        </div>
       ),
     },
     {
@@ -82,7 +172,7 @@ const StudentListTable = ({
       center: true,
       cell: (row) => (
         <div className="py-3 text-center">
-          <div className="text-[14px] font-mono font-bold text-gray-400 uppercase tracking-tighter">
+          <div className="text-[14px] font-mono font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tighter">
             #{row.id}
           </div>
           <div className="font-bold text-gray-900 dark:text-white text-sm">
@@ -170,8 +260,8 @@ const StudentListTable = ({
     },
   ];
 
-  // --- Modern Custom Styles ---
-  const customStyles = {
+  // --- Dynamic Dark Mode Custom Styles ---
+  const getCustomStyles = (isDark) => ({
     table: {
       style: {
         backgroundColor: "transparent",
@@ -180,36 +270,38 @@ const StudentListTable = ({
     },
     headRow: {
       style: {
-        backgroundColor: "#f8fafc",
+        backgroundColor: isDark ? "#1e293b" : "#f8fafc",
         borderTopWidth: "1px",
-        borderColor: "#e2e8f0",
+        borderColor: isDark ? "#334155" : "#e2e8f0",
         minHeight: "56px",
       },
     },
     headCells: {
       style: {
-        color: "#1e293b",
+        color: isDark ? "#cbd5e1" : "#1e293b",
         fontSize: "12px",
         fontWeight: "800",
         textTransform: "uppercase",
         justifyContent: "center",
-        textAlign: "center",
-        paddingLeft: "8px",
-        paddingRight: "8px",
       },
     },
     rows: {
       style: {
         minHeight: "80px",
+        backgroundColor: isDark ? "#0f172a" : "#ffffff", // slate-900 : white
+        color: isDark ? "#94a3b8" : "#475569",
         overflow: "visible !important",
+        borderRadius: "0px !important", // ✅ Force edges to be square
         "&:not(:last-child)": {
           borderBottomStyle: "solid",
           borderBottomWidth: "1px",
-          borderBottomColor: "#f1f5f9",
+          borderBottomColor: isDark ? "#1e293b" : "#f1f5f9",
+          borderRadius: "0px !important",
         },
         "&:hover": {
-          backgroundColor: "#f8fafc",
+          backgroundColor: isDark ? "#1e293b" : "#f8fafc",
           transition: "all 0.2s",
+          borderRadius: "0px !important", // ✅ Ensure hover state is also square
         },
       },
     },
@@ -223,27 +315,37 @@ const StudentListTable = ({
     },
     pagination: {
       style: {
-        borderTop: "1px solid #e2e8f0",
-        borderRadius: "0 0 1.5rem 1.5rem",
+        backgroundColor: isDark ? "#0f172a" : "#ffffff",
+        color: isDark ? "#cbd5e1" : "#1e293b",
+        borderTop: `1px solid ${isDark ? "#1e293b" : "#e2e8f0"}`,
+        // ✅ Apply the rounding here to the very bottom element
+        borderBottomLeftRadius: "1.5rem",
+        borderBottomRightRadius: "1.5rem",
+      },
+      pageButtonsStyle: {
+        fill: isDark ? "#cbd5e1" : "#1e293b",
+        "&:hover:not(:disabled)": {
+          backgroundColor: isDark ? "#334155" : "#f1f5f9",
+        },
       },
     },
-  };
+  });
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-[1.5rem] shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-800 overflow-hidden">
+    <div className="bg-white dark:bg-gray-950 rounded-[1.5rem] shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-800">
       <DataTable
         columns={columns}
         data={students}
         pagination
-        highlightOnHover
-        customStyles={customStyles}
+        customStyles={getCustomStyles(isDarkMode)}
         responsive
         noHeader
         progressComponent={
-          <div className="p-10 text-teal-600 animate-pulse font-bold">
+          <div className="p-10 text-teal-600 animate-pulse font-bold bg-white dark:bg-gray-900 w-full text-center">
             Loading Students...
           </div>
         }
+        noDataComponent={<NoDataMessage isDarkMode={isDarkMode} />}
       />
     </div>
   );

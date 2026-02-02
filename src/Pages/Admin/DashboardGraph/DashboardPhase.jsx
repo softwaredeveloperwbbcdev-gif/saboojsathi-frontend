@@ -25,6 +25,8 @@ import {
 } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom"; // Assuming you use react-router
 
+import { useStudentDownload } from "../School/SchoolAction";
+
 // Register chart components
 ChartJS.register(
   ArcElement,
@@ -32,12 +34,14 @@ ChartJS.register(
   Legend,
   CategoryScale,
   LinearScale,
-  BarElement
+  BarElement,
 );
 
 const DashboardPhase = ({ graphData }) => {
   const [showData, setShowData] = useState([]);
   const navigate = useNavigate();
+
+  const { downloadExcel, isDownloading } = useStudentDownload();
 
   useEffect(() => {
     if (graphData) {
@@ -170,7 +174,7 @@ const DashboardPhase = ({ graphData }) => {
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols- gap-4">
           <ActionCard
             title="Add Student"
             subText="Registration"
@@ -185,12 +189,19 @@ const DashboardPhase = ({ graphData }) => {
             colorClass="bg-indigo-500"
             onClick={() => navigate(`/StudentProfile/${btoa(14)}`)}
           />
-          <ActionCard
+          {/* <ActionCard
             title="Excel Export"
             subText="Student Data"
             icon={HiDocumentArrowDown}
             colorClass="bg-emerald-500"
             onClick={() => navigate(`/StudentProfileDownload/${btoa(14)}`)}
+          /> */}
+          <ActionCard
+            title="Excel Export"
+            subText={isDownloading ? "Downloading..." : "Student Data"}
+            icon={HiDocumentArrowDown}
+            colorClass="bg-emerald-500"
+            onClick={() => downloadExcel(btoa(14))}
           />
           <ActionCard
             title="Muster Roll"
@@ -199,13 +210,13 @@ const DashboardPhase = ({ graphData }) => {
             colorClass="bg-purple-500"
             onClick={() => navigate(`/DownloadDistribution/${btoa(14)}`)}
           />
-          <ActionCard
+          {/* <ActionCard
             title="Distribution"
             subText="Update Records"
             icon={HiArrowPathRoundedSquare}
             colorClass="bg-orange-500"
             onClick={() => navigate(`/UploadDistribution/${btoa(14)}`)}
-          />
+          /> */}
         </div>
       </div>
 

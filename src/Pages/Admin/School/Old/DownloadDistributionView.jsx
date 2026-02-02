@@ -1,13 +1,13 @@
-import AdminAuthenticatedLayout from "../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
+import AdminAuthenticatedLayout from "../../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
 import { useParams } from "react-router-dom";
-import useApi from "../../../Hooks/useApi";
-import LogoutPopup from "../../../Components/LogoutPopup";
+import useApi from "../../../../Hooks/useApi";
+import LogoutPopup from "../../../../Components/LogoutPopup";
 import { toast } from "react-toastify";
 import { useState } from "react";
 import {
   phaseYearId,
   defaultPhaseYear,
-} from "../../../Utils/Constants/Constants";
+} from "../../../../Utils/Constants/Constants";
 
 const DownloadDistributionView = () => {
   const { phaseId } = useParams();

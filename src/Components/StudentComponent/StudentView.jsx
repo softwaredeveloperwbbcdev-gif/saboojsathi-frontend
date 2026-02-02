@@ -1,12 +1,4 @@
-import React from "react";
-import {
-  HiUser,
-  HiMapPin,
-  HiDocumentCheck,
-  HiXMark,
-  HiIdentification,
-  HiAcademicCap,
-} from "react-icons/hi2";
+import { HiUser, HiMapPin, HiDocumentCheck, HiXMark } from "react-icons/hi2";
 
 const SectionHeader = ({ icon: Icon, title, subtitle }) => (
   <div className="flex items-center gap-4 mb-6 pb-2 border-b border-gray-100 dark:border-gray-800">
@@ -37,7 +29,7 @@ function StudentView({ student, closeHandler }) {
   if (!student) return null;
 
   return (
-    <div className="bg-[#f8fafc] dark:bg-gray-950 rounded-3xl shadow-2xl w-full max-h-[95vh] overflow-hidden flex flex-col border border-white dark:border-gray-800">
+    <div className="bg-[#f8fafc] dark:bg-gray-950 rounded-3xl shadow-2xl w-full max-h-full overflow-hidden flex flex-col border border-white dark:border-gray-800">
       {/* --- MODAL HEADER --- */}
       <div className="p-6 md:p-8 flex justify-between items-center bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
         <div>
@@ -61,7 +53,7 @@ function StudentView({ student, closeHandler }) {
       </div>
 
       {/* --- SCROLLABLE CONTENT --- */}
-      <div className="p-6 md:p-8 overflow-y-auto space-y-8 custom-scrollbar">
+      <div className="p-6 md:p-8 space-y-8 custom-scrollbar">
         {/* --- APPLICANT PROFILE CARD --- */}
         <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-gray-800">
           <SectionHeader

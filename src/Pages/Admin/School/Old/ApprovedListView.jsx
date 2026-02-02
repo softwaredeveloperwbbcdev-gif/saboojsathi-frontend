@@ -1,16 +1,16 @@
-import AdminAuthenticatedLayout from "../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
+import AdminAuthenticatedLayout from "../../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
 import { useState, useEffect } from "react";
-import Modal from "../../../Components/Modal";
-import StudentView from "../Student/StudentView";
+import Modal from "../../../../Components/Modal";
+import StudentView from "../../Student/Old/StudentView";
 import { useParams } from "react-router-dom";
-import useApi from "../../../Hooks/useApi";
-import LogoutPopup from "../../../Components/LogoutPopup";
+import useApi from "../../../../Hooks/useApi";
+import LogoutPopup from "../../../../Components/LogoutPopup";
 import { toast } from "react-toastify";
 
 import {
   phaseYearId,
   defaultPhaseYear,
-} from "../../../Utils/Constants/Constants";
+} from "../../../../Utils/Constants/Constants";
 
 const ApprovedListView = () => {
   const { phaseId } = useParams();
