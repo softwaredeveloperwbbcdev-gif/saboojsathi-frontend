@@ -1,40 +1,29 @@
-import React, { useEffect, useState, useRef } from "react";
-import AdminAuthenticatedLayout from "../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
+import { useEffect, useState } from "react";
+import AdminAuthenticatedLayout from "../../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
 import { FaUser } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { GrDocumentText } from "react-icons/gr";
-import InputLabel from "../../../Components/InputLabel";
-import InputError from "../../../Components/InputError";
-import TextInput from "../../../Components/TextInput";
-import SelectInput from "../../../Components/SelectInput";
+import InputLabel from "../../../../Components/InputLabel";
+import InputError from "../../../../Components/InputError";
+import TextInput from "../../../../Components/TextInput";
+import SelectInput from "../../../../Components/SelectInput";
 import { useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
-import MsgDisplayModal from "../../../Components/MsgDisplayModal";
-import useApi from "../../../Hooks/useApi";
-import LogoutPopup from "../../../Components/LogoutPopup";
+import { useParams } from "react-router-dom";
+import MsgDisplayModal from "../../../../Components/MsgDisplayModal";
+import useApi from "../../../../Hooks/useApi";
+import LogoutPopup from "../../../../Components/LogoutPopup";
 import { toast } from "react-toastify";
-
 import {
   phaseYearId,
   defaultPhaseYear,
-} from "../../../Utils/Constants/Constants";
+} from "../../../../Utils/Constants/Constants";
 
-const StudentEdit = () => {
-  const { id, phaseId } = useParams();
+function StudentAdd() {
+  const { phaseId } = useParams();
   const phaseDetails = phaseYearId[phaseId] || defaultPhaseYear;
 
   const { callApi, showPopup, popupMessage, handleLogout, setShowPopup } =
     useApi();
-
-  const navigate = useNavigate();
-
-  const [blockData, setBlockData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [backendErrors, setBackendErrors] = useState({}); // to show form backend error message
-  const [studentData, setStudentData] = useState([]); // data of each student for edit
-  const [successMessage, setSuccessMessage] = useState("");
-  const today = new Date().toISOString().split("T")[0];
-  const initialized = useRef(false);
 
   const [schoolMasterData, setSchoolMasterData] = useState({
     classes: [],
@@ -45,6 +34,45 @@ const StudentEdit = () => {
     categories: [],
     relationships: [],
   });
+  const [blockData, setBlockData] = useState([]);
+  const [backendErrors, setBackendErrors] = useState({}); // to show form backend error message
+  const [successMessage, setSuccessMessage] = useState("");
+  const [applicantId, setApplicantId] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const today = new Date().toISOString().split("T")[0]; // e.g., "2025-07-09"
+
+  //Feteches the data for the opening form
+  const fetchData = async () => {
+    setLoading(true);
+    const response = await callApi("GET", "studentform");
+
+    if (response.error) {
+      toast(response.message);
+    } else {
+      setSchoolMasterData(response.data);
+    }
+    setLoading(false);
+  };
+
+  //calls fetchData on page load
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchBlocks = async (districtId) => {
+    try {
+      const response = await callApi("GET", `getBlock/${btoa(districtId)}`);
+      if (response.error) {
+        toast(`Failed to fetch blocks: ${response.message}`);
+      } else {
+        setBlockData(response.data);
+      }
+    } catch (err) {
+      toast(`An unexpected error occurred: ${err}`);
+    }
+  };
+
   const {
     register, // Connects inputs to React Hook Form
     handleSubmit, // Handles form submission
@@ -53,142 +81,44 @@ const StudentEdit = () => {
     setValue,
     formState: { errors }, // Contains validation errors
   } = useForm({
+    mode: "all",
     defaultValues: {
       appl_class: "1", // 👈 preselect class with id "1"
       phaseId: phaseId,
     },
   });
-  const [showModal, setShowModal] = useState(false);
+
   const applAlreadyReceived = watch("appl_already_received");
 
-  const viewApplicantDetails = async (id, phaseId) => {
+  // The new form submit function using apiCall
+  const formSubmit = async (data) => {
     setLoading(true);
+    // Clear previous messages to avoid confusion
+    setSuccessMessage("");
+    setBackendErrors({});
+
     try {
-      const response = await callApi(
-        "GET",
-        `studentProfileEdit/${id}/${phaseId}`
-      );
+      const response = await callApi("POST", "studentregistration", data);
 
       if (response.error) {
-        console.error("Failed to fetch applicant details:", response.message);
-        toast.error(
-          `❌ Failed to fetch applicant details: ${response.message}`
-        );
-      } else {
-        // Handle successful response
-        if (response.data) {
-          setStudentData(response.data.students);
-          setSchoolMasterData({
-            classes: response.data.classes || [],
-            genders: response.data.genders || [],
-            districts: response.data.districts || [],
-            boards: response.data.boards || [],
-            religions: response.data.religions || [],
-            categories: response.data.categories || [],
-            relationships: response.data.relationships || [],
-          });
-        }
-      }
-    } catch (err) {
-      console.error("❌ An unexpected error occurred:", err);
-      toast.error("An unexpected error occurred. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchBlocks = async (district) => {
-    try {
-      const response = await callApi("GET", `getBlock/${btoa(district)}`);
-
-      if (response.error) {
-        toast.error("Failed to fetch blocks:", response.message);
-      } else {
-        // API call was successful
-        setBlockData(response.data);
-        //console.log("Blocks data received:", response.data);
-      }
-    } catch (err) {
-      toast.error("An unexpected error occurred:", err);
-    }
-  };
-
-  useEffect(() => {
-    viewApplicantDetails(id, phaseId);
-  }, [id, phaseId]);
-
-  useEffect(() => {
-    if (studentData && studentData.length > 0) {
-      fetchBlocks(studentData[0].district);
-    }
-  }, [studentData]);
-
-  useEffect(() => {
-    ///////////////////////////////////
-    if (!initialized.current && studentData?.[0] && blockData.length > 0) {
-      reset({
-        appl_name: studentData[0].name,
-        appl_g_name: studentData[0].guardian,
-        appl_class: studentData[0].class || 1,
-        appl_board_council: studentData[0].edu_board,
-        appl_g_relation: studentData[0].guardian_relation,
-        appl_cast: studentData[0].caste,
-        appl_religion: studentData[0].religion,
-        appl_sex: studentData[0].gender,
-        appl_dob: studentData[0].dob, //student.students[0].dob,
-        appl_reg_no: studentData[0].reg_no,
-        appl_sec: studentData[0].section,
-        appl_roll_no: studentData[0].roll,
-        appl_premisis_no: studentData[0].road,
-        appl_city: studentData[0].cityvil,
-        appl_po: studentData[0].po,
-        appl_pin: studentData[0].pin,
-        appl_dist: studentData[0].district,
-        appl_block: studentData[0].block,
-        appl_ps: studentData[0].ps,
-        appl_mob: studentData[0].contactno,
-        appl_already_received: studentData[0].cycle_rev,
-        appl_scheme_name: studentData[0].cycle_scheme,
-        appl_check: studentData[0].appl_check,
-      });
-
-      initialized.current = true;
-    }
-    ///////////////////////////////////
-  }, [blockData]);
-
-  useEffect(() => {
-    if (studentData?.length > 0 && blockData.length > 0) {
-      setLoading(false);
-    }
-  }, [studentData, blockData]);
-
-  const formSubmit = async (formdata) => {
-    const finalData = {
-      ...formdata,
-      id: studentData?.[0]?.id || id, // Prefer API-loaded ID if available
-      phaseId: phaseId,
-    };
-    setLoading(true); // Start loader
-    try {
-      const response = await callApi("POST", "studentupdation", finalData);
-
-      if (response.error) {
+        // ⚠️ Use a separate state for errors
         if (response.message === "Validation Errors") {
           setBackendErrors(response.errors);
         } else {
-          toast.error(`❌ Failed to update student data: ${response.message}`);
+          toast(response.message);
         }
       } else {
-        toast.success(response.message);
-        navigate(`/StudentProfile/${phaseId}`);
+        console.log("✅ Success:", response.data);
+        reset(); // Reset form
+        setSuccessMessage(response.message);
+        setApplicantId(response.data);
+        setShowModal(true);
       }
     } catch (err) {
-      // This catches unexpected exceptions not handled by the hook
       console.error("❌ Exception:", err);
-      toast.error(`An unexpected error occurred: ${err.message}`);
+      toast(`An unexpected error occurred: ${err.message}`);
     } finally {
-      setLoading(false); // Stop loader
+      setLoading(false);
     }
   };
 
@@ -198,7 +128,7 @@ const StudentEdit = () => {
         {/* Page Heading */}
         <section className="p-4 md:p-8 lg:p-12 bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-300">
           <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-8 tracking-tight">
-            Update Application Class IX Phase {phaseDetails.phaseName} for
+            Online Application Class IX Phase {phaseDetails.phaseName} for
             Academic Year {phaseDetails.year}
           </h1>
           {/* Page Heading */}
@@ -211,7 +141,6 @@ const StudentEdit = () => {
                 &nbsp;&nbsp;&nbsp;Applicant's Details
               </h2>
               {/* Applicant Details First Row */}
-
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
                 <div className="relative">
                   <TextInput
@@ -351,7 +280,7 @@ const StudentEdit = () => {
                     id="appl_g_relation"
                     {...register("appl_g_relation", {
                       required: "Relationship required",
-                    })} // just
+                    })}
                   >
                     <option value="">Guardian's Relationship</option>
                     {schoolMasterData.relationships.map((cls) => (
@@ -588,7 +517,7 @@ const StudentEdit = () => {
                       },
                       maxLength: {
                         value: 3, // example maximum length
-                        message: "Roll number cannot exceed 3 digits",
+                        message: "Roll number cannot exceed 8 digits",
                       },
                     })}
                   />
@@ -605,8 +534,6 @@ const StudentEdit = () => {
                   />
                 </div>
               </div>
-
-              {/* Applicant Details Third Row */}
               {/* Contact Details */}
               <h2 className="bg-teal-600 dark:bg-teal-400 text-white dark:text-gray-800 text-lg font-semibold px-4 py-2 mt-8 flex items-center gap-2 rounded-md">
                 <FaLocationDot />
@@ -784,14 +711,14 @@ const StudentEdit = () => {
                     })}
                   >
                     <option value="">Block</option>
-                    {!blockData.length ? (
-                      <option>Loading blocks...</option>
-                    ) : (
+                    {blockData ? (
                       blockData.map((cls) => (
                         <option key={cls.id} value={cls.id}>
                           {cls.desc}
                         </option>
                       ))
+                    ) : (
+                      <option disabled>No blocks available</option>
                     )}
                   </SelectInput>
                   <InputLabel
@@ -836,7 +763,7 @@ const StudentEdit = () => {
                   <TextInput
                     id="appl_mob"
                     type="text"
-                    maxlength="10" //
+                    maxLength="10" //
                     placeholder="Mobile No."
                     onInput={(e) => {
                       let digits = e.target.value.replace(/[^0-9]/g, "");
@@ -961,7 +888,7 @@ const StudentEdit = () => {
                   className="bg-sky-600 hover:bg-sky-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200"
                   type="submit"
                 >
-                  Update
+                  Submit
                 </button>
                 <button
                   className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200"
@@ -973,23 +900,24 @@ const StudentEdit = () => {
               </div>
             </form>
           </div>
+          {showModal && (
+            <MsgDisplayModal
+              msg={successMessage}
+              applicantId={applicantId}
+              setShowModal={setShowModal}
+              setSuccessMessage={setSuccessMessage}
+              phaseId={phaseId}
+            />
+          )}
           {loading && (
             <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
               <div className="loader border-t-4 border-blue-500 rounded-full w-10 h-10 animate-spin"></div>
             </div>
           )}
         </section>
+        {/* Main Content */}
       </AdminAuthenticatedLayout>
       {/* Modal section */}
-      {showModal && (
-        <MsgDisplayModal
-          msg={successMessage}
-          applicantId={null}
-          setShowModal={setShowModal}
-          setSuccessMessage={setSuccessMessage}
-          edit={1}
-        />
-      )}
       {showPopup && (
         <LogoutPopup
           message={popupMessage}
@@ -1002,6 +930,6 @@ const StudentEdit = () => {
       {/* Modal section */}
     </>
   );
-};
+}
 
-export default StudentEdit;
+export default StudentAdd;

@@ -97,7 +97,7 @@ function LoginForm() {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       // Handle successful login
@@ -179,7 +179,7 @@ function LoginForm() {
                 {...register("stake_cd", {
                   required: "Please select a stakeholder",
                 })}
-                className={`w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700/50 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none text-gray-700 dark:text-gray-200 appearance-none transition-all cursor-pointer ${
+                className={`w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none text-gray-700 dark:text-gray-200 appearance-none transition-all cursor-pointer ${
                   errors.stake_cd
                     ? "border-red-500"
                     : "border-gray-200 dark:border-gray-600"
@@ -193,7 +193,11 @@ function LoginForm() {
                     className="dark:bg-gray-800 font-semibold"
                   >
                     {level.user_details.map((detail) => (
-                      <option key={detail.stake_cd} value={detail.stake_cd}>
+                      <option
+                        key={detail.stake_cd}
+                        value={detail.stake_cd}
+                        className="dark:bg-gray-800 font-semibold"
+                      >
                         {detail.ref_name}
                       </option>
                     ))}

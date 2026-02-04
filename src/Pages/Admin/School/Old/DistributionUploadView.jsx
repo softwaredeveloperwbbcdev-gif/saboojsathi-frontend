@@ -1,16 +1,16 @@
-import AdminAuthenticatedLayout from "../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
-import DistributionModal from "../../../Components/DistributionModal";
-import Modal from "../../../Components/Modal";
+import AdminAuthenticatedLayout from "../../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
+import DistributionModal from "../../../../Components/DistributionModal";
+import Modal from "../../../../Components/Modal";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import useApi from "../../../Hooks/useApi";
-import LogoutPopup from "../../../Components/LogoutPopup";
+import useApi from "../../../../Hooks/useApi";
+import LogoutPopup from "../../../../Components/LogoutPopup";
 import { toast } from "react-toastify";
 
 import {
   phaseYearId,
   defaultPhaseYear,
-} from "../../../Utils/Constants/Constants";
+} from "../../../../Utils/Constants/Constants";
 
 const DistributionUploadView = () => {
   const { phaseId } = useParams();

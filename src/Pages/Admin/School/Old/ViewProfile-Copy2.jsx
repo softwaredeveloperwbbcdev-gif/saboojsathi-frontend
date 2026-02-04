@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import AdminAuthenticatedLayout from "../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
+import AdminAuthenticatedLayout from "../../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
 import { IoIosWarning } from "react-icons/io";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-import InputLabel from "../../../Components/InputLabel";
-import SelectInput from "../../../Components/SelectInput";
+import InputLabel from "../../../../Components/InputLabel";
+import SelectInput from "../../../../Components/SelectInput";
 import {
   phaseYearId,
   defaultPhaseYear,
-} from "../../../Utils/Constants/Constants";
+} from "../../../../Utils/Constants/Constants";
 
 function ViewProfile() {
   const { phaseId } = useParams();
