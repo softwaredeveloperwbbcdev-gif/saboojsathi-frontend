@@ -23,43 +23,6 @@ const DownloadDistributionView = () => {
 
   const [loading, setLoading] = useState(false); // loader
 
-  // const downloadPdf = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await callApi(
-  //       "GET",
-  //       `downloadMusterRoll/${phaseId}/${btoa(schoolId)}`
-  //     );
-
-  //     if (response.error) {
-  //       console.error("Failed to download PDF:", response.message);
-  //       toast.error(`❌ Failed to download the PDF: ${response.message}`);
-  //     } else {
-  //       const { base64, mime, filename } = response.data;
-  //       const byteCharacters = atob(base64);
-  //       const byteNumbers = new Array(byteCharacters.length);
-  //       for (let i = 0; i < byteCharacters.length; i++) {
-  //         byteNumbers[i] = byteCharacters.charCodeAt(i);
-  //       }
-  //       const byteArray = new Uint8Array(byteNumbers);
-  //       const blob = new Blob([byteArray], { type: mime });
-
-  //       const blobUrl = URL.createObjectURL(blob);
-  //       const link = document.createElement("a");
-  //       link.href = blobUrl;
-  //       link.download = filename || "muster-roll.pdf";
-  //       document.body.appendChild(link);
-  //       link.click();
-  //       document.body.removeChild(link);
-  //     }
-  //   } catch (err) {
-  //     console.error("❌ An unexpected error occurred:", err);
-  //     toast.error("An unexpected error occurred. Please try again.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const downloadPdf = async () => {
     setLoading(true);
 
@@ -70,7 +33,7 @@ const DownloadDistributionView = () => {
         null,
         {
           responseType: "blob",
-        }
+        },
       );
 
       if (response.error) {

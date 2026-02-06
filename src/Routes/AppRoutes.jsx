@@ -21,13 +21,13 @@ import LoginFormCms from "../Pages/Frontend/LoginFormCms.jsx";
 import Dashboard from "../Pages/Frontend/Dashboard.jsx";
 import StudentAdd from "../Pages/Admin/Student/StudentAdd.jsx";
 import ViewProfile from "../Pages/Admin/School/ViewProfile.jsx";
-import DownloadDistributionView from "../Pages/Admin/School/DownloadDistributionView.jsx";
-import DistributionUploadView from "../Pages/Admin/School/DistributionUploadView.jsx";
+//import DownloadDistributionView from "../Pages/Admin/School/DownloadDistributionView.jsx";
+//import DistributionUploadView from "../Pages/Admin/School/DistributionUploadView.jsx";
 import StudentEdit from "../Pages/Admin/Student/StudentEdit.jsx";
-import ApprovedListView from "../Pages/Admin/School/ApprovedListView.jsx";
+//import ApprovedListView from "../Pages/Admin/School/ApprovedListView.jsx";
 import ViewPending from "../Pages/Admin/Circle/ViewPending.jsx";
 import ViewStudent from "../Pages/Admin/Circle/ViewStudent.jsx";
-import StudentProfileDownloadExcelView from "../Pages/Admin/School/StudentProfileDownloadExcelView.jsx";
+//import StudentProfileDownloadExcelView from "../Pages/Admin/School/StudentProfileDownloadExcelView.jsx";
 import DistributionUploadViewDistrict from "../Pages/Admin/District/DownloadDistributionViewDistrict.jsx";
 import DistributionLocationProcess from "../Pages/Admin/Block/DistributionLocationProcess.jsx";
 import DistributionTagSchool from "../Pages/Admin/Block/DistributionTagSchool.jsx";
@@ -168,14 +168,14 @@ const AppRoutes = () => {
           </AuthGuard>
         }
       />
-      <Route
+      {/* <Route
         path="/StudentProfileDownload/:phaseId"
         element={
           <AuthGuard>
             <StudentProfileDownloadExcelView />
           </AuthGuard>
         }
-      />
+      /> 
       <Route
         path="/DownloadDistribution/:phaseId"
         element={
@@ -199,7 +199,7 @@ const AppRoutes = () => {
             <DistributionUploadView />
           </AuthGuard>
         }
-      />
+      />*/}
       <Route
         path="/CircleVerifyListSchool/:phaseId"
         element={

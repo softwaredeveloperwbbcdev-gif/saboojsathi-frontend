@@ -2,7 +2,7 @@ import AdminAuthenticatedLayout from "../../../Layouts/AdminLayout/AdminAuthenti
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Modal from "../../../Components/Modal";
-import StudentView from "../Student/StudentView";
+import StudentView from "../../../Components/StudentComponent/StudentView";
 import { useNavigate } from "react-router-dom";
 import useApi from "../../../Hooks/useApi";
 import LogoutPopup from "../../../Components/LogoutPopup";
@@ -39,7 +39,7 @@ const ViewStudent = () => {
       // Use the callApi hook to make the GET request
       const response = await callApi(
         "GET",
-        `getSchoolVerifyApplicantList/${phaseId}/${schoolId}/${status}`
+        `getSchoolVerifyApplicantList/${phaseId}/${schoolId}/${status}`,
       );
 
       const res = response.data;
@@ -78,7 +78,7 @@ const ViewStudent = () => {
       setSelectedIds((prev) => [...prev, id]);
     } else {
       setSelectedIds((prev) =>
-        prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+        prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
       );
     }
     console.log(selectedIds);
@@ -89,7 +89,7 @@ const ViewStudent = () => {
     try {
       const response = await callApi(
         "GET",
-        `studentProfile/${btoa(id)}/${phaseId}`
+        `studentProfile/${btoa(id)}/${phaseId}`,
       );
       const res = response;
       if (res.error) {
@@ -140,7 +140,7 @@ const ViewStudent = () => {
         toast.success(
           `Application's successfully ${
             event == "approve" ? "approved" : "rejected"
-          }`
+          }`,
         );
         if (user.stake_cd == "0601") {
           navigate(`/CircleVerifyListSchool/${phaseId}`);
@@ -152,7 +152,7 @@ const ViewStudent = () => {
         toast.error(
           `Application's failed to be ${
             event == "approve" ? "approved" : "rejected"
-          } `
+          } `,
         );
       }
     } catch (err) {
@@ -255,8 +255,8 @@ const ViewStudent = () => {
                       {student.status == 2 && student.active_status != "R"
                         ? "Finalized"
                         : student.status == 3 && student.active_status != "R"
-                        ? "Approved"
-                        : "Rejected"}
+                          ? "Approved"
+                          : "Rejected"}
                     </td>
                     <td className="p-4">
                       {typeIs != "Rejected" && (

@@ -55,10 +55,10 @@ const StudentActionButtons = ({ applicantId, status, id, handlers }) => {
       color === "blue"
         ? "bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white"
         : color === "sky"
-        ? "bg-sky-50 text-sky-600 hover:bg-sky-600 hover:text-white"
-        : color === "red"
-        ? "bg-red-50 text-red-600 hover:bg-red-600 hover:text-white"
-        : "bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white"
+          ? "bg-sky-50 text-sky-600 hover:bg-sky-600 hover:text-white"
+          : color === "red"
+            ? "bg-red-50 text-red-600 hover:bg-red-600 hover:text-white"
+            : "bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white"
     }
   `;
 
@@ -96,7 +96,7 @@ const StudentActionButtons = ({ applicantId, status, id, handlers }) => {
       icon: HiExclamationTriangle,
       show: status == 5,
       color: "warning",
-      onClick: viewRejectedCause,
+      onClick: () => viewRejectedCause(applicantId),
     },
     {
       label: "Upload Distribution Details",
@@ -122,7 +122,7 @@ const StudentActionButtons = ({ applicantId, status, id, handlers }) => {
               >
                 <action.icon className="text-xl" />
               </button>
-            )
+            ),
         )}
       </div>
       {/* Button */}
@@ -163,10 +163,10 @@ const StudentActionButtons = ({ applicantId, status, id, handlers }) => {
                     <action.icon className="text-lg text-sky-500" />
                     {action.label}
                   </button>
-                )
+                ),
             )}
           </div>,
-          document.body
+          document.body,
         )}
     </>
   );
