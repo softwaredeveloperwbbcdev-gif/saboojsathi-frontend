@@ -37,17 +37,21 @@ ChartJS.register(
   BarElement,
 );
 
-const DashboardPhase = ({ graphData }) => {
+const DashboardPhase = ({ graphData, setLoading }) => {
   const [showData, setShowData] = useState([]);
   const navigate = useNavigate();
 
-  const { downloadExcel, isDownloading } = useStudentDownload();
+  const { downloadPdf, downloadExcel, isDownloading } = useStudentDownload();
 
   useEffect(() => {
     if (graphData) {
       setShowData(graphData);
     }
   }, [graphData]);
+
+  useEffect(() => {
+    setLoading(isDownloading);
+  }, [isDownloading]);
 
   const profileStats = {
     application: showData.general?.[0]?.application || 0,
@@ -189,16 +193,9 @@ const DashboardPhase = ({ graphData }) => {
             colorClass="bg-indigo-500"
             onClick={() => navigate(`/StudentProfile/${btoa(14)}`)}
           />
-          {/* <ActionCard
-            title="Excel Export"
-            subText="Student Data"
-            icon={HiDocumentArrowDown}
-            colorClass="bg-emerald-500"
-            onClick={() => navigate(`/StudentProfileDownload/${btoa(14)}`)}
-          /> */}
           <ActionCard
             title="Excel Export"
-            subText={isDownloading ? "Downloading..." : "Student Data"}
+            subText="Student Data"
             icon={HiDocumentArrowDown}
             colorClass="bg-emerald-500"
             onClick={() => downloadExcel(btoa(14))}
@@ -208,15 +205,8 @@ const DashboardPhase = ({ graphData }) => {
             subText="PDF Report"
             icon={HiClipboardDocumentList}
             colorClass="bg-purple-500"
-            onClick={() => navigate(`/DownloadDistribution/${btoa(14)}`)}
+            onClick={() => downloadPdf(btoa(14))}
           />
-          {/* <ActionCard
-            title="Distribution"
-            subText="Update Records"
-            icon={HiArrowPathRoundedSquare}
-            colorClass="bg-orange-500"
-            onClick={() => navigate(`/UploadDistribution/${btoa(14)}`)}
-          /> */}
         </div>
       </div>
 

@@ -38,5 +38,45 @@ export const useStudentDownload = () => {
     }
   };
 
-  return { downloadExcel, isDownloading };
+  // Added PDF Download Function
+  const downloadPdf = async (phaseId, schoolId) => {
+    setIsDownloading(true);
+    try {
+      const response = await callApi(
+        "GET",
+        `downloadMusterRoll/${phaseId}/${btoa(schoolId)}`,
+        null,
+        {
+          responseType: "blob",
+        },
+      );
+
+      if (response.error) {
+        toast.error(`Download failed: ${response.message || "Server error"}`);
+      } else {
+        // Create the Blob specifically as a PDF
+        const blob = new Blob([response.data], {
+          type: "application/pdf",
+        });
+
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `MasterRoll_${schoolId}.pdf`;
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+        toast.success("PDF download started successfully");
+      }
+    } catch (err) {
+      console.error("❌ PDF download failed:", err);
+      toast.error("Unexpected PDF download error.");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  return { downloadExcel, downloadPdf, isDownloading };
 };

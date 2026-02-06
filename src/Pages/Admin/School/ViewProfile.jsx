@@ -11,10 +11,11 @@ import SelectInput from "../../../Components/SelectInput";
 import useApi from "../../../Hooks/useApi";
 import LogoutPopup from "../../../Components/LogoutPopup";
 import Modal from "../../../Components/Modal";
-import RejectModal from "../../../Components/RejectModal";
+import RejectModal from "../../../Components/StudentComponent/RejectModal";
 import StudentView from "../../../Components/StudentComponent/StudentView";
 import StudentListTable from "../../../Components/StudentComponent/StudentListTable";
-import DistributionModal from "../../../Components/DistributionModal";
+import DistributionModal from "../../../Components/StudentComponent/DistributionModal";
+import RejectedCauseModal from "../../../Components/StudentComponent/RejectedCauseModal";
 
 import {
   phaseYearId,
@@ -53,6 +54,9 @@ function ViewProfile() {
   const [isModalOpenView, setIsModalOpenView] = useState(false);
   const [studentData, setStudentData] = useState([]);
   const [frameData, setFrameData] = useState({});
+  const [currentStatus, setCurrentStatus] = useState("");
+  const [isModalOpenCause, setIsModalOpenCause] = useState(false);
+  const [rejectedCauseData, setRejectedCauseData] = useState(null);
 
   const user = JSON.parse(atob(localStorage.getItem("user")));
   const { phase, year, phaseName } = phaseDetails;
@@ -63,7 +67,7 @@ function ViewProfile() {
 
   const { register, handleSubmit, setValue } = useForm({
     defaultValues: {
-      status_code: "1",
+      status_code: localStorage.getItem("student_filter_status") || "",
       year: year,
       sortField: "(applicant_section, applicant_roll_no)",
     },
@@ -86,6 +90,9 @@ function ViewProfile() {
   }, []);
 
   const handleOnChange = (name, value) => {
+    if (name === "status_code") {
+      setCurrentStatus(value); // Save to storage
+    }
     setValue(name, value, { shouldDirty: true, shouldValidate: true });
     handleSubmit(onSubmit)();
   };
@@ -130,8 +137,10 @@ function ViewProfile() {
     }
   };
 
-  const editApplicantDetails = (appId) =>
+  const editApplicantDetails = (appId) => {
+    localStorage.setItem("student_filter_status", currentStatus);
     navigate(`/StudentEdit/${btoa(appId)}/${phaseId}`);
+  };
   const handleReject = (id) => {
     setApplicantId(id);
     setIsModalOpen(true);
@@ -141,7 +150,6 @@ function ViewProfile() {
     setStudentData([]);
     setIsModalOpenView(false);
   };
-  const viewRejectedCause = (id) => console.log("Rejection cause for:", id);
 
   const uploadDistributionDetails = async (id) => {
     setLoading(true);
@@ -219,6 +227,30 @@ function ViewProfile() {
     }
   }, [frameData]);
 
+  const viewRejectedCause = async (appId) => {
+    setLoading(true);
+    try {
+      // Assuming endpoint: getRejectedCause/{appId}/{phaseId}
+      const res = await callApi("POST", `studentRejectedDetails`, {
+        phaseId: phaseId,
+        applicantId: btoa(appId),
+      });
+      if (!res.error) {
+        setRejectedCauseData(res.data.details);
+        setIsModalOpenCause(true);
+      } else {
+        toast.error("Could not fetch rejection reason");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseModalCause = () => {
+    setIsModalOpenCause(false);
+    setRejectedCauseData(null);
+  };
+
   return (
     <AdminAuthenticatedLayout>
       <section className="p-4 md:p-10 bg-[#f8fafc] dark:bg-gray-950 min-h-screen">
@@ -250,6 +282,7 @@ function ViewProfile() {
                 onChange={(e) => handleOnChange("status_code", e.target.value)}
                 className="w-full border-slate-200 transition-all dark:bg-gray-800 dark:border-gray-700"
               >
+                <option value="">All</option>
                 <option value="1">Pending</option>
                 <option value="2">Verified</option>
                 <option value="3">Finalized</option>
@@ -329,6 +362,17 @@ function ViewProfile() {
           modaldata={frameData}
           frameupdate={frameUpdate}
           onClose={handleCloseModalUpdate}
+        />
+      </Modal>
+
+      <Modal
+        show={isModalOpenCause}
+        onClose={handleCloseModalCause}
+        maxWidth="md"
+      >
+        <RejectedCauseModal
+          causeData={rejectedCauseData}
+          onClose={handleCloseModalCause}
         />
       </Modal>
 
