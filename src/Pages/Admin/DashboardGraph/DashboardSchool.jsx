@@ -37,7 +37,7 @@ ChartJS.register(
   BarElement,
 );
 
-const DashboardPhase = ({ graphData, setLoading }) => {
+const DashboardSchool = ({ graphData, setLoading }) => {
   const [showData, setShowData] = useState([]);
   const navigate = useNavigate();
 
@@ -340,4 +340,4 @@ const DashboardPhase = ({ graphData, setLoading }) => {
   );
 };
 
-export default DashboardPhase;
+export default DashboardSchool;
