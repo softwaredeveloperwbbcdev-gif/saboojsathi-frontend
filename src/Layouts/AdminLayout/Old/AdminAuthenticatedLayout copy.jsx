@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useIdleTimer } from "react-idle-timer";
 import { useContext } from "react";
 import { TokenContext } from "../../ContextProvider/TokenContext";
-import AdminSidebar from "./AdminSidebarCopy";
+import AdminHeader from "./AdminHeader";
+import AdminSidebar from "./AdminSidebar";
 import AdminFooter from "./AdminFooter";
 import { getSchoolSideMenu } from "./SideMenus/SchoolSideMenu";
 import { getSISideMenu } from "./SideMenus/SISideMenu";
@@ -12,30 +13,16 @@ import { getDistrictSideMenu } from "./SideMenus/DistrictSideMenu";
 import { getStateSideMenu } from "./SideMenus/StateSideMenu";
 import MsgDisplayModalInActive from "../../Components/MsgDisplayModalInActive";
 
-const MENU_MAP = {
-  "0701": getSchoolSideMenu,
-  "0601": getSISideMenu,
-  "0501": getBlockSideMenu,
-  "0304": getDistrictSideMenu,
-  "0207": getStateSideMenu,
-  "0208": getStateSideMenu,
-};
-
 function AdminAuthenticatedLayout({ children }) {
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [isOpenProfile, setOpenProfile] = useState(false);
   const navigate = useNavigate();
   const [showPrompt, setShowPrompt] = useState(false);
   const [remainingTime, setRemainingTime] = useState(60); // 60 seconds countdown
   const countdownRef = useRef(null);
+  let menuData = { user: "", data: [] };
 
-  const { logout } = useContext(TokenContext);
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(atob(localStorage.getItem("user")));
-  const stake_cd = user.stake_cd;
-  const location_name = user.name;
-
-  const menuFn = MENU_MAP[stake_cd];
-  const menuData = menuFn ? menuFn() : { user: "Guest", data: [] };
-
+  //console.log(jwtDecode(tokenId));
   const handleOnIdle = () => {
     console.log("User is idle");
     clearInterval(countdownRef.current); // ✅ important
@@ -82,6 +69,36 @@ function AdminAuthenticatedLayout({ children }) {
     debounce: 500,
   });
 
+  const { logout } = useContext(TokenContext);
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(atob(localStorage.getItem("user")));
+  const stake_cd = user.stake_cd;
+  const location_name = user.name;
+
+  let data = [];
+  let username;
+  if (stake_cd == "0701") {
+    menuData = getSchoolSideMenu();
+    username = menuData.user;
+    data = menuData.data;
+  } else if (stake_cd == "0601") {
+    menuData = getSISideMenu();
+    username = menuData.user;
+    data = menuData.data;
+  } else if (stake_cd == "0501") {
+    menuData = getBlockSideMenu();
+    username = menuData.user;
+    data = menuData.data;
+  } else if (stake_cd == "0304") {
+    menuData = getDistrictSideMenu();
+    username = menuData.user;
+    data = menuData.data;
+  } else if (stake_cd == "0207" || stake_cd == "0208") {
+    menuData = getStateSideMenu();
+    username = menuData.user;
+    data = menuData.data;
+  }
+
   const handleLogout = async () => {
     try {
       const host = window.location.hostname;
@@ -94,11 +111,14 @@ function AdminAuthenticatedLayout({ children }) {
         },
       });
 
+      console.log(response);
+
       if (!response.ok) {
         throw new Error("API request failed");
       }
 
       const data = await response.json();
+      console.log("API response:", data);
       if (data.status == "success") {
         logout();
         navigate("/Login");
@@ -112,12 +132,19 @@ function AdminAuthenticatedLayout({ children }) {
   return (
     <>
       <section className="bg-gray-200 dark:bg-gray-600">
+        <AdminHeader
+          user={username}
+          onLogout={handleLogout}
+          onProfileToggle={() => setOpenProfile(!isOpenProfile)}
+          isOpenProfile={isOpenProfile}
+          onSidebarToggle={() => setSidebarOpen(!isSidebarOpen)}
+        />
+
         <div className="flex flex-row w-full min-h-screen">
           <AdminSidebar
-            menuData={menuData.data}
-            username={menuData.user}
             location_name={location_name}
-            onLogout={handleLogout}
+            data={data}
+            isOpen={isSidebarOpen}
           />
           <div className="w-full min-h-screen flex flex-col">
             <div className="flex-grow">
@@ -130,7 +157,7 @@ function AdminAuthenticatedLayout({ children }) {
                 children
               )}
             </div>
-            {/* <AdminFooter /> */}
+            <AdminFooter />
           </div>
         </div>
       </section>

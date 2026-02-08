@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import AdminAuthenticatedLayout from "../../Layouts/AdminLayout/AdminAuthenticatedLayout"; // Adjust path as needed
 import Loader from "../../Components/Loader";
-import State from "../Admin/DashboardGraph/DashboardPhase";
+import State from "../Admin/DashboardGraph/DashboardSchool";
 import useApi from "../../Hooks/useApi";
 import LogoutPopup from "../../Components/LogoutPopup";
 import { toast } from "react-toastify";

@@ -13,21 +13,15 @@ import Synoptic from "../Pages/Frontend/SynopticReport.jsx";
 import DistrictWise from "../Pages/Frontend/DistrictWiseReport.jsx";
 import GenderWise from "../Pages/Frontend/GenderWiseReport.jsx";
 import LoginForm from "../Pages/Frontend/LoginForm.jsx";
-//import LoginList from "../Pages/Frontend/LoginList.jsx";
-//import LoginListTwo from "../Pages/Frontend/LoginListTwo.jsx";
 import LoginFormCms from "../Pages/Frontend/LoginFormCms.jsx";
 
 //Admin Pages
 import Dashboard from "../Pages/Frontend/Dashboard.jsx";
 import StudentAdd from "../Pages/Admin/Student/StudentAdd.jsx";
 import ViewProfile from "../Pages/Admin/School/ViewProfile.jsx";
-//import DownloadDistributionView from "../Pages/Admin/School/DownloadDistributionView.jsx";
-//import DistributionUploadView from "../Pages/Admin/School/DistributionUploadView.jsx";
 import StudentEdit from "../Pages/Admin/Student/StudentEdit.jsx";
-//import ApprovedListView from "../Pages/Admin/School/ApprovedListView.jsx";
 import ViewPending from "../Pages/Admin/Circle/ViewPending.jsx";
 import ViewStudent from "../Pages/Admin/Circle/ViewStudent.jsx";
-//import StudentProfileDownloadExcelView from "../Pages/Admin/School/StudentProfileDownloadExcelView.jsx";
 import DistributionUploadViewDistrict from "../Pages/Admin/District/DownloadDistributionViewDistrict.jsx";
 import DistributionLocationProcess from "../Pages/Admin/Block/DistributionLocationProcess.jsx";
 import DistributionTagSchool from "../Pages/Admin/Block/DistributionTagSchool.jsx";
