@@ -1,5 +1,5 @@
 // src/Pages/Dashboard.jsx
-import AdminAuthenticatedLayout from "../../Layouts/AdminLayout/AdminAuthenticatedLayout"; // Adjust path as needed
+import AdminAuthenticatedLayout from "../../Layouts/AdminLayout/Old/AdminAuthenticatedLayoutCopy"; // Adjust path as needed
 
 const Dashboard = () => {
   const user = JSON.parse(atob(localStorage.getItem("user")));
