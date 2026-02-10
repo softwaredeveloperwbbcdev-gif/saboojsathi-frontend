@@ -2,16 +2,16 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useIdleTimer } from "react-idle-timer";
 import { useContext } from "react";
-import { TokenContext } from "../../ContextProvider/TokenContext";
-import AdminHeader from "./AdminHeader";
-import AdminSidebar from "./AdminSidebar";
-import AdminFooter from "./AdminFooter";
-import { getSchoolSideMenu } from "./SideMenus/SchoolSideMenu";
-import { getSISideMenu } from "./SideMenus/SISideMenu";
-import { getBlockSideMenu } from "./SideMenus/BlockSideMenu";
-import { getDistrictSideMenu } from "./SideMenus/DistrictSideMenu";
-import { getStateSideMenu } from "./SideMenus/StateSideMenu";
-import MsgDisplayModalInActive from "../../Components/MsgDisplayModalInActive";
+import { TokenContext } from "./../../../ContextProvider/TokenContext";
+import AdminHeader from "./../AdminHeader";
+import AdminSidebar from "./../AdminSidebar";
+import AdminFooter from "./../AdminFooter";
+import { getSchoolSideMenu } from "./../SideMenus/SchoolSideMenu";
+import { getSISideMenu } from "./../SideMenus/SISideMenu";
+import { getBlockSideMenu } from "./../SideMenus/BlockSideMenu";
+import { getDistrictSideMenu } from "./../SideMenus/DistrictSideMenu";
+import { getStateSideMenu } from "./../SideMenus/StateSideMenu";
+import MsgDisplayModalInActive from "./../../../Components/MsgDisplayModalInActive";
 
 function AdminAuthenticatedLayout({ children }) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);

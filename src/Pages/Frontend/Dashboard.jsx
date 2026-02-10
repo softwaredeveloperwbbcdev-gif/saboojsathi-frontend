@@ -42,7 +42,7 @@ const Dashboard = () => {
   return (
     <>
       <AdminAuthenticatedLayout>
-        <State graphData={dashboardData} setLoading={setLoading}/>
+        <State graphData={dashboardData} setLoading={setLoading} />
         {loading && <Loader />} {/* 👈 show the loader component */}
       </AdminAuthenticatedLayout>
       {/* Modal section */}
