@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LightLogo from "../../assets/images/Admin/Askoka-stambha-light.png";
 import DarkLogo from "../../assets/images/Admin/Askoka-stambha-dark.png";
+import { usePhaseStore } from "../../Store/phaseStore";
+
 import {
   ChevronDown,
   User,
@@ -23,6 +25,14 @@ export default function Sidebar({
   location_name,
   onLogout,
 }) {
+  const navigate = useNavigate();
+  const setPhaseId = usePhaseStore((state) => state.setPhaseId);
+
+  const handlePhaseClick = (phaseId, to) => {
+    setPhaseId(phaseId); // store in Zustand
+    navigate(to); // go to dashboard
+  };
+
   const [openMenus, setOpenMenus] = useState({});
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [theme, setTheme] = useState("light");
@@ -169,13 +179,13 @@ export default function Sidebar({
                       className="ml-9 mt-1 space-y-1 border-l border-gray-200 dark:border-gray-800"
                     >
                       {item.submenu.map((sub) => (
-                        <Link
+                        <button
                           key={sub.id}
-                          to={sub.to}
+                          onClick={() => handlePhaseClick(sub.phaseId, sub.to)}
                           className="block px-4 py-2 text-xs text-gray-500 hover:text-green-700 dark:hover:text-green-400"
                         >
                           {sub.label}
-                        </Link>
+                        </button>
                       ))}
                     </motion.div>
                   )}

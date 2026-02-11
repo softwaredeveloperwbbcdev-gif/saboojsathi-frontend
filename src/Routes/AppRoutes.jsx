@@ -16,7 +16,7 @@ import LoginForm from "../Pages/Frontend/LoginForm.jsx";
 import LoginFormCms from "../Pages/Frontend/LoginFormCms.jsx";
 
 //Admin Pages
-import Dashboard from "../Pages/Frontend/Dashboard_.jsx";
+import Dashboard from "../Pages/Frontend/Dashboard.jsx";
 import StudentAdd from "../Pages/Admin/Student/StudentAdd.jsx";
 import ViewProfile from "../Pages/Admin/School/ViewProfile.jsx";
 import StudentEdit from "../Pages/Admin/Student/StudentEdit.jsx";
