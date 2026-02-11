@@ -6,17 +6,20 @@ import State from "../Admin/DashboardGraph/DashboardSchool";
 import useApi from "../../Hooks/useApi";
 import LogoutPopup from "../../Components/LogoutPopup";
 import { toast } from "react-toastify";
+import { usePhaseStore } from "../../Store/phaseStore";
 
 const Dashboard = () => {
   const { callApi, showPopup, popupMessage, handleLogout, setShowPopup } =
     useApi();
+
+  const phaseId = usePhaseStore((state) => state.phaseId);
 
   const [loading, setLoading] = useState(false);
   const [dashboardData, setDashboardData] = useState([]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [phaseId]);
 
   const fetchData = async () => {
     /////////////////////////////////////////////////////

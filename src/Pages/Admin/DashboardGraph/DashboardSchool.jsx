@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Doughnut, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -27,6 +27,13 @@ import { useNavigate } from "react-router-dom"; // Assuming you use react-router
 
 import { useStudentDownload } from "../School/SchoolAction";
 
+import { usePhaseStore } from "../../../Store/phaseStore";
+
+import {
+  phaseYearId,
+  defaultPhaseYear,
+} from "../../../Utils/Constants/Constants";
+
 // Register chart components
 ChartJS.register(
   ArcElement,
@@ -38,8 +45,11 @@ ChartJS.register(
 );
 
 const DashboardSchool = ({ graphData, setLoading }) => {
+  const phaseId = usePhaseStore((state) => state.phaseId);
   const [showData, setShowData] = useState([]);
   const navigate = useNavigate();
+
+  const phaseDetails = phaseYearId[phaseId] || defaultPhaseYear;
 
   const { downloadPdf, downloadExcel, isDownloading } = useStudentDownload();
 
@@ -131,7 +141,7 @@ const DashboardSchool = ({ graphData, setLoading }) => {
           Dashboard Overview
         </h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
-          Phase XI - Academic Year 2025
+          Phase {phaseDetails.phaseName} - Academic Year {phaseDetails.year}
         </p>
       </div>
 
@@ -184,28 +194,28 @@ const DashboardSchool = ({ graphData, setLoading }) => {
             subText="Registration"
             icon={HiUserPlus}
             colorClass="bg-blue-500"
-            onClick={() => navigate(`/StudentAdd/${btoa(14)}`)}
+            onClick={() => navigate(`/StudentAdd/${phaseId}`)}
           />
           <ActionCard
             title="Student List"
             subText="Management"
             icon={HiTableCells}
             colorClass="bg-indigo-500"
-            onClick={() => navigate(`/StudentProfile/${btoa(14)}`)}
+            onClick={() => navigate(`/StudentProfile/${phaseId}`)}
           />
           <ActionCard
             title="Excel Export"
             subText="Student Data"
             icon={HiDocumentArrowDown}
             colorClass="bg-emerald-500"
-            onClick={() => downloadExcel(btoa(14))}
+            onClick={() => downloadExcel(phaseId)}
           />
           <ActionCard
             title="Muster Roll"
             subText="PDF Report"
             icon={HiClipboardDocumentList}
             colorClass="bg-purple-500"
-            onClick={() => downloadPdf(btoa(14))}
+            onClick={() => downloadPdf(phaseId)}
           />
         </div>
       </div>
