@@ -92,42 +92,81 @@ const DashboardSchool = ({ graphData, setLoading }) => {
       : [],
   };
 
+  // const StatCard = ({ title, value, icon: Icon, colorClass }) => (
+  //   <div className="relative overflow-hidden bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md">
+  //     <div className="flex items-center justify-between">
+  //       <div>
+  //         <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+  //           {title}
+  //         </p>
+  //         <h3 className="text-2xl font-bold text-gray-800 dark:text-white mt-1">
+  //           {value.toLocaleString()}
+  //         </h3>
+  //       </div>
+  //       <div className={`p-3 rounded-xl ${colorClass}`}>
+  //         <Icon className="text-xl text-white" />
+  //       </div>
+  //       <div className="absolute -bottom-2 -right-2 opacity-5">
+  //         <Icon size={80} />
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
+
   const StatCard = ({ title, value, icon: Icon, colorClass }) => (
     <div className="relative overflow-hidden bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
             {title}
           </p>
-          <h3 className="text-2xl font-bold text-gray-800 dark:text-white mt-1">
+          <h3 className="text-2xl font-black text-gray-800 dark:text-white mt-1">
             {value.toLocaleString()}
           </h3>
         </div>
-        <div className={`p-3 rounded-xl ${colorClass}`}>
+        <div className={`p-3 rounded-xl shadow-lg ${colorClass}`}>
           <Icon className="text-xl text-white" />
         </div>
-        <div className="absolute -bottom-2 -right-2 opacity-5">
-          <Icon size={80} />
-        </div>
+      </div>
+      <div className="absolute -bottom-4 -right-4 opacity-[0.03] dark:opacity-[0.05] text-gray-900 dark:text-white">
+        <Icon size={90} />
       </div>
     </div>
   );
 
   // Helper for Functional Link Cards
+  // const ActionCard = ({ title, icon: Icon, onClick, colorClass, subText }) => (
+  //   <button
+  //     onClick={onClick}
+  //     className="group flex flex-col items-center text-center p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-300 hover:shadow-lg active:scale-95"
+  //   >
+  //     <div
+  //       className={`mb-4 p-4 rounded-full ${colorClass} group-hover:scale-110 transition-transform duration-300`}
+  //     >
+  //       <Icon className="text-2xl text-white" />
+  //     </div>
+  //     <h4 className="text-sm font-bold text-gray-800 dark:text-white mb-1">
+  //       {title}
+  //     </h4>
+  //     <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-tighter">
+  //       {subText}
+  //     </p>
+  //   </button>
+  // );
   const ActionCard = ({ title, icon: Icon, onClick, colorClass, subText }) => (
     <button
       onClick={onClick}
-      className="group flex flex-col items-center text-center p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-300 hover:shadow-lg active:scale-95"
+      className="group flex flex-col items-center text-center p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:border-blue-500 transition-all duration-300 hover:shadow-xl active:scale-95"
     >
       <div
-        className={`mb-4 p-4 rounded-full ${colorClass} group-hover:scale-110 transition-transform duration-300`}
+        className={`mb-4 p-4 rounded-2xl shadow-md ${colorClass} group-hover:rotate-6 transition-transform duration-300`}
       >
         <Icon className="text-2xl text-white" />
       </div>
       <h4 className="text-sm font-bold text-gray-800 dark:text-white mb-1">
         {title}
       </h4>
-      <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-tighter">
+      <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-tighter">
         {subText}
       </p>
     </button>
@@ -138,10 +177,11 @@ const DashboardSchool = ({ graphData, setLoading }) => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-          Dashboard Overview
+          Dashboard <span className="text-blue-600">Overview</span>
         </h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
-          Phase {phaseDetails.phaseName} - Academic Year {phaseDetails.year}
+          <HiShieldCheck className="text-blue-500" /> Phase{" "}
+          {phaseDetails.phaseName} - Academic Year {phaseDetails.year}
         </p>
       </div>
 
