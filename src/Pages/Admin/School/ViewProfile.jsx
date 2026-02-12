@@ -47,7 +47,7 @@ function ViewProfile() {
 
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState([]);
-  const [finializeBtn, setFinializeBtn] = useState(false);
+  const [finalizeBtn, setFinalizeBtn] = useState(false);
   const [applicantId, setApplicantId] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenUpdate, setIsModalOpenUpdate] = useState(false);
@@ -78,7 +78,7 @@ function ViewProfile() {
     const res = await callApi("POST", "studentsProfile", data);
     if (res.data?.status === "success") {
       setStudents(res.data.studentdata);
-      setFinializeBtn(res.data.finialize_status);
+      setFinalizeBtn(res.data.finalize_status);
     } else {
       setStudents([]);
     }
@@ -307,7 +307,7 @@ function ViewProfile() {
         </div>
 
         {/* Action Footer */}
-        {finializeBtn && (
+        {finalizeBtn && (
           <div className="mt-8 flex justify-end">
             <button
               onClick={finilize_student}
