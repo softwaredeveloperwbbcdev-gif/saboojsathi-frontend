@@ -1,23 +1,12 @@
 // src/Pages/Dashboard.jsx
 import { useEffect, useState } from "react";
-import AdminAuthenticatedLayout from "../../Layouts/AdminLayout/AdminAuthenticatedLayout"; // Adjust path as needed
-import Loader from "../../Components/Loader";
-import DashboardSchool from "../Admin/DashboardGraph/DashboardSchool";
-import DashboardCircle from "../Admin/DashboardGraph/DashboardCircle";
-import DashboardBlockProfile from "../Admin/DashboardGraph/DashboardBlockProfile";
-import useApi from "../../Hooks/useApi";
-import LogoutPopup from "../../Components/LogoutPopup";
+import AdminAuthenticatedLayout from "../../../Layouts/AdminLayout/AdminAuthenticatedLayout"; // Adjust path as needed
+import Loader from "../../../Components/Loader";
+import useApi from "../../../Hooks/useApi";
+import LogoutPopup from "../../../Components/LogoutPopup";
 import { toast } from "react-toastify";
-import { usePhaseStore } from "../../Store/phaseStore";
-
-const DASHBOARD_MAP = {
-  "0701": DashboardSchool,
-  "0601": DashboardCircle,
-  "0501": DashboardBlockProfile,
-  // "0304": getDistrictSideMenu,
-  // "0207": getStateSideMenu,
-  // "0208": getStateSideMenu,
-};
+import { usePhaseStore } from "../../../Store/phaseStore";
+import DashboardBlockTagging from "../DashboardGraph/DashboardBlockTagging";
 
 const Dashboard = () => {
   const { callApi, showPopup, popupMessage, handleLogout, setShowPopup } =
@@ -26,8 +15,6 @@ const Dashboard = () => {
   const phaseId = usePhaseStore((state) => state.phaseId);
   const user = JSON.parse(atob(localStorage.getItem("user")));
   const stake_cd = user.stake_cd;
-
-  const DashboardComponent = DASHBOARD_MAP[stake_cd];
 
   const [loading, setLoading] = useState(false);
   const [dashboardData, setDashboardData] = useState([]);
@@ -60,7 +47,10 @@ const Dashboard = () => {
   return (
     <>
       <AdminAuthenticatedLayout>
-        <DashboardComponent graphData={dashboardData} setLoading={setLoading} />
+        <DashboardBlockTagging
+          graphData={dashboardData}
+          setLoading={setLoading}
+        />
         {loading && <Loader />} {/* 👈 show the loader component */}
       </AdminAuthenticatedLayout>
       {/* Modal section */}

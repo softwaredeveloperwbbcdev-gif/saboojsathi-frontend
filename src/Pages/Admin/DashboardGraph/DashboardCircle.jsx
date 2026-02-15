@@ -10,17 +10,12 @@ import {
   BarElement,
 } from "chart.js";
 import {
-  HiUsers,
   HiCheckBadge,
   HiXCircle,
   HiChartBar,
   HiOutlineUserGroup,
   HiShieldCheck,
-  HiTableCells,
-  HiClipboardDocumentList,
   HiCursorArrowRays, // New icon for "Action"
-  HiHomeModern, // For "School List"
-  HiArrowDownTray, // For downloads
 } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
 import { usePhaseStore } from "../../../Store/phaseStore";
@@ -78,43 +73,48 @@ const DashboardCircle = ({ graphData, setLoading }) => {
       : [],
   };
 
-  const StatCard = ({ title, value, icon: Icon, colorClass }) => (
-    <div className="relative overflow-hidden bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md">
-      <div className="flex items-center justify-between">
+  const StatCard = ({ title, value, icon: Icon, colorClass, gradient }) => (
+    <div className="relative overflow-hidden bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md group">
+      <div className="flex items-center justify-between z-10 relative">
         <div>
-          <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+          <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">
             {title}
           </p>
-          <h3 className="text-2xl font-black text-gray-800 dark:text-white mt-1">
+          <h3 className="text-2xl font-black text-gray-800 dark:text-white group-hover:scale-105 transition-transform origin-left">
             {value.toLocaleString()}
           </h3>
         </div>
-        <div className={`p-3 rounded-xl shadow-lg ${colorClass}`}>
-          <Icon className="text-xl text-white" />
+        <div className={`p-3 rounded-xl shadow-lg ${colorClass} text-white`}>
+          <Icon className="text-xl" />
         </div>
       </div>
-      <div className="absolute -bottom-4 -right-4 opacity-[0.03] dark:opacity-[0.05] text-gray-900 dark:text-white">
+      {/* Decorative Background Icon */}
+      <div className="absolute -bottom-4 -right-4 opacity-[0.03] dark:opacity-[0.05] text-gray-900 dark:text-white transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1">
         <Icon size={90} />
       </div>
+      {/* Bottom Gradient Line */}
+      <div className={`absolute bottom-0 left-0 w-full h-1 ${gradient}`} />
     </div>
   );
 
-  const ActionCard = ({ title, icon: Icon, onClick, colorClass, subText }) => (
+  const ActionCard = ({ title, subText, icon: Icon, onClick, colorClass }) => (
     <button
       onClick={onClick}
-      className="group flex flex-col items-center text-center p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:border-blue-500 transition-all duration-300 hover:shadow-xl active:scale-95"
+      className="flex items-center gap-4 p-5 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-300 hover:shadow-lg active:scale-95 text-left w-full group"
     >
       <div
-        className={`mb-4 p-4 rounded-2xl shadow-md ${colorClass} group-hover:rotate-6 transition-transform duration-300`}
+        className={`p-3 rounded-xl ${colorClass} text-white shadow-md group-hover:scale-110 group-hover:rotate-6 transition-transform`}
       >
-        <Icon className="text-2xl text-white" />
+        <Icon className="text-2xl" />
       </div>
-      <h4 className="text-sm font-bold text-gray-800 dark:text-white mb-1">
-        {title}
-      </h4>
-      <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-tighter">
-        {subText}
-      </p>
+      <div>
+        <h4 className="text-sm font-bold text-gray-800 dark:text-white">
+          {title}
+        </h4>
+        <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wide">
+          {subText}
+        </p>
+      </div>
     </button>
   );
 
@@ -124,12 +124,17 @@ const DashboardCircle = ({ graphData, setLoading }) => {
       <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="text-center md:text-left">
           <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">
-            Dashboard <span className="text-blue-600">Overview</span>
+            Student Profile <span className="text-blue-600">Overview</span>
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium flex items-center gap-2">
-            <HiShieldCheck className="text-blue-500" /> Phase{" "}
-            {phaseDetails.phaseName} - Academic Year {phaseDetails.year}
+          <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium flex items-center justify-center md:justify-start gap-2">
+            <HiShieldCheck className="text-blue-500" /> Dashboard • Phase{" "}
+            {phaseDetails.phaseName}
           </p>
+        </div>
+        <div className="bg-indigo-50 dark:bg-indigo-900/20 px-4 py-2 rounded-xl border border-indigo-100 dark:border-indigo-800">
+          <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">
+            Year: {phaseDetails.year}
+          </span>
         </div>
       </div>
 
@@ -140,18 +145,21 @@ const DashboardCircle = ({ graphData, setLoading }) => {
           value={profileStats.pending}
           icon={HiCursorArrowRays}
           colorClass="bg-amber-500"
+          gradient="bg-gradient-to-r from-amber-400 to-amber-600"
         />
         <StatCard
           title="Approved Profile"
           value={profileStats.approved}
           icon={HiCheckBadge}
           colorClass="bg-emerald-500"
+          gradient="bg-gradient-to-r from-emerald-400 to-emerald-600"
         />
         <StatCard
           title="Rejected Profile"
           value={profileStats.rejected}
           icon={HiXCircle}
           colorClass="bg-red-500"
+          gradient="bg-gradient-to-r from-red-400 to-red-600"
         />
       </div>
 
@@ -160,7 +168,7 @@ const DashboardCircle = ({ graphData, setLoading }) => {
         <div className="flex items-center gap-3 mb-6">
           <div className="h-6 w-1.5 bg-blue-600 rounded-full"></div>
           <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">
-            Circle Operations
+            Reports & Actions
           </h2>
         </div>
 
