@@ -22,6 +22,9 @@ import ViewProfile from "../Pages/Admin/School/ViewProfile.jsx";
 import StudentEdit from "../Pages/Admin/Student/StudentEdit.jsx";
 import ViewPending from "../Pages/Admin/Circle/ViewPending.jsx";
 import ViewStudent from "../Pages/Admin/Circle/ViewStudent.jsx";
+
+//Block User Pages
+import DashboardTagging from "../Pages/Admin/Block/DashboardTagging.jsx";
 import DistributionUploadViewDistrict from "../Pages/Admin/District/DownloadDistributionViewDistrict.jsx";
 import DistributionLocationProcess from "../Pages/Admin/Block/DistributionLocationProcess.jsx";
 import DistributionTagSchool from "../Pages/Admin/Block/DistributionTagSchool.jsx";
@@ -98,7 +101,6 @@ import InvoiceView from "../Pages/Admin/Cms/InvoiceView.jsx";
 import ChallanViewFilterDeo from "../Pages/Admin/Cms/ChallanViewFilterDeo.jsx";
 import AppsTest from "../Pages/Test/AppsTest.jsx";
 import AppsTestTwo from "../Pages/Test/AppsTestTwo.jsx";
-
 import AccessDeniedPage from "../Components/AccessDeniedPage.jsx";
 
 ///////////////////////////////////// 16-09-25
@@ -127,6 +129,14 @@ const AppRoutes = () => {
         element={
           <AuthGuard>
             <Dashboard />
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/DashboardTagging"
+        element={
+          <AuthGuard>
+            <DashboardTagging />
           </AuthGuard>
         }
       />
