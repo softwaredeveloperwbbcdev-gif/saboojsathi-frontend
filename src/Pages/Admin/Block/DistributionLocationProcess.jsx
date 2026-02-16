@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaRegCheckCircle } from "react-icons/fa";
 import Modal from "../../../Components/Modal";
-import DistributionLocationAdd from "../../../Components/DistributionLocationAdd";
+import DistributionLocationAdd from "../../../Components/BlockComponent/DistributionLocationAdd";
 import useApi from "../../../Hooks/useApi";
 import LogoutPopup from "../../../Components/LogoutPopup";
 import { toast } from "react-toastify";
@@ -46,7 +46,7 @@ const DistributionLocationProcess = () => {
       const response = await callApi(
         "POST",
         "/getDeliveryLocations",
-        deliveryData
+        deliveryData,
       );
 
       if (!response.error && response.data?.locationList) {
@@ -95,7 +95,7 @@ const DistributionLocationProcess = () => {
       const response = await callApi(
         "POST",
         "/addDeliveryLocation",
-        updatedFrameData
+        updatedFrameData,
       );
 
       if (!response.error) {

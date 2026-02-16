@@ -136,7 +136,7 @@ const DashboardBlockProfile = ({ graphData, setLoading }) => {
           <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">
             Student Profile <span className="text-indigo-600">Overview</span>
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium flex items-center gap-2">
+          <p className="text-gray-500 dark:text-gray-400 mt-1 font-medium flex items-center justify-center md:justify-start gap-2">
             <HiChartBar className="text-indigo-500" /> Dashboard • Phase{" "}
             {phaseDetails.phaseName}
           </p>
