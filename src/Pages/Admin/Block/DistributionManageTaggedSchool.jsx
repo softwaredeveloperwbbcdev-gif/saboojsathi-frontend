@@ -55,7 +55,7 @@ function DistributionManageTaggedSchool() {
       const response = await callApi(
         "POST",
         "/getDeliveryLocations",
-        deliveryData
+        deliveryData,
       );
 
       if (!response.error && response.data?.locationList) {
@@ -125,7 +125,7 @@ function DistributionManageTaggedSchool() {
         toast.success("✅ School has been untagged");
 
         setTaggedSchoolList((prevList) =>
-          prevList.filter((school) => school.school_id !== schoolId)
+          prevList.filter((school) => school.school_id !== schoolId),
         );
       } else {
         toast.error(`❌ Failed to untag school: ${response.message}`);
@@ -162,8 +162,8 @@ function DistributionManageTaggedSchool() {
                       <option value="">Select Delivery Center</option>
                       {distributionLocationList.map((location, index) => (
                         <option
-                          key={location.distribution_location_id + index}
-                          value={btoa(location.distribution_location_id)}
+                          key={location.location_id + index}
+                          value={btoa(location.location_id)}
                         >
                           {location.distribution_location_name}
                         </option>
@@ -238,7 +238,7 @@ function DistributionManageTaggedSchool() {
                             onClick={() =>
                               handleUntag(
                                 school.school_id,
-                                `${school.school_id}_${index}`
+                                `${school.school_id}_${index}`,
                               )
                             }
                           >

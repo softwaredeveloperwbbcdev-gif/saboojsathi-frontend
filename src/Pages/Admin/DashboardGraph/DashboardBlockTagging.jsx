@@ -20,6 +20,7 @@ import {
 import Modal from "../../../Components/Modal";
 import DistributionLocationAdd from "../../../Components/BlockComponent/DistributionLocationAdd";
 import DistributionLocationUpdate from "../../../Components/BlockComponent/DistirbutionLocationUpdate";
+import DistributionTagUntagSchool from "../../../Components/BlockComponent/DistributionTagUntagSchool";
 import { toast } from "react-toastify";
 import useApi from "../../../Hooks/useApi";
 
@@ -30,6 +31,7 @@ const DashboardBlockTagging = ({ graphData, setLoading }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [distributionLocationList, setDistributionLocationList] = useState([]);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isTagModalOpen, setTagModalOpen] = useState(false);
   const [selectedCenter, setSelectedCenter] = useState(null);
 
   const { callApi } = useApi();
@@ -226,6 +228,15 @@ const DashboardBlockTagging = ({ graphData, setLoading }) => {
     }
   };
 
+  const handleOpenTagUntagModal = (center) => {
+    setSelectedCenter(center);
+    setTagModalOpen(true);
+  };
+
+  const handleCloseTagUntagModal = () => {
+    setTagModalOpen(false);
+  };
+
   return (
     <>
       <div className="p-4 md:p-10 bg-[#f8fafc] dark:bg-gray-950 min-h-screen transition-colors duration-300">
@@ -328,10 +339,7 @@ const DashboardBlockTagging = ({ graphData, setLoading }) => {
                     : "bg-gray-400 dark:bg-gray-600 opacity-50"
                 }
                 onClick={() =>
-                  selectedCenter &&
-                  navigate(
-                    `/TaggingProcess/${phaseId}/${btoa(selectedCenter.id)}`,
-                  )
+                  selectedCenter && handleOpenTagUntagModal(selectedCenter)
                 }
                 disabled={!selectedCenter}
               />
@@ -465,6 +473,21 @@ const DashboardBlockTagging = ({ graphData, setLoading }) => {
           updateLocation={updateLocation}
           onClose={handleUpdateCloseModal}
         ></DistributionLocationUpdate>
+      </Modal>
+
+      <Modal
+        show={isTagModalOpen}
+        onClose={handleCloseTagUntagModal}
+        maxWidth="2xl"
+        closeable={true}
+      >
+        <DistributionTagUntagSchool
+          centerDetails={selectedCenter}
+          phaseId={phaseId}
+          location={location}
+          onRefresh={getBlockWiseDistributionLocationDetails}
+          onClose={handleCloseTagUntagModal}
+        ></DistributionTagUntagSchool>
       </Modal>
     </>
   );
