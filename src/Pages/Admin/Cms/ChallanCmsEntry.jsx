@@ -63,7 +63,7 @@ const ChallanCmsEntry = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await callApi("GET", `cmsphase`);
+      const response = await callApi("POST", `cmsphase`);
       if (response.error) {
         toast.error(`Failed to fetch initial data: ${response.message}`);
       } else {
@@ -89,7 +89,9 @@ const ChallanCmsEntry = () => {
   const fetchDistrict = async (phaseId) => {
     setLoading(true);
     try {
-      const response = await callApi("GET", `cmsdistrictchallan/${phaseId}`);
+      const response = await callApi("POST", `cmsdistrictchallan`, {
+        phase: btoa(phaseId),
+      });
       if (response.error) {
         toast.error(`Failed to fetch districts: ${response.message}`);
       } else {
@@ -132,7 +134,9 @@ const ChallanCmsEntry = () => {
   const fetchBlocks = async (districtId) => {
     setLoading(true);
     try {
-      const response = await callApi("GET", `cmsblockchallan/${districtId}`);
+      const response = await callApi("POST", `cmsblockchallan`, {
+        id: btoa(districtId),
+      });
       if (response.error) {
         toast.error(`Failed to fetch blocks: ${response.message}`);
       } else {
@@ -171,10 +175,11 @@ const ChallanCmsEntry = () => {
   const fetchDeliveryLocation = async (phaseId, districtId, blockId) => {
     setLoading(true);
     try {
-      const response = await callApi(
-        "GET",
-        `cmsdeliveryloc/${phaseId}/${districtId}/${blockId}`
-      );
+      const response = await callApi("POST", `cmsdeliveryloc`, {
+        phase: btoa(phaseId),
+        id: btoa(districtId),
+        bid: btoa(blockId),
+      });
       if (response.error) {
         toast.error(`Failed to fetch delivery locations: ${response.message}`);
       } else {
@@ -204,10 +209,12 @@ const ChallanCmsEntry = () => {
   const fetchRemainingCycle = async (orderDtQtyId) => {
     setLoading(true);
     try {
-      const response = await callApi("GET", `cmscycleremain/${orderDtQtyId}`);
+      const response = await callApi("POST", `cmscycleremain`, {
+        qtydt: btoa(orderDtQtyId),
+      });
       if (response.error) {
         toast.error(
-          `Failed to fetch remaining cycle data: ${response.message}`
+          `Failed to fetch remaining cycle data: ${response.message}`,
         );
       } else {
         setChallanMasterData((prev) => ({
