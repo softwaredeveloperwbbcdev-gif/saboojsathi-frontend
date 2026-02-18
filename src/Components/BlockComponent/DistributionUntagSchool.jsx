@@ -1,21 +1,21 @@
 import { useState, useEffect } from "react";
 import {
   School,
-  Users,
   Search,
   AlertCircle,
   Loader2,
-  Check,
+  XCircle,
   MapPin,
+  UserMinus,
+  Trash2,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import useApi from "../../Hooks/useApi";
 import { phaseYearId, defaultPhaseYear } from "../../Utils/Constants/Constants";
 
-const DistributionTagUntagSchool = ({
+const DistributionUntagSchool = ({
   centerDetails,
   phaseId,
-  location,
   onRefresh,
   onClose,
 }) => {
@@ -32,26 +32,31 @@ const DistributionTagUntagSchool = ({
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const getBlockWiseSchoolList = async () => {
-      const deliveryData = { phaseId, locationId: btoa(id) };
+    const getTaggedSchoolList = async () => {
+      // Pass locationId to fetch schools already linked to this center
+      const requestData = {
+        phaseId,
+        block_id: btoa(id),
+        delivery_location: btoa(centerDetails.location_id),
+      };
       setLoading(true);
       try {
         const response = await callApi(
           "POST",
-          "/getUntaggedSchoolList",
-          deliveryData,
+          "/getTaggedSchoolList", // Assuming this endpoint exists for your center
+          requestData,
         );
         if (!response.error && response.data?.schoolList) {
           setSchoolList(response.data.schoolList);
         }
       } catch (err) {
-        toast.error("Failed to load school list");
+        toast.error("Failed to load tagged schools");
       } finally {
         setLoading(false);
       }
     };
 
-    getBlockWiseSchoolList();
+    getTaggedSchoolList();
   }, [phaseId, id, centerDetails]);
 
   const handleCheckboxChange = (schoolId) => {
@@ -62,29 +67,29 @@ const DistributionTagUntagSchool = ({
     );
   };
 
-  const handleSchoolTag = async () => {
+  const handleSchoolUntag = async () => {
     setIsSubmitting(true);
     const dataSet = {
       phaseId,
       schoolIds: [...selectedIds],
-      locationId: location,
+      locationId: btoa(centerDetails.location_id),
     };
 
     try {
       const response = await callApi(
         "POST",
-        "/tagSchoolWithDeliveryPoint",
+        "/untagSchool", // Specific endpoint for untagging
         dataSet,
       );
       if (!response.error) {
-        toast.success(`Successfully tagged ${selectedIds.length} schools`);
+        toast.success(`Successfully removed ${selectedIds.length} schools`);
         onRefresh?.();
         onClose();
       } else {
         toast.error(response.message);
       }
     } catch (err) {
-      toast.error("An unexpected error occurred");
+      toast.error("An unexpected error occurred during untagging");
     } finally {
       setIsSubmitting(false);
     }
@@ -98,18 +103,18 @@ const DistributionTagUntagSchool = ({
 
   return (
     <div className="flex flex-col h-[85vh] md:h-[70vh] bg-white dark:bg-slate-900 overflow-hidden">
-      {/* Header Section */}
-      <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+      {/* Header Section - Rose Theme for Removal */}
+      <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-rose-50/30 dark:bg-rose-950/10">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-teal-100 dark:bg-teal-900/30 text-teal-600 rounded-lg">
-            <School size={24} />
+          <div className="p-2 bg-rose-100 dark:bg-rose-900/30 text-rose-600 rounded-lg">
+            <UserMinus size={24} />
           </div>
           <div>
             <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-              Tag Schools to Delivery Point
+              Untag Schools from Center
             </h2>
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-1">
-              <MapPin size={14} className="text-orange-500" />
+              <MapPin size={14} className="text-rose-500" />
               <span className="font-semibold text-slate-700 dark:text-slate-300">
                 {centerDetails?.location_name || "Selected Center"}
               </span>
@@ -128,8 +133,8 @@ const DistributionTagUntagSchool = ({
           />
           <input
             type="text"
-            placeholder="Search by School Name or DISE code..."
-            className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-teal-500 dark:text-white"
+            placeholder="Search within tagged schools..."
+            className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-rose-500 dark:text-white"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -142,7 +147,7 @@ const DistributionTagUntagSchool = ({
           <div className="h-full flex flex-col items-center justify-center gap-3 text-slate-400">
             <Loader2 className="animate-spin" size={32} />
             <p className="text-xs font-bold uppercase tracking-widest">
-              Loading Schools...
+              Fetching Tagged Schools...
             </p>
           </div>
         ) : filteredSchools.length > 0 ? (
@@ -161,9 +166,9 @@ const DistributionTagUntagSchool = ({
                 {filteredSchools.map((school, idx) => (
                   <tr
                     key={school.school_id}
-                    className={`hover:bg-teal-50/50 dark:hover:bg-teal-900/10 transition-colors ${
+                    className={`hover:bg-rose-50/50 dark:hover:bg-rose-900/10 transition-colors ${
                       selectedIds.includes(school.school_id)
-                        ? "bg-teal-50/30 dark:bg-teal-900/5"
+                        ? "bg-rose-50/30 dark:bg-rose-900/5"
                         : ""
                     }`}
                   >
@@ -173,10 +178,9 @@ const DistributionTagUntagSchool = ({
                     <td className="px-4 py-3">
                       <input
                         type="checkbox"
-                        className="w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500 cursor-pointer"
+                        className="w-4 h-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500 cursor-pointer"
                         checked={selectedIds.includes(school.school_id)}
                         onChange={() => handleCheckboxChange(school.school_id)}
-                        disabled={!school.total}
                       />
                     </td>
                     <td className="px-4 py-3">
@@ -207,7 +211,7 @@ const DistributionTagUntagSchool = ({
           <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-2 opacity-60">
             <AlertCircle size={40} />
             <p className="text-sm font-bold tracking-tight">
-              No Schools Available to Tag
+              No Tagged Schools Found
             </p>
           </div>
         )}
@@ -217,11 +221,11 @@ const DistributionTagUntagSchool = ({
       <div className="p-6 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-slate-900">
         <div className="text-sm">
           {selectedIds.length > 0 ? (
-            <span className="text-teal-600 dark:text-teal-400 font-bold">
-              {selectedIds.length} schools selected for tagging
+            <span className="text-rose-600 dark:text-rose-400 font-bold">
+              {selectedIds.length} schools marked for removal
             </span>
           ) : (
-            <span className="text-slate-400">Select schools from the list</span>
+            <span className="text-slate-400">Select schools to untag</span>
           )}
         </div>
         <div className="flex gap-3 w-full md:w-auto">
@@ -233,15 +237,15 @@ const DistributionTagUntagSchool = ({
           </button>
           <button
             disabled={!selectedIds.length || isSubmitting}
-            onClick={handleSchoolTag}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white px-8 py-2.5 rounded-xl font-bold shadow-lg shadow-teal-600/20 transition-all active:scale-95"
+            onClick={handleSchoolUntag}
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-700 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white px-8 py-2.5 rounded-xl font-bold shadow-lg shadow-rose-600/20 transition-all active:scale-95"
           >
             {isSubmitting ? (
               <Loader2 className="animate-spin" size={18} />
             ) : (
-              <Check size={18} />
+              <Trash2 size={18} />
             )}
-            Confirm Tagging
+            Confirm Untagging
           </button>
         </div>
       </div>
@@ -249,4 +253,4 @@ const DistributionTagUntagSchool = ({
   );
 };
 
-export default DistributionTagUntagSchool;
+export default DistributionUntagSchool;

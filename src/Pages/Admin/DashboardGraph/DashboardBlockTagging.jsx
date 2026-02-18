@@ -10,7 +10,6 @@ import {
   HiMapPin,
 } from "react-icons/hi2";
 import { HiCheckCircle } from "react-icons/hi";
-import { HiOutlineOfficeBuilding } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import { usePhaseStore } from "../../../Store/phaseStore";
 import {
@@ -20,7 +19,8 @@ import {
 import Modal from "../../../Components/Modal";
 import DistributionLocationAdd from "../../../Components/BlockComponent/DistributionLocationAdd";
 import DistributionLocationUpdate from "../../../Components/BlockComponent/DistirbutionLocationUpdate";
-import DistributionTagUntagSchool from "../../../Components/BlockComponent/DistributionTagUntagSchool";
+import DistributionTagSchool from "../../../Components/BlockComponent/DistributionTagSchool";
+import DistributionUntagSchool from "../../../Components/BlockComponent/DistributionUntagSchool";
 import { toast } from "react-toastify";
 import useApi from "../../../Hooks/useApi";
 
@@ -32,6 +32,7 @@ const DashboardBlockTagging = ({ graphData, setLoading }) => {
   const [distributionLocationList, setDistributionLocationList] = useState([]);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isTagModalOpen, setTagModalOpen] = useState(false);
+  const [isUntagModalOpen, setUntagModalOpen] = useState(false);
   const [selectedCenter, setSelectedCenter] = useState(null);
 
   const { callApi } = useApi();
@@ -228,13 +229,22 @@ const DashboardBlockTagging = ({ graphData, setLoading }) => {
     }
   };
 
-  const handleOpenTagUntagModal = (center) => {
+  const handleOpenTagModal = (center) => {
     setSelectedCenter(center);
     setTagModalOpen(true);
   };
 
-  const handleCloseTagUntagModal = () => {
+  const handleCloseTagModal = () => {
     setTagModalOpen(false);
+  };
+
+  const handleOpenUntagModal = (center) => {
+    setSelectedCenter(center);
+    setUntagModalOpen(true);
+  };
+
+  const handleCloseUntagModal = () => {
+    setUntagModalOpen(false);
   };
 
   return (
@@ -328,7 +338,7 @@ const DashboardBlockTagging = ({ graphData, setLoading }) => {
               />
 
               <ActionCard
-                title="Manage Tagging"
+                title="Tag School"
                 subText={
                   selectedCenter ? "Link Schools" : "Select a location below"
                 }
@@ -339,7 +349,26 @@ const DashboardBlockTagging = ({ graphData, setLoading }) => {
                     : "bg-gray-400 dark:bg-gray-600 opacity-50"
                 }
                 onClick={() =>
-                  selectedCenter && handleOpenTagUntagModal(selectedCenter)
+                  selectedCenter && handleOpenTagModal(selectedCenter)
+                }
+                disabled={!selectedCenter}
+              />
+
+              <ActionCard
+                title="Untag School"
+                subText={
+                  selectedCenter
+                    ? "Remove Linked Schools"
+                    : "Select a location below"
+                }
+                icon={HiLinkSlash} // or HiUserMinus
+                colorClass={
+                  selectedCenter
+                    ? "bg-rose-600"
+                    : "bg-gray-400 dark:bg-gray-600 opacity-50"
+                }
+                onClick={() =>
+                  selectedCenter && handleOpenUntagModal(selectedCenter)
                 }
                 disabled={!selectedCenter}
               />
@@ -477,17 +506,32 @@ const DashboardBlockTagging = ({ graphData, setLoading }) => {
 
       <Modal
         show={isTagModalOpen}
-        onClose={handleCloseTagUntagModal}
+        onClose={handleCloseTagModal}
         maxWidth="2xl"
         closeable={true}
       >
-        <DistributionTagUntagSchool
+        <DistributionTagSchool
           centerDetails={selectedCenter}
           phaseId={phaseId}
           location={location}
           onRefresh={getBlockWiseDistributionLocationDetails}
-          onClose={handleCloseTagUntagModal}
-        ></DistributionTagUntagSchool>
+          onClose={handleCloseTagModal}
+        ></DistributionTagSchool>
+      </Modal>
+
+      <Modal
+        show={isUntagModalOpen}
+        onClose={handleCloseUntagModal}
+        maxWidth="2xl"
+        closeable={true}
+      >
+        <DistributionUntagSchool
+          centerDetails={selectedCenter}
+          phaseId={phaseId}
+          location={location}
+          onRefresh={getBlockWiseDistributionLocationDetails}
+          onClose={handleCloseUntagModal}
+        ></DistributionUntagSchool>
       </Modal>
     </>
   );
