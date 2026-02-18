@@ -18,6 +18,8 @@ const DistributionTagSchool = () => {
   const user = JSON.parse(atob(localStorage.getItem("user")));
   const id = user.internal_code;
 
+  console.log(id);
+
   const navigate = useNavigate();
 
   const { callApi, showPopup, popupMessage, handleLogout, setShowPopup } =
@@ -39,7 +41,7 @@ const DistributionTagSchool = () => {
       const response = await callApi(
         "POST",
         "/getUntaggedSchoolList",
-        deliveryData
+        deliveryData,
       );
 
       if (!response.error && response.data?.schoolList) {
@@ -63,7 +65,7 @@ const DistributionTagSchool = () => {
   const handleCheckboxChange = (id) => {
     if (selectedIds.includes(id)) {
       setSelectedIds((prev) =>
-        prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+        prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
       );
     } else {
       setSelectedIds((prev) => [...prev, id]);
@@ -83,7 +85,7 @@ const DistributionTagSchool = () => {
       const response = await callApi(
         "POST",
         "/tagSchoolWithDeliveryPoint",
-        dataSet
+        dataSet,
       );
 
       if (!response.error) {
