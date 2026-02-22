@@ -6,9 +6,9 @@ import useApi from "../../../Hooks/useApi";
 import LogoutPopup from "../../../Components/LogoutPopup";
 import { toast } from "react-toastify";
 import { usePhaseStore } from "../../../Store/phaseStore";
-import DashboardBlockTagging from "../DashboardGraph/DashboardBlockTagging";
+import DashboardBlockChallan from "../DashboardGraph/DashboardBlockChallan";
 
-const DashboardTagging = () => {
+const DashboardChallan = () => {
   const { callApi, showPopup, popupMessage, handleLogout, setShowPopup } =
     useApi();
 
@@ -47,7 +47,7 @@ const DashboardTagging = () => {
   return (
     <>
       <AdminAuthenticatedLayout>
-        <DashboardBlockTagging
+        <DashboardBlockChallan
           graphData={dashboardData}
           setLoading={setLoading}
         />
@@ -68,4 +68,4 @@ const DashboardTagging = () => {
   );
 };
 
-export default DashboardTagging;
+export default DashboardChallan;
