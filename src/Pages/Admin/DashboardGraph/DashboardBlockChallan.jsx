@@ -219,7 +219,7 @@ const DashboardBlockChallan = ({ graphData, setLoading }) => {
             subText="View all supply receipts"
             icon={HiClipboardDocumentList}
             colorClass="bg-blue-600"
-            onClick={() => navigate(`/Block/ChallanList/${phaseId}`)}
+            onClick={() => navigate(`/ChallanView`)}
           />
           <ActionCard
             title="Download School Receipt"

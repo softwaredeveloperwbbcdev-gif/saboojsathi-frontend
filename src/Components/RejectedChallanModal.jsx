@@ -8,6 +8,7 @@ const InputLabel = ({ children, htmlFor }) => (
 );
 
 const RejectedChallanModal = ({ rejectedMsg, onClose }) => {
+  console.log(rejectedMsg);
   return (
     <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl overflow-hidden max-w-lg w-full transform transition-all duration-300">
       {/* Header with a prominent icon */}

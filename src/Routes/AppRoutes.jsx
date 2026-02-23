@@ -26,6 +26,7 @@ import ViewStudent from "../Pages/Admin/Circle/ViewStudent.jsx";
 //Block User Pages
 import DashboardTagging from "../Pages/Admin/Block/DashboardTagging.jsx";
 import DashboardChallan from "../Pages/Admin/Block/DashboardChallan.jsx";
+import ChallanView from "../Pages/Admin/Block/ChallanView.jsx";
 import DistributionUploadViewDistrict from "../Pages/Admin/District/DownloadDistributionViewDistrict.jsx";
 import DistributionLocationProcess from "../Pages/Admin/Block/DistributionLocationProcess.jsx";
 import DistributionTagSchool from "../Pages/Admin/Block/DistributionTagSchool.jsx";
@@ -277,6 +278,14 @@ const AppRoutes = () => {
           </AuthGuard>
         }
       />
+      <Route
+        path="/ChallanView"
+        element={
+          <AuthGuard>
+            <ChallanView />
+          </AuthGuard>
+        }
+      ></Route>
       <Route
         path="/DownloadMemorandumView/:phaseId"
         element={
