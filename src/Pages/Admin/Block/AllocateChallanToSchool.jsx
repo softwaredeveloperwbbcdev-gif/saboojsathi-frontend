@@ -28,7 +28,7 @@ const AllocateChallanToSchool = () => {
 
   const totalCurrentAllocation = Object.values(allocations).reduce(
     (total, current) => total + current.boys + current.girls,
-    0
+    0,
   );
 
   const handleAllocationChange = (id, gender, value) => {
@@ -46,13 +46,13 @@ const AllocateChallanToSchool = () => {
     }
 
     const maxAllowed =
-      gender === 1
+      gender === "boys"
         ? school.boys - school.boys_all
         : school.girls - school.girls_all;
 
     if (newAllocation > maxAllowed) {
       toast.error(
-        `Allocation for ${school.school_name} (${gender}) cannot be more than ${maxAllowed}.`
+        `Allocation for ${school.school_name} (${gender}) cannot be more than ${maxAllowed}.`,
       );
       return;
     }
@@ -64,7 +64,7 @@ const AllocateChallanToSchool = () => {
       challanDetails.remaining_allocation
     ) {
       toast.error(
-        `Total allocation cannot exceed remaining cycles (${challanDetails.remaining_allocation}).`
+        `Total allocation cannot exceed remaining cycles (${challanDetails.remaining_allocation}).`,
       );
       return;
     }
@@ -135,7 +135,7 @@ const AllocateChallanToSchool = () => {
     const allocatedData = schoolList
       .filter((school) => allocations[school.school_id]?.selected)
       .map((school) => ({
-        challanId: challanDetails.challan_no,
+        challanId: btoa(challanDetails.challan_id_pk),
         schoolId: school.school_id,
         currentAllocation: {
           boys: allocations[school.school_id]?.boys || 0,
@@ -182,7 +182,7 @@ const AllocateChallanToSchool = () => {
       const response = await callApi(
         "POST",
         "/getAllocationChallanSchoolDetails",
-        deliveryData
+        deliveryData,
       );
 
       if (
@@ -210,7 +210,7 @@ const AllocateChallanToSchool = () => {
         schoolList.reduce((acc, school) => {
           acc[school.school_id] = { boys: 0, girls: 0, selected: false };
           return acc;
-        }, {})
+        }, {}),
       );
     }
   }, [schoolList]);
@@ -428,7 +428,7 @@ const AllocateChallanToSchool = () => {
                             handleAllocationChange(
                               school.school_id,
                               "boys",
-                              e.target.value
+                              e.target.value,
                             )
                           }
                           className={`w-16 md:w-20 text-center border rounded-md p-1 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
@@ -451,7 +451,7 @@ const AllocateChallanToSchool = () => {
                             handleAllocationChange(
                               school.school_id,
                               "girls",
-                              e.target.value
+                              e.target.value,
                             )
                           }
                           className={`w-16 md:w-20 text-center border rounded-md p-1 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
