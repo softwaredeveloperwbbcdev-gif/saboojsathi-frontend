@@ -219,7 +219,7 @@ const ChallanCmsEntry = () => {
       } else {
         setChallanMasterData((prev) => ({
           ...prev,
-          cycleDetails: response.data[0] || {},
+          cycleDetails: response.data || {},
         }));
       }
     } catch (err) {

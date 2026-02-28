@@ -18,6 +18,7 @@ import {
   ClipboardCheck,
   Share2,
 } from "lucide-react";
+import { IoPieChart } from "react-icons/io5";
 import { toast } from "react-toastify";
 import useApi from "../../../Hooks/useApi";
 import RejectChallanModal from "../../../Components/RejectChallanModal";
@@ -109,7 +110,7 @@ const ChallanView = () => {
       const response = await callApi("POST", "/getAllocationDetails", {
         challan_id: btoa(challanId),
       });
-
+      console.log(response);
       if (!response.error && response.data?.allocationList) {
         setAllocationList(response.data.allocationList);
         setIsModalOpen(true);
@@ -131,18 +132,46 @@ const ChallanView = () => {
   const downloadPdf = async (challanNo) => {
     setLoading(true);
     try {
-      const response = await callApi("POST", "/downloadChallanReceipt", {
-        phaseId,
-        challan_no: challanNo,
-      });
-      if (!response.error && response.data?.base64) {
+      const response = await callApi(
+        "POST",
+        "downloadChallanReceipt",
+        {
+          phaseId: phaseId, // Included from useParams()
+          challan_no: challanNo,
+        },
+        {
+          responseType: "blob",
+        },
+      );
+
+      if (response.error) {
+        toast.error(`Download failed: ${response.message || "Server error"}`);
+      } else {
+        // Create the Blob specifically as a PDF
+        const blob = new Blob([response.data], {
+          type: "application/pdf",
+        });
+
+        const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
-        link.href = `data:${response.data.mime};base64,${response.data.base64}`;
-        link.download = response.data.filename || "challan.pdf";
+        link.href = url;
+
+        // Setting filename; decoding challanNo for the label
+        const fileNameLabel =
+          typeof challanNo === "string" ? atob(challanNo) : "Receipt";
+        link.download = `Challan_${fileNameLabel}.pdf`;
+
+        document.body.appendChild(link);
         link.click();
+        link.remove();
+
+        // Clean up the URL object to free memory
+        window.URL.revokeObjectURL(url);
+        toast.success("Challan PDF downloaded successfully");
       }
     } catch (err) {
-      toast.error("Download failed");
+      console.error("❌ PDF download failed:", err);
+      toast.error("Unexpected PDF download error.");
     } finally {
       setLoading(false);
     }
@@ -276,7 +305,7 @@ const ChallanView = () => {
                         )}
                         {challan.status == 3 && (
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 text-xs font-bold">
-                            <PieChart size={14} /> Partially Allocated
+                            <IoPieChart size={14} /> Partially Allocated
                           </span>
                         )}
                         {challan.status == 4 && (
