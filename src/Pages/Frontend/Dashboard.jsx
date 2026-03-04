@@ -5,6 +5,8 @@ import Loader from "../../Components/Loader";
 import DashboardSchool from "../Admin/DashboardGraph/DashboardSchool";
 import DashboardCircle from "../Admin/DashboardGraph/DashboardCircle";
 import DashboardBlockProfile from "../Admin/DashboardGraph/DashboardBlockProfile";
+import DashboardDistrict from "../Admin/DashboardGraph/DashboardDistrict";
+import DashboardState from "../Admin/DashboardGraph/DashboardState";
 import useApi from "../../Hooks/useApi";
 import LogoutPopup from "../../Components/LogoutPopup";
 import { toast } from "react-toastify";
@@ -14,9 +16,9 @@ const DASHBOARD_MAP = {
   "0701": DashboardSchool,
   "0601": DashboardCircle,
   "0501": DashboardBlockProfile,
-  // "0304": getDistrictSideMenu,
-  // "0207": getStateSideMenu,
-  // "0208": getStateSideMenu,
+  "0304": DashboardDistrict,
+  "0207": DashboardState,
+  "0208": DashboardState,
 };
 
 const Dashboard = () => {

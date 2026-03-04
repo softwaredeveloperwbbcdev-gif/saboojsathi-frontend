@@ -226,16 +226,14 @@ const DashboardBlockChallan = ({ graphData, setLoading }) => {
             subText="Get individual receipts"
             icon={HiArrowDownTray}
             colorClass="bg-emerald-600"
-            onClick={() => navigate(`/Block/DownloadReceipt/${phaseId}`)}
+            onClick={() => navigate(`/DownloadMemorandumView`)}
           />
           <ActionCard
             title="Challan Generation Report"
             subText="View generation statistics"
             icon={HiDocumentChartBar}
             colorClass="bg-indigo-600"
-            onClick={() =>
-              navigate(`/BlockReport/ChallanGeneration/${phaseId}`)
-            }
+            onClick={() => navigate(`/ChallanGenerationReportSchool`)}
           />
         </div>
       </div>

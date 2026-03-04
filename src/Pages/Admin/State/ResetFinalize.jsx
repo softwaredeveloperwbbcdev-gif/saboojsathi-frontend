@@ -1,17 +1,33 @@
 // ResetFinalizeDesign.jsx
-import React, { useEffect, useState, forwardRef } from "react";
+import { useEffect, useState, forwardRef } from "react";
 import { useForm } from "react-hook-form";
 import Loader from "../../../Components/Loader";
 import AdminAuthenticatedLayout from "../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
-//import InputLabel from "../../../Components/InputLabel";
-//import InputError from "../../../Components/InputError";
-//import SelectInput from "../../../Components/SelectInput";
-//import TextInput from "../../../Components/TextInput";
 import useApi from "../../../Hooks/useApi";
 import { toast } from "react-toastify";
 import axios from "axios";
 
-const MOCK_PHASES = ["X", "IX", "VIII"];
+const MOCK_PHASES = [
+  { value: btoa(14), label: "PHASE XIII" },
+  { value: btoa(13), label: "PHASE XII" },
+  { value: btoa(12), label: "PHASE XI" },
+  { value: btoa(11), label: "PHASE X" },
+  { value: btoa(10), label: "PHASE IX" },
+  { value: btoa(9), label: "PHASE VIII" },
+  { value: btoa(8), label: "PHASE VII" },
+  { value: btoa(7), label: "PHASE VI" },
+  { value: btoa(6), label: "PHASE V" },
+  { value: btoa(5), label: "PHASE IV" },
+  {
+    label: "PHASE III",
+    isGroup: true,
+    options: [
+      { value: btoa(4), label: "PHASE III-2016" },
+      { value: btoa(3), label: "PHASE III-2017" },
+    ],
+  },
+  { value: btoa(2), label: "PHASE II" },
+];
 
 const InputLabel = ({ value, className = "", ...props }) => (
   <label
@@ -104,7 +120,7 @@ export default function ResetFinalizeDesign() {
       toast(
         `Failed to fetch data: ${
           error.response?.data?.message || error.message || "Unknown error"
-        }`
+        }`,
       );
     } finally {
       setLoading(false);
@@ -140,12 +156,14 @@ export default function ResetFinalizeDesign() {
 
       try {
         setLoading(true);
-        const response = await callApi("GET", `schools/${districtId}`);
+        const response = await callApi("POST", `schools`, {
+          districtId: btoa(districtId),
+        });
         const list = Array.isArray(response?.data)
           ? response.data
           : Array.isArray(response?.data?.data)
-          ? response.data.data
-          : [];
+            ? response.data.data
+            : [];
         setSchool(list);
       } catch (err) {
         console.error("load schools error:", err);
@@ -175,12 +193,7 @@ export default function ResetFinalizeDesign() {
 
     setLoading(true);
     try {
-      const response = await callApi("POST", "reset-finalize", payload);
-
-      // Defensive checks for captcha failure / invalid response:
-      // 1) response.error => treat as failure
-      // 2) explicit captcha flag from backend (if it returns captcha_valid: false)
-      // 3) missing expected school data => treat as failure
+      const response = await callApi("POST", "resetFinalize", payload);
       const captchaValidExplicit = response?.data?.captcha_valid;
       const hasSchoolData =
         Array.isArray(response?.data?.school) &&
@@ -226,14 +239,14 @@ export default function ResetFinalizeDesign() {
     }
   };
 
-  const reset_school = async (dise_code) => {
+  const reset_school = async (school_id) => {
     const payload = {
-      schcd: dise_code,
-      phase: phase,
+      schoolId: btoa(school_id),
+      phaseId: phase,
     };
     setLoading(true);
     try {
-      const response = await callApi("POST", "reset-now", payload);
+      const response = await callApi("POST", "resetNow", payload);
 
       if (response.error) {
         toast.error("Failed to reset: " + response.message);
@@ -268,295 +281,6 @@ export default function ResetFinalizeDesign() {
 
   return (
     <>
-      {/* <AdminAuthenticatedLayout>
-      <div
-        style={{
-          fontFamily:
-            "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
-        }}
-      >
-        <div style={{ maxWidth: 900, margin: "32px auto", padding: 20 }}>
-          <form
-            onSubmit={handleSubmit(onProcess)}
-            style={{
-              border: "1px solid #e6e6e6",
-              borderRadius: 8,
-              padding: 16,
-              background: "#fff",
-            }}
-          >
-            <div
-              style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}
-            >
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 12,
-                }}
-              >
-
-                <div>
-                  <InputLabel value="District" />
-                  <SelectInput
-                    {...register("district", {
-                      required: "select District",
-                      onChange: (e) =>
-                        handleOnChange("district", e.target.value),
-                    })}
-                    className=""
-                  >
-                    <option value="">-- Select District --</option>
-                    {district.map((d) => (
-                      <option key={d.id} value={d.id}>
-                        {String(d.desc ?? "").trim()}
-                      </option>
-                    ))}
-                  </SelectInput>
-                  <InputError message={errors.district?.message} />
-                </div>
-
-                <div>
-                  <InputLabel value="School" />
-                  <SelectInput
-                    {...register("school", {
-                      required: "Select School",
-                    })}
-                    className=""
-                  >
-                    <option value="">-- Select School --</option>
-                    {school.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {String(s.desc ?? "").trim()}
-                      </option>
-                    ))}
-                  </SelectInput>
-                  <InputError message={errors.school?.message} />
-                </div>
-              </div>
-
-              <div>
-                <InputLabel value="Phase" />
-                <SelectInput
-                  {...register("phase", {
-                    required: "select phase",
-                  })}
-                  className=""
-                >
-                  <option value="">-- Select Phase --</option>
-                  {MOCK_PHASES.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
-                  ))}
-                </SelectInput>
-                <InputError message={errors.phase?.message} />
-              </div>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 120px",
-                  gap: 12,
-                  alignItems: "end",
-                }}
-              >
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <InputLabel value="Captcha" />
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <div
-                      style={{
-                        padding: "10px 12px",
-                        border: "1px solid #e0e0e0",
-                        borderRadius: 6,
-                        display: "flex",
-                        alignItems: "center",
-                        minWidth: 160,
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      {captcha || "Loading..."}
-                      <button
-                        type="button"
-                        onClick={fetchCaptchaData}
-                        aria-label="Reload captcha"
-                        title="Reload captcha"
-                        style={{
-                          background: "transparent",
-                          border: "none",
-                          cursor: "pointer",
-                          color: "#333",
-                          paddingLeft: 8,
-                        }}
-                      >
-                        <svg
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <path
-                            d="M21 12A9 9 0 103 12"
-                            stroke="#333"
-                            strokeWidth="1.6"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                          <path
-                            d="M21 3v6h-6"
-                            stroke="#333"
-                            strokeWidth="1.6"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <InputLabel value="Enter answer" />
-                  <TextInput
-                    placeholder="Type captcha"
-                    {...register("captcha", {
-                      required: "Captcha is required",
-                      onChange: (e) => setCaptchaAnswer(e.target.value),
-                    })}
-                    className=""
-                  />
-                  <InputError
-                    message={
-                      errors.captcha?.message || backendErrors.captcha?.[0]
-                    }
-                  />
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: 8 }}>
-                <button
-                  type="submit"
-                  style={{
-                    padding: "10px 14px",
-                    borderRadius: 6,
-                    border: "none",
-                    background: "#e11d48",
-                    color: "#fff",
-                    cursor: "pointer",
-                  }}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Processing..." : "Process School"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    resetField("district");
-                    resetField("school");
-                    resetField("phase");
-                    resetField("captcha");
-                    setProcessedVisible(false);
-                    setResetSchoolData([]);
-                    setCaptchaAnswer("");
-                    fetchCaptchaData();
-                  }}
-                  style={{
-                    padding: "10px 14px",
-                    borderRadius: 6,
-                    border: "1px solid #cfcfcf",
-                    background: "#fff",
-                    cursor: "pointer",
-                  }}
-                >
-                  Reset Form
-                </button>
-              </div>
-            </div>
-          </form>
-
-
-          {processedVisible && (
-            <div
-              style={{
-                marginTop: 18,
-                padding: 16,
-                borderRadius: 8,
-                border: "1px solid #e6e6e6",
-                background: "#fafafa",
-              }}
-            >
-              <h3 style={{ marginTop: 0, marginBottom: 12, fontSize: 16 }}>
-                Processed School Details
-              </h3>
-              {restSchoolData && restSchoolData?.[0] && (
-                <div style={{ display: "grid", gap: 10 }}>
-                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                    <div style={{ minWidth: 160 }}>
-                      <div
-                        style={{ fontSize: 12, color: "#666", marginBottom: 6 }}
-                      >
-                        Dice Code
-                      </div>
-                      <div
-                        style={{
-                          padding: "10px 12px",
-                          borderRadius: 6,
-                          border: "1px solid #ddd",
-                        }}
-                      >
-                        {restSchoolData?.[0]?.schcd}
-                      </div>
-                    </div>
-
-                    <div style={{ flex: 1, minWidth: 200 }}>
-                      <div
-                        style={{ fontSize: 12, color: "#666", marginBottom: 6 }}
-                      >
-                        School Name
-                      </div>
-                      <div
-                        style={{
-                          padding: "10px 12px",
-                          borderRadius: 6,
-                          border: "1px solid #ddd",
-                        }}
-                      >
-                        {restSchoolData?.[0]?.school_name}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                    {locked == "1" ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          reset_school(restSchoolData?.[0]?.schcd);
-                        }}
-                        style={{
-                          padding: "10px 14px",
-                          borderRadius: 6,
-                          border: "none",
-                          background: "#e11d48",
-                          color: "#fff",
-                          cursor: "pointer",
-                        }}
-                      >
-                        Reset Finalize
-                      </button>
-                    ) : (
-                      "School is Unlocked"
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {loading && <Loader />}
-      </div>
-    </AdminAuthenticatedLayout>*/}
-
       <AdminAuthenticatedLayout>
         <div className="mx-auto max-w-4xl p-4 py-8 md:p-6 md:py-12">
           {/* Page Header */}
@@ -649,15 +373,41 @@ export default function ResetFinalizeDesign() {
                   <InputLabel value="Phase" />
                   <SelectInput
                     {...register("phase", {
-                      required: "Please select a Phase",
+                      required: "Please select a Target Phase",
+                      onChange: (e) => handleOnChange("phase", e.target.value),
                     })}
                   >
-                    <option value="">-- Select Phase --</option>
-                    {MOCK_PHASES.map((p) => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
-                    ))}
+                    <option value="">Select Target Phase</option>
+
+                    {MOCK_PHASES.map((phase, index) => {
+                      // Determine a unique string key for the top level
+                      const topKey = phase.isGroup
+                        ? `group-${phase.label}-${index}`
+                        : `option-${phase.value}-${index}`;
+
+                      if (phase.isGroup) {
+                        return (
+                          <optgroup key={topKey} label={phase.label}>
+                            {phase.options.map((opt, subIndex) => (
+                              <option
+                                key={`sub-${opt.value}-${subIndex}`}
+                                value={opt.value}
+                              >
+                                {/* FIX: Ensure we render opt.label (a string), NOT the 'opt' object */}
+                                {opt.label}
+                              </option>
+                            ))}
+                          </optgroup>
+                        );
+                      }
+
+                      return (
+                        <option key={topKey} value={phase.value}>
+                          {/* FIX: Ensure we render phase.label (a string), NOT the 'phase' object */}
+                          {phase.label}
+                        </option>
+                      );
+                    })}
                   </SelectInput>
                   <InputError message={errors.phase?.message} />
                 </div>
@@ -775,7 +525,7 @@ export default function ResetFinalizeDesign() {
                     <button
                       type="button"
                       onClick={() => {
-                        reset_school(restSchoolData?.[0]?.schcd);
+                        reset_school(restSchoolData?.[0]?.school_id_pk);
                       }}
                       className="inline-flex items-center gap-2 rounded-md bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
                       disabled={loading}

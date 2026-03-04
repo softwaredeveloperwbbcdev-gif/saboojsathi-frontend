@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import AdminAuthenticatedLayout from "../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
-import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import InputLabel from "../../../Components/InputLabel";
 import SelectInput from "../../../Components/SelectInput";
@@ -8,6 +7,7 @@ import { FaFilePdf } from "react-icons/fa";
 import useApi from "../../../Hooks/useApi";
 import LogoutPopup from "../../../Components/LogoutPopup";
 import { toast } from "react-toastify";
+import { usePhaseStore } from "../../../Store/phaseStore";
 
 import {
   phaseYearId,
@@ -15,7 +15,7 @@ import {
 } from "../../../Utils/Constants/Constants";
 
 const DownloadMemorandumView = () => {
-  const { phaseId } = useParams();
+  const phaseId = usePhaseStore((state) => state.phaseId);
   const phaseDetails = phaseYearId[phaseId] || defaultPhaseYear;
   const user = JSON.parse(atob(localStorage.getItem("user")));
 
@@ -41,7 +41,7 @@ const DownloadMemorandumView = () => {
       const response = await callApi(
         "POST",
         "/getTaggedShoolListForChallan",
-        deliveryData
+        deliveryData,
       );
 
       if (!response.error && response.data?.schoolList) {
@@ -74,7 +74,7 @@ const DownloadMemorandumView = () => {
       const response = await callApi(
         "POST",
         "/downloadMemorandumView",
-        finalData
+        finalData,
       );
 
       if (!response.error && response.data?.allocationList) {
@@ -98,45 +98,96 @@ const DownloadMemorandumView = () => {
     handleSubmit(onSubmit)();
   };
 
+  // const downloadPdf = async (allocationId) => {
+  //   const payload = {
+  //     allocation_id: allocationId,
+  //     phaseId: phaseId,
+  //   };
+  //   setLoading(true);
+
+  //   try {
+  //     const response = await callApi("POST", "/downloadSchoolReceipt", payload);
+
+  //     if (!response.error && response.data?.base64 && response.data?.mime) {
+  //       const { base64, mime, filename } = response.data;
+
+  //       const byteCharacters = atob(base64);
+  //       const byteNumbers = new Array(byteCharacters.length);
+  //       for (let i = 0; i < byteCharacters.length; i++) {
+  //         byteNumbers[i] = byteCharacters.charCodeAt(i);
+  //       }
+  //       const byteArray = new Uint8Array(byteNumbers);
+  //       const blob = new Blob([byteArray], { type: mime });
+
+  //       // Create object URL and force download
+  //       const blobUrl = URL.createObjectURL(blob);
+  //       const link = document.createElement("a");
+  //       link.href = blobUrl;
+  //       link.download = filename || "school-receipt.pdf";
+  //       document.body.appendChild(link);
+  //       link.click();
+  //       document.body.removeChild(link);
+  //     } else {
+  //       toast.error(`❌ Download failed: ${response.message}`);
+  //     }
+  //   } catch (err) {
+  //     toast.error(`❌ Error during PDF download: ${err}`);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const downloadPdf = async (allocationId) => {
     const payload = {
       allocation_id: allocationId,
       phaseId: phaseId,
     };
+
     setLoading(true);
 
     try {
-      const response = await callApi("POST", "/downloadSchoolReceipt", payload);
+      const response = await callApi(
+        "POST",
+        "/downloadSchoolReceipt",
+        payload,
+        {
+          responseType: "blob",
+        },
+      );
 
-      if (!response.error && response.data?.base64 && response.data?.mime) {
-        const { base64, mime, filename } = response.data;
+      if (response.error) {
+        toast.error(
+          `❌ Download failed: ${response.message || "Server error"}`,
+        );
+      } else {
+        // Create the Blob specifically as a PDF directly from response data
+        const blob = new Blob([response.data], {
+          type: "application/pdf",
+        });
 
-        const byteCharacters = atob(base64);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: mime });
-
-        // Create object URL and force download
-        const blobUrl = URL.createObjectURL(blob);
+        const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
-        link.href = blobUrl;
-        link.download = filename || "school-receipt.pdf";
+        link.href = url;
+
+        // You can customize the file name to include the allocationId
+        link.download = `School_Receipt_${allocationId}.pdf`;
+
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
-      } else {
-        toast.error(`❌ Download failed: ${response.message}`);
+
+        // Clean up the DOM and memory
+        link.remove();
+        window.URL.revokeObjectURL(url);
+
+        toast.success("PDF download started successfully");
       }
     } catch (err) {
-      toast.error(`❌ Error during PDF download: ${err}`);
+      console.error("❌ PDF download failed:", err);
+      toast.error("Unexpected PDF download error.");
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <>
       <AdminAuthenticatedLayout>

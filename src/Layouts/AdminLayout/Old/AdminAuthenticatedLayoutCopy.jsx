@@ -4,12 +4,12 @@ import { useIdleTimer } from "react-idle-timer";
 import { useContext } from "react";
 import { TokenContext } from "./../../../ContextProvider/TokenContext";
 import AdminHeader from "./../AdminHeader";
-import AdminSidebar from "./../AdminSidebar";
+import AdminSidebar from "./AdminSidebarCopy";
 import AdminFooter from "./../AdminFooter";
-import { getSchoolSideMenu } from "./../SideMenus/SchoolSideMenu";
-import { getSISideMenu } from "./../SideMenus/SISideMenu";
-import { getBlockSideMenu } from "./../SideMenus/BlockSideMenu";
-import { getDistrictSideMenu } from "./../SideMenus/DistrictSideMenu";
+import { getSchoolSideMenu } from "./../SideMenus/Old/SchoolSideMenu copy";
+import { getSISideMenu } from "./../SideMenus/Old/SISideMenu copy";
+import { getBlockSideMenu } from "./../SideMenus/old/BlockSideMenu copy";
+import { getDistrictSideMenu } from "./../SideMenus/Old/DistrictSideMenu copy";
 import { getStateSideMenu } from "./../SideMenus/StateSideMenu";
 import MsgDisplayModalInActive from "./../../../Components/MsgDisplayModalInActive";
 

@@ -36,7 +36,7 @@ const InputError = ({ message, className = "", ...props }) => {
 
 const TextInput = forwardRef(function TextInput(
   { type = "text", className = "", isFocused = false, ...props },
-  ref
+  ref,
 ) {
   const inputRef = ref ? ref : useRef();
 
@@ -65,7 +65,7 @@ const TextInput = forwardRef(function TextInput(
 
 const SelectInput = forwardRef(function SelectInput(
   { className = "", children, ...props },
-  ref
+  ref,
 ) {
   // Base styling for modern, clean look (inherited from the main component's styling)
   const baseStyle =
@@ -160,7 +160,7 @@ function ResetPasswordState() {
       toast(
         `Failed to fetch data: ${
           error.response?.data?.message || error.message || "Unknown error"
-        }`
+        }`,
       );
     } finally {
       setLoading(false);
@@ -172,7 +172,7 @@ function ResetPasswordState() {
     // special case: stake 0304 uses district loginid directly
     if (selectedStake === "0304" && selectedDistrict) {
       const selectLoginID = districts.find(
-        (val) => String(val.id) === String(selectedDistrict)
+        (val) => String(val.id) === String(selectedDistrict),
       );
       const loginId = selectLoginID?.loginid;
       setValue("loginId", loginId);
@@ -193,10 +193,10 @@ function ResetPasswordState() {
   const fetchStakeInfo = async () => {
     try {
       setLoading(true);
-      const response = await callApi(
-        "GET",
-        `getStakeOtherList/${selectedStake}/${selectedDistrict}`
-      );
+      const response = await callApi("POST", `getStakeOtherList`, {
+        stakeId: btoa(selectedStake),
+        distId: btoa(selectedDistrict),
+      });
       if (response.error) {
         toast(`Failed to fetch data: ${response.message}`);
       } else {
@@ -211,7 +211,7 @@ function ResetPasswordState() {
 
   const findIdForLogin = (id) => {
     const selectLoginID = dropDownVal.find(
-      (val) => String(val.id) === String(id)
+      (val) => String(val.id) === String(id),
     );
     const loginId = selectLoginID?.loginid;
     setValue("loginId", loginId);

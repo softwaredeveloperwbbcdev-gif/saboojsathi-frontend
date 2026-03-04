@@ -153,7 +153,7 @@ const AllocateChallanToSchool = () => {
       const response = await callApi("POST", "/allocationSave", allocatedData);
 
       if (!response.error) {
-        navigate(`/AllocateChallanView/${phaseId}`);
+        navigate(`/ChallanView`);
         toast.success("Challan Allocated Successfully!");
       } else {
         toast.error(`Failed to allocate challan: ${response.message}`);

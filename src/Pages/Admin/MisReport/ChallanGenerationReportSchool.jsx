@@ -5,17 +5,20 @@ import { useParams } from "react-router-dom";
 import useApi from "../../../Hooks/useApi";
 import LogoutPopup from "../../../Components/LogoutPopup";
 import { toast } from "react-toastify";
+import { usePhaseStore } from "../../../Store/phaseStore";
 import {
   phaseYearId,
   defaultPhaseYear,
 } from "../../../Utils/Constants/Constants";
 
 function ChallanGenerationReportBlock() {
-  const { phaseId, id } = useParams();
+  const phaseId = usePhaseStore((state) => state.phaseId);
   const phaseDetails = phaseYearId[phaseId] || defaultPhaseYear;
   const { callApi, showPopup, popupMessage, handleLogout, setShowPopup } =
     useApi();
 
+  const user = JSON.parse(atob(localStorage.getItem("user")));
+  const id = user.internal_code;
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
 
@@ -29,7 +32,7 @@ function ChallanGenerationReportBlock() {
       setLoading(true);
       const response = await callApi(
         "GET",
-        `challan_generation_report_school/${phaseId}/${id}`
+        `challan_generation_report_school/${phaseId}/${id}`,
       ); // API call
       if (response.error) {
         console.log(JSON.stringify(response));
