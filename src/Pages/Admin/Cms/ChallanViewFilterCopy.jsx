@@ -18,7 +18,7 @@ const useDarkMode = () => {
   const [isDark, setIsDark] = useState(
     () =>
       window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches
+      window.matchMedia("(prefers-color-scheme: dark)").matches,
   );
 
   useEffect(() => {
@@ -58,6 +58,8 @@ const ChallanViewFilter = () => {
   const { callApi, showPopup, popupMessage, handleLogout, setShowPopup } =
     useApi();
 
+  const phase = watch("phase");
+
   const [loading, setLoading] = useState(false);
   const [challanData, setChallanData] = useState([]);
   const [challanViewData, setChallanViewData] = useState({
@@ -73,7 +75,7 @@ const ChallanViewFilter = () => {
   const fetchData = async () => {
     setLoading(true); // Start loader
     try {
-      const response = await callApi("GET", `cmsphase`);
+      const response = await callApi("POST", `cmsphase`);
       if (response.error) {
         // Handle the error (e.g., alert the user)
         toast.error(`Failed to fetch data phase ${response.message}`);
@@ -117,7 +119,9 @@ const ChallanViewFilter = () => {
     }));
     try {
       if (phase !== "") {
-        const response = await callApi("GET", `cmsdistrictchallan/${phase}`);
+        const response = await callApi("POST", `cmsdistrictchallan`, {
+          phase: btoa(phase),
+        });
         if (response.error) {
           // Handle the error (e.g., alert the user)
           toast.error(`Failed to fetch district data ${response.message}`);
@@ -143,10 +147,9 @@ const ChallanViewFilter = () => {
     }));
     try {
       if (districtChallan !== "") {
-        const response = await callApi(
-          "GET",
-          `cmsblockchallan/${districtChallan}`
-        );
+        const response = await callApi("POST", `cmsblockchallan`, {
+          id: btoa(districtChallan),
+        });
         if (response.error) {
           // Handle the error (e.g., alert the user)
           toast.error(`Failed to fetch block data ${response.message}`);
@@ -170,7 +173,7 @@ const ChallanViewFilter = () => {
       const response = await callApi(
         "Post",
         `cmschallanviewsupplier`,
-        formdata
+        formdata,
       );
       if (response.error) {
         // Handle the error (e.g., alert the user)
@@ -185,43 +188,96 @@ const ChallanViewFilter = () => {
     }
   };
 
+  // const onDownload = async (challanId) => {
+  //   const challan = {
+  //     phaseId: btoa(phase),
+  //     challan_no: challanId,
+  //   };
+  //   setLoading(true);
+  //   try {
+  //     const response = await callApi(
+  //       "POST",
+  //       "/downloadChallanReceipt",
+  //       challan,
+  //     );
+
+  //     if (!response.error && response.data?.base64 && response.data?.mime) {
+  //       const byteCharacters = atob(response.data.base64);
+  //       const byteNumbers = new Array(byteCharacters.length);
+
+  //       for (let i = 0; i < byteCharacters.length; i++) {
+  //         byteNumbers[i] = byteCharacters.charCodeAt(i);
+  //       }
+
+  //       const byteArray = new Uint8Array(byteNumbers);
+  //       const blob = new Blob([byteArray], { type: response.data.mime });
+
+  //       // Create a blob URL and trigger download
+  //       const blobUrl = URL.createObjectURL(blob);
+  //       const link = document.createElement("a");
+  //       link.href = blobUrl;
+  //       link.download = response.data.filename || "challan-receipt.pdf";
+  //       document.body.appendChild(link);
+  //       link.click();
+  //       document.body.removeChild(link);
+  //     } else {
+  //       toast.error(`❌ Failed to download PDF: ${response.message}`);
+  //     }
+  //   } catch (err) {
+  //     toast.error(`❌ Error while downloading PDF: ${err}`);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const onDownload = async (challanId) => {
-    const challan = {
-      phaseId: challanData.phase,
-      challan_no: challanId,
-    };
     setLoading(true);
     try {
       const response = await callApi(
         "POST",
         "/downloadChallanReceipt",
-        challan
+        {
+          phaseId: btoa(phase), // Matches your original request structure
+          challan_no: challanId,
+        },
+        {
+          responseType: "blob", // Instructs API handler to return binary data
+        },
       );
 
-      if (!response.error && response.data?.base64 && response.data?.mime) {
-        const byteCharacters = atob(response.data.base64);
-        const byteNumbers = new Array(byteCharacters.length);
+      if (response.error) {
+        toast.error(
+          `❌ Download failed: ${response.message || "Server error"}`,
+        );
+      } else {
+        // Create a Blob from the binary response data
+        const blob = new Blob([response.data], {
+          type: response.data.type || "application/pdf",
+        });
 
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: response.data.mime });
-
-        // Create a blob URL and trigger download
-        const blobUrl = URL.createObjectURL(blob);
+        // Create a temporary URL for the Blob
+        const blobUrl = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = blobUrl;
-        link.download = response.data.filename || "challan-receipt.pdf";
+
+        // Logic for the filename: decodes the challanId if it's base64
+        const fileNameLabel =
+          typeof challanId === "string" ? atob(challanId) : "receipt";
+        link.download = `Challan_${fileNameLabel}.pdf`;
+
+        // Trigger the download
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
-      } else {
-        toast.error(`❌ Failed to download PDF: ${response.message}`);
+
+        // Cleanup: remove link and revoke the URL to free up memory
+        link.remove();
+        window.URL.revokeObjectURL(blobUrl);
+
+        toast.success("✅ Challan Receipt downloaded successfully");
       }
     } catch (err) {
-      toast.error(`❌ Error while downloading PDF: ${err}`);
+      console.error("❌ PDF download error:", err);
+      toast.error(`❌ Unexpected error: ${err.message || "Download failed"}`);
     } finally {
       setLoading(false);
     }
@@ -237,7 +293,7 @@ const ChallanViewFilter = () => {
       const response = await callApi(
         "POST",
         "/getChallanRejectReason",
-        ChallanData
+        ChallanData,
       );
 
       if (!response.error && response.data) {
@@ -269,7 +325,7 @@ const ChallanViewFilter = () => {
       const response = await callApi(
         "POST",
         "/getAllocationDetails",
-        finalData
+        finalData,
       );
 
       if (!response.error && response.data?.allocationList) {

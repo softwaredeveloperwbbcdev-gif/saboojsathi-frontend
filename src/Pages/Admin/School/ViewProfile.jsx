@@ -16,6 +16,7 @@ import StudentView from "../../../Components/StudentComponent/StudentView";
 import StudentListTable from "../../../Components/StudentComponent/StudentListTable";
 import DistributionModal from "../../../Components/StudentComponent/DistributionModal";
 import RejectedCauseModal from "../../../Components/StudentComponent/RejectedCauseModal";
+import { usePhaseStore } from "../../../Store/phaseStore";
 
 import {
   phaseYearId,
@@ -23,7 +24,7 @@ import {
 } from "../../../Utils/Constants/Constants";
 
 function ViewProfile() {
-  const { phaseId } = useParams();
+  const phaseId = usePhaseStore((state) => state.phaseId);
   const phaseDetails = phaseYearId[phaseId] || defaultPhaseYear;
   const navigate = useNavigate();
 
@@ -69,6 +70,7 @@ function ViewProfile() {
     defaultValues: {
       status_code: localStorage.getItem("student_filter_status") || "",
       year: year,
+      phaseId: phaseId,
       sortField: "(applicant_section, applicant_roll_no)",
     },
   });

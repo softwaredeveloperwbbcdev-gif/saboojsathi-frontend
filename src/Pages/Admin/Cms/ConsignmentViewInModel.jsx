@@ -31,17 +31,19 @@ export default function ConsignmentViewModal({ consignment, onClose }) {
             <h3 className="font-semibold text-lg mb-2">Primary Details</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
               <p>
-                Supplier: <b>{data.supplier_name}</b>
+                Supplier: <b>{data.supplier.supplier_name}</b>
               </p>
               <p>
-                District: <b>{data.destination_district}</b>
+                District: <b>{data.destination.district.dist_name}</b>
               </p>
               <p>
-                Block: <b>{data.destination_block}</b>
+                Block: <b>{data.destination.block.block_name}</b>
               </p>
               <p>
                 Delivery Location:{" "}
-                <b>{data.delivery_location?.toUpperCase()}</b>
+                <b>
+                  {data.destination?.delivery_location.distribution_location_name.toUpperCase()}
+                </b>
               </p>
               <p>
                 Consignment Date: <b>{data.consignment_date}</b>
@@ -56,22 +58,22 @@ export default function ConsignmentViewModal({ consignment, onClose }) {
             <h3 className="font-semibold text-lg mb-2">Shipping Details</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
               <p>
-                Truck No: <b>{data.truck_no?.toUpperCase()}</b>
+                Truck No: <b>{data.dispatch.truck_no?.toUpperCase()}</b>
               </p>
               <p>
-                Driver: <b>{data.driver_name?.toUpperCase()}</b>
+                Driver: <b>{data.drivers.driver_name?.toUpperCase()}</b>
               </p>
               <p>
-                Driver Mobile: <b>{data.driver_mobile_no}</b>
+                Driver Mobile: <b>{data.drivers.driver_mobile_no}</b>
               </p>
               <p>
-                Alt Mobile: <b>{data.driver_alt_mob_no}</b>
+                Alt Mobile: <b>{data.drivers.driver_alt_mob_no}</b>
               </p>
               <p>
-                Qty Boys: <b>{data.qty_boys}</b>
+                Qty Boys: <b>{data.dispatch.qty_boys}</b>
               </p>
               <p>
-                Qty Girls: <b>{data.qty_girls}</b>
+                Qty Girls: <b>{data.dispatch.qty_girls}</b>
               </p>
             </div>
           </section>

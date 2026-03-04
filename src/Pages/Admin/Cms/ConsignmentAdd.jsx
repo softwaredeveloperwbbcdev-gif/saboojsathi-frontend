@@ -74,14 +74,14 @@ const ConsignmentAdd = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await callApi("GET", "cmsconsignmentadddetails");
+      const response = await callApi("POST", "cmsconsignmentadddetails");
       if (response.error) {
         // Handle the error (e.g., alert the user)
         toast.error(`Failed to fetch data ${response.message}`);
       } else {
         setConsignmentAddData((prev) => ({
           ...prev,
-          csupplier: response.data.supplier_name || [],
+          csupplier: [response.data.supplier_name] || [],
           cphase: response.data.supplier_phase || [],
         }));
       }
@@ -95,7 +95,7 @@ const ConsignmentAdd = () => {
 
   useEffect(() => {
     if (phase) {
-      fetcDistrict(phase);
+      fetchDistrict(phase);
     }
   }, [phase]); // run when phase changes
 
@@ -106,10 +106,12 @@ const ConsignmentAdd = () => {
     }
   }, [district]); // run when phase changes
 
-  const fetcDistrict = async (phase) => {
+  const fetchDistrict = async (phase) => {
     setLoading(true);
     try {
-      const response = await callApi("GET", `cmsdistrictchallan/${phase}`);
+      const response = await callApi("POST", `cmsdistrictchallan`, {
+        phase: btoa(phase),
+      });
       if (response.error) {
         // Handle the error (e.g., alert the user)
         toast.error(`Failed to fetch data ${response.message}`);
@@ -130,10 +132,9 @@ const ConsignmentAdd = () => {
   const fetchBlocks = async (districtChallan) => {
     setLoading(true);
     try {
-      const response = await callApi(
-        "GET",
-        `cmsblockchallan/${districtChallan}`
-      );
+      const response = await callApi("POST", `cmsblockchallan`, {
+        id: btoa(districtChallan),
+      });
       if (response.error) {
         // Handle the error (e.g., alert the user)
         toast.error(`Failed to fetch data ${response.message}`);
@@ -161,10 +162,11 @@ const ConsignmentAdd = () => {
   const fetchDeliveryLocation = async (phase, district, block) => {
     setLoading(true);
     try {
-      const response = await callApi(
-        "GET",
-        `cmsdeliveryloc/${phase}/${district}/${block}`
-      );
+      const response = await callApi("POST", `cmsdeliveryloc`, {
+        phase: btoa(phase),
+        id: btoa(district),
+        bid: btoa(block),
+      });
       if (response.error) {
         // Handle the error (e.g., alert the user)
         toast.error(`Failed to fetch data ${response.message}`);
@@ -412,6 +414,7 @@ const ConsignmentAdd = () => {
                         name="drivermob"
                         type="tel"
                         placeholder="Driver Mobile Number"
+                        maxlength="10"
                       />
 
                       <InputField
@@ -419,6 +422,7 @@ const ConsignmentAdd = () => {
                         name="driveraltmob"
                         type="tel"
                         placeholder="Alternative Contact Number"
+                        maxlength="10"
                       />
                     </div>
                   </div>
@@ -435,13 +439,13 @@ const ConsignmentAdd = () => {
 
                       <InputField
                         label="Dispatch Date"
-                        name="dispacthdate"
+                        name="dispatchdate"
                         type="date"
                       />
 
                       <InputField
                         label="Dispatch Time"
-                        name="dispacthtime"
+                        name="dispatchtime"
                         type="time"
                       />
                     </div>

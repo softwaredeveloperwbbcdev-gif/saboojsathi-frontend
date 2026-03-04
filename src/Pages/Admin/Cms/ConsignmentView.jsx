@@ -25,76 +25,6 @@ import {
   AlertTriangle,
 } from "lucide-react";
 
-// const ConfirmationModal = ({
-//   show,
-//   onClose,
-//   onConfirm,
-//   title,
-//   children,
-//   icon: Icon = AlertTriangle, // Default to warning
-//   iconColor = "text-red-600",
-//   confirmText = "Confirm",
-//   confirmColor = "bg-red-600 hover:bg-red-700",
-// }) => {
-//   if (!show) {
-//     return null;
-//   }
-
-//   return (
-//     <div
-//       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden"
-//       onClick={onClose}
-//     >
-//       <div className="fixed inset-0 bg-black/50 transition-opacity" />
-//       <div
-//         className="relative z-50 w-full max-w-md p-4 mx-auto bg-white rounded-lg shadow-lg dark:bg-gray-800"
-//         onClick={(e) => e.stopPropagation()} // Prevent modal close on content click
-//       >
-//         <div className="flex sm:items-start">
-//           <div
-//             className={`mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full ${
-//               iconColor === "text-red-600"
-//                 ? "bg-red-100 dark:bg-red-900"
-//                 : "bg-green-100 dark:bg-green-900"
-//             } sm:mx-0 sm:h-10 sm:w-10`}
-//           >
-//             <Icon className={`h-6 w-6 ${iconColor}`} aria-hidden="true" />
-//           </div>
-//           <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-//             <h3
-//               className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100"
-//               id="modal-title"
-//             >
-//               {title}
-//             </h3>
-//             <div className="mt-2">
-//               <p className="text-sm text-gray-500 dark:text-gray-400">
-//                 {children}
-//               </p>
-//             </div>
-//           </div>
-//         </div>
-//         <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-//           <button
-//             type="button"
-//             className={`inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white ${confirmColor} focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm`}
-//             onClick={onConfirm}
-//           >
-//             {confirmText}
-//           </button>
-//           <button
-//             type="button"
-//             className="mt-3 inline-flex justify-center w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
-//             onClick={onClose}
-//           >
-//             Cancel
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
 const ConfirmationModal = ({
   show,
   onClose,
@@ -170,7 +100,7 @@ const useDarkMode = () => {
   const [isDark, setIsDark] = useState(
     () =>
       window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches
+      window.matchMedia("(prefers-color-scheme: dark)").matches,
   );
 
   useEffect(() => {
@@ -239,6 +169,7 @@ const ConsignmentView = () => {
     formState: { errors }, // Contains validation errors
   } = useForm({});
 
+  const phase = watch("phase");
   const district = watch("district");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
@@ -246,11 +177,11 @@ const ConsignmentView = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [cmsViewSearchDts, setCmsViewSearchDts] = useState({
-    cphase: [],
-    cdistricts: [],
-    cblocks: [],
-  });
+
+  const [cmsViewSearchPhase, setCmsViewSearchPhase] = useState([]);
+  const [cmsViewSearchBlock, setCmsViewSearchBlock] = useState([]);
+  const [cmsViewSearchDistrict, setCmsViewSearchDistrict] = useState([]);
+
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showPublishConfirm, setShowPublishConfirm] = useState(false);
   const [actionTarget, setActionTarget] = useState(null);
@@ -266,56 +197,49 @@ const ConsignmentView = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchData();
+    fetchDataPhase();
   }, []);
 
-  const fetchData = async () => {
+  const fetchDataPhase = async () => {
     setLoading(true);
     try {
-      const response = await callApi("POST", `cmsconsignmentdistrictphase`);
+      const response = await callApi("GET", `phaseDetailsForConsignmentView`);
+      if (response.error) {
+        toast.error(`Failed to fetch data ${response.message}`);
+      } else {
+        if (response.data) {
+          setCmsViewSearchPhase(response.data || []);
+        } else {
+          setCmsViewSearchPhase([]);
+        }
+      }
+    } catch (err) {
+      toast.error("Unexpected Error occured: ", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (phase) {
+      fetchDistrict(phase);
+    }
+  }, [phase]);
+
+  const fetchDistrict = async (phaseId) => {
+    setLoading(true);
+    try {
+      const response = await callApi("POST", `cmsdistrictchallan`, {
+        phase: btoa(phaseId),
+      });
       if (response.error) {
         // Handle the error (e.g., alert the user)
         toast.error(`Failed to fetch data ${response.message}`);
       } else {
-        //////////////////////////////////////
-        if (response.data.block) {
-          // when this condition then i want to set the district value and block value
-          setCmsViewSearchDts((prev) => ({
-            ...prev,
-            cphase: response.data.phase || [],
-            cdistricts: [
-              {
-                id: response.data.district[0].did,
-                desc: response.data.district[0].ddesc,
-              },
-            ],
-            cblocks: [
-              {
-                id: response.data.district[0].bid,
-                desc: response.data.district[0].bdesc,
-              },
-            ],
-          }));
-          setDeleteReasons(response.data.reject_reasons || []);
-        } else if (response.data.district_) {
-          // when this condition then i want to set the district value
-          setCmsViewSearchDts((prev) => ({
-            ...prev,
-            cphase: response.data.phase || [],
-            cdistricts: response.data.district || [],
-          }));
-          setDeleteReasons(response.data.reject_reasons || []);
-        } else {
-          setCmsViewSearchDts((prev) => ({
-            ...prev,
-            cphase: response.data.phase || [],
-            cdistricts: response.data.district || [],
-          }));
-        }
-        //////////////////////////////////////
+        setCmsViewSearchDistrict(response.data);
       }
     } catch (err) {
-      toast.error("Unexpected download error:", err);
+      toast.error("Unexpected Error Occured:", err);
     } finally {
       setLoading(false);
     }
@@ -331,22 +255,13 @@ const ConsignmentView = () => {
     ////////////////////////////////////////////////////////////////////
     setLoading(true);
     try {
-      const response = await callApi("POST", `cmschallanblock`, {
-        district: districtChallan,
+      const response = await callApi("POST", `cmsblockchallan`, {
+        id: btoa(districtChallan),
       });
       if (response.error) {
-        // Handle the error (e.g., alert the user)
         toast.error(`Failed to fetch data ${response.message}`);
       } else {
-        //////////////////////////////////////
-        // setValue("district", districtChallan);
-        setCmsViewSearchDts((prev) => ({
-          ...prev,
-          cblocks: response.data || [],
-        }));
-
-        // setValue("block", blockUserId);
-        //////////////////////////////////////
+        setCmsViewSearchBlock(response.data);
       }
     } catch (err) {
       toast.error("Unexpected download error:", err);
@@ -366,10 +281,15 @@ const ConsignmentView = () => {
   const onSubmit = async (formdata) => {
     setLoading(true);
     try {
-      const response = await callApi("POST", `cmsconsignmentdata`, formdata);
+      const response = await callApi(
+        "POST",
+        `viewConsignmentDetails`,
+        formdata,
+      );
       if (response.error) {
         toast.error(`Failed to fetch data ${response.message}`);
       } else {
+        console.log(response.data);
         setData(response.data);
       }
     } catch (err) {
@@ -379,13 +299,11 @@ const ConsignmentView = () => {
     }
   };
 
-  const showViewConsignment = async (sl, t, p) => {
+  const showViewConsignment = async (consignmentID) => {
     setLoading(true);
     try {
-      const response = await callApi("POST", `cmsviewconsignmentonmodel`, {
-        db_serial: sl,
-        tracking_no: t,
-        phase: p,
+      const response = await callApi("POST", `viewConsignment`, {
+        consignmentId: consignmentID,
       });
       if (response.error) {
         // Handle the error (e.g., alert the user)
@@ -401,6 +319,7 @@ const ConsignmentView = () => {
     }
     ///////////////////////////////////////////
   };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
@@ -463,7 +382,7 @@ const ConsignmentView = () => {
         actionTarget.t,
         actionTarget.p,
         selectedReasonId,
-        otherReason.trim()
+        otherReason.trim(),
       );
     }
     // --- Replace this with your actual API call (e.g., axios.post('/api/delete-consignment', payload)) ---
@@ -643,27 +562,28 @@ const ConsignmentView = () => {
     },
     {
       name: "Supplier",
-      selector: (data) => data.supplier_name,
+      selector: (data) => data.supplier.supplier_name,
       center: true,
     },
     {
       name: "Block",
-      selector: (data) => data.block_name,
+      selector: (data) => data.destination.block.block_name,
       center: true,
     },
     {
       name: "Delivery Location",
-      selector: (data) => data.delivery_location,
+      selector: (data) =>
+        data.destination.delivery_location.distribution_location_name,
       center: true,
     },
     {
       name: "Qty. Boys",
-      selector: (data) => data.qty_boys,
+      selector: (data) => data.dispatch.qty_boys,
       center: true,
     },
     {
       name: "Qty. Girls",
-      selector: (data) => data.qty_girls,
+      selector: (data) => data.dispatch.qty_girls,
       center: true,
     },
     {
@@ -673,9 +593,7 @@ const ConsignmentView = () => {
         <div className={`flex justify-between flex-wrap gap-2`}>
           <button
             className="flex items-center justify-center px-3 py-1 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition shadow-sm"
-            onClick={() =>
-              showViewConsignment(data.serial_no, data.tracking_no, data.phase)
-            }
+            onClick={() => showViewConsignment(btoa(data.consignment_id))}
           >
             <Eye size={14} className="mr-1 hidden sm:inline" /> View
           </button>
@@ -810,6 +728,24 @@ const ConsignmentView = () => {
 
             <form>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Phase */}
+                <div>
+                  <InputLabel value="Phase" />
+                  <SelectInput
+                    name="phase"
+                    {...register("phase", {
+                      onChange: (e) => handleOnChange("phase", e.target.value),
+                    })}
+                  >
+                    <option value="">Select Phase</option>
+                    {cmsViewSearchPhase.map((cls) => (
+                      <option key={cls.id} value={cls.id}>
+                        {cls.desc}
+                      </option>
+                    ))}
+                  </SelectInput>
+                </div>
+
                 {/* District */}
                 <div>
                   <InputLabel value="District" />
@@ -821,7 +757,7 @@ const ConsignmentView = () => {
                     })}
                   >
                     <option value="">Select District</option>
-                    {cmsViewSearchDts.cdistricts.map((cls) => (
+                    {cmsViewSearchDistrict.map((cls) => (
                       <option key={cls.id} value={cls.id}>
                         {cls.desc}
                       </option>
@@ -844,25 +780,7 @@ const ConsignmentView = () => {
                     })}
                   >
                     <option value="">Select Block</option>
-                    {cmsViewSearchDts.cblocks.map((cls) => (
-                      <option key={cls.id} value={cls.id}>
-                        {cls.desc}
-                      </option>
-                    ))}
-                  </SelectInput>
-                </div>
-
-                {/* Phase */}
-                <div>
-                  <InputLabel value="Phase" />
-                  <SelectInput
-                    name="phase"
-                    {...register("phase", {
-                      onChange: (e) => handleOnChange("phase", e.target.value),
-                    })}
-                  >
-                    <option value="">Select Phase</option>
-                    {cmsViewSearchDts.cphase.map((cls) => (
+                    {cmsViewSearchBlock.map((cls) => (
                       <option key={cls.id} value={cls.id}>
                         {cls.desc}
                       </option>

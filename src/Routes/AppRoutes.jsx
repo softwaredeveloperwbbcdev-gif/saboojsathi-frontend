@@ -16,6 +16,7 @@ import LoginForm from "../Pages/Frontend/LoginForm.jsx";
 import LoginFormCms from "../Pages/Frontend/LoginFormCms.jsx";
 
 //Admin Pages
+import Dashboard_ from "../Pages/Frontend/Dashboard_.jsx";
 import Dashboard from "../Pages/Frontend/Dashboard.jsx";
 import StudentAdd from "../Pages/Admin/Student/StudentAdd.jsx";
 import ViewProfile from "../Pages/Admin/School/ViewProfile.jsx";
@@ -135,6 +136,14 @@ const AppRoutes = () => {
         }
       />
       <Route
+        path="/Dashboard_"
+        element={
+          <AuthGuard>
+            <Dashboard_ />
+          </AuthGuard>
+        }
+      />
+      <Route
         path="/DashboardTagging"
         element={
           <AuthGuard>
@@ -231,7 +240,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/DownloadDistributionDistrict/:phaseId"
+        path="/DownloadDistributionDistrict"
         element={
           <AuthGuard>
             <DistributionUploadViewDistrict />
@@ -239,7 +248,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/DistrictVerifyListSchool/:phaseId"
+        path="/DistrictVerifyListSchool"
         element={
           <AuthGuard>
             <DistrictViewPending />
@@ -287,7 +296,7 @@ const AppRoutes = () => {
         }
       ></Route>
       <Route
-        path="/DownloadMemorandumView/:phaseId"
+        path="/DownloadMemorandumView"
         element={
           <AuthGuard>
             <DownloadMemorandumView />
@@ -505,7 +514,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/ChallanGenerationReportSchool/:phaseId/:id" //07.08.2025
+        path="/ChallanGenerationReportSchool" //07.08.2025
         element={
           <AuthGuard>
             <ChallanGenerationReportSchool />
