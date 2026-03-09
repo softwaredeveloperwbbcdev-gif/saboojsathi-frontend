@@ -82,14 +82,23 @@ const ConsignmentEdit = () => {
   const showViewConsignment = async (consignmentId) => {
     setLoading(true);
     try {
-      const response = await callApi("POST", `cmsconsignmentdataeditonly`, {
+      const response = await callApi("POST", `cmsEditConsignment`, {
         consignmentId: consignmentId,
       });
       if (response.error) {
         // Handle the error (e.g., alert the user)
         toast.error(`Failed to fetch data ${response.message}`);
       } else {
-        setCmsConsignEditData(response.data);
+        console.log(response.data);
+        setCmsConsignEditData(response.data.consignmentDetails);
+        setCmsConsignmentEditStoreData((prev) => ({
+          ...prev,
+          csupplier: [response.data.supplier_name] || [],
+          cphase: response.data.supplier_phase || [],
+          cdistricts: response.data.districtsList || [],
+          cblocks: response.data.blocks || [],
+          cdeliveryCenter: response.data.deliveryloc || [],
+        }));
       }
     } catch (err) {
       toast.error("Unexpected download error:", err);
@@ -99,60 +108,49 @@ const ConsignmentEdit = () => {
   };
 
   /////////////////////////////////////////////
-  // useEffect(() => {
-  //   if (cmsConsignEditData.phase) {
-  //     fetchDistrict(cmsConsignEditData.phase);
-  //   }
-  // }, [cmsConsignEditData.did]);
 
   // useEffect(() => {
-  //   if (cmsConsignEditData.did) {
-  //     fetchBlocks(cmsConsignEditData[0].did);
+  //   if (cmsConsignEditData && Object.keys(cmsConsignEditData).length > 0) {
+  //     fetchAllDetails(
+  //       cmsConsignEditData.phase,
+  //       cmsConsignEditData.did,
+  //       cmsConsignEditData.bid,
+  //     );
   //   }
-  // }, [cmsConsignEditData.bid]);
+  // }, [cmsConsignEditData]);
 
-  useEffect(() => {
-    if (cmsConsignEditData && Object.keys(cmsConsignEditData).length > 0) {
-      fetchAllDetails(
-        cmsConsignEditData[0].phase,
-        cmsConsignEditData[0].did,
-        cmsConsignEditData[0].bid
-      );
-    }
-  }, [cmsConsignEditData]);
-
-  const fetchAllDetails = async (phase, district, block) => {
-    const searchData = {
-      phase: phase,
-      district: district,
-      block: block,
-    };
-    setLoading(true);
-    try {
-      const response = await callApi(
-        "POST",
-        `consignmentadddetailsplain`,
-        searchData
-      );
-      if (response.error) {
-        // Handle the error (e.g., alert the user)
-        toast.error(`Failed to fetch data ${response.message}`);
-      } else {
-        setCmsConsignmentEditStoreData((prev) => ({
-          ...prev,
-          csupplier: [response.data.supplier_name] || [],
-          cphase: response.data.supplier_phase || [],
-          cdistricts: response.data.district || [],
-          cblocks: response.data.blocks || [],
-          cdeliveryCenter: response.data.location || [],
-        }));
-      }
-    } catch (err) {
-      toast.error("Unexpected download error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const fetchAllDetails = async (phase, district, block) => {
+  //   const searchData = {
+  //     phase: phase,
+  //     district: district,
+  //     block: block,
+  //   };
+  //   setLoading(true);
+  //   try {
+  //     const response = await callApi(
+  //       "POST",
+  //       `consignmentadddetailsplain`,
+  //       searchData,
+  //     );
+  //     if (response.error) {
+  //       // Handle the error (e.g., alert the user)
+  //       toast.error(`Failed to fetch data ${response.message}`);
+  //     } else {
+  //       setCmsConsignmentEditStoreData((prev) => ({
+  //         ...prev,
+  //         csupplier: [response.data.supplier_name] || [],
+  //         cphase: response.data.supplier_phase || [],
+  //         cdistricts: response.data.district || [],
+  //         cblocks: response.data.blocks || [],
+  //         cdeliveryCenter: response.data.location || [],
+  //       }));
+  //     }
+  //   } catch (err) {
+  //     toast.error("Unexpected download error:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const convertFromBackendTime = (timeStr) => {
     if (!timeStr) return "";
@@ -166,28 +164,28 @@ const ConsignmentEdit = () => {
     ) {
       // alert("wwww---"+JSON.stringify(cmsConsignEditData));
       reset({
-        consignment_no: cmsConsignEditData[0].consignment_no,
-        tracking_no: cmsConsignEditData[0].tracking_no,
-        supplier_brand: cmsConsignEditData[0].supplier_id,
-        consignment_date: cmsConsignEditData[0].consignment_date,
-        phase: cmsConsignEditData[0].phase,
-        district: cmsConsignEditData[0].did,
-        block: cmsConsignEditData[0].bid,
-        location: cmsConsignEditData[0].location_id,
-        truckno: cmsConsignEditData[0].truck_no,
-        drivername: cmsConsignEditData[0].driver_name,
-        drivermob: cmsConsignEditData[0].driver_mobile_no,
-        driveraltmob: cmsConsignEditData[0].driver_alt_mob_no,
-        dispacthdate: cmsConsignEditData[0].dispatch_date,
-        dispacthtime: convertFromBackendTime(
-          cmsConsignEditData[0].dispatch_time
+        consignment_no: cmsConsignEditData.consignment_no,
+        tracking_no: cmsConsignEditData.tracking_no,
+        supplier_brand: cmsConsignEditData.supplier_brand,
+        consignment_date: cmsConsignEditData.consignment_date,
+        phase: cmsConsignEditData.phase,
+        district: cmsConsignEditData.destination.destination_district,
+        block: cmsConsignEditData.destination.destination_block,
+        location: cmsConsignEditData.destination.delivery_location.location_id,
+        truckno: cmsConsignEditData.dispatch.truck_no,
+        drivername: cmsConsignEditData.drivers.driver_name,
+        drivermob: cmsConsignEditData.drivers.driver_mobile_no,
+        driveraltmob: cmsConsignEditData.drivers.driver_alt_mob_no,
+        dispatchdate: cmsConsignEditData.dispatch.dispatch_date,
+        dispatchtime: convertFromBackendTime(
+          cmsConsignEditData.dispatch.dispatch_time,
         ),
-        arrivaldate: cmsConsignEditData[0].exptd_arrival_date,
+        arrivaldate: cmsConsignEditData.dispatch.exptd_arrival_date,
         arrivaltime: convertFromBackendTime(
-          cmsConsignEditData[0].exptd_arrival_time
+          cmsConsignEditData.dispatch.exptd_arrival_time,
         ),
-        boyscycle: cmsConsignEditData[0].qty_boys,
-        girlscycle: cmsConsignEditData[0].qty_girls,
+        boyscycle: cmsConsignEditData.dispatch.qty_boys,
+        girlscycle: cmsConsignEditData.dispatch.qty_girls,
       });
       setIsInitialLoad(false); // 👈 important
     }
@@ -202,7 +200,9 @@ const ConsignmentEdit = () => {
   const fetchDistrict = async (phase) => {
     setLoading(true);
     try {
-      const response = await callApi("GET", `cmsdistrictchallanget/${phase}`);
+      const response = await callApi("POST", `cmsdistrictchallan`, {
+        phase: btoa(phase),
+      });
       if (response.error) {
         // Handle the error (e.g., alert the user)
         toast.error(`Failed to fetch data ${response.message}`);
@@ -228,10 +228,9 @@ const ConsignmentEdit = () => {
   const fetchBlocks = async (districtChallan) => {
     setLoading(true);
     try {
-      const response = await callApi(
-        "GET",
-        `cmsblockchallanget/${districtChallan}`
-      );
+      const response = await callApi("POST", `cmsblockchallan`, {
+        id: btoa(districtChallan),
+      });
       if (response.error) {
         // Handle the error (e.g., alert the user)
         toast.error(`Failed to fetch data ${response.message}`);
@@ -257,10 +256,11 @@ const ConsignmentEdit = () => {
   const fetchDeliveryLocation = async (phase, district, block) => {
     setLoading(true);
     try {
-      const response = await callApi(
-        "GET",
-        `cmsdeliverylocget/${phase}/${district}/${block}`
-      );
+      const response = await callApi("POST", `cmsdeliveryloc`, {
+        phase: btoa(phase),
+        id: btoa(district),
+        bid: btoa(block),
+      });
       if (response.error) {
         // Handle the error (e.g., alert the user)
         toast.error(`Failed to fetch data ${response.message}`);
@@ -284,15 +284,16 @@ const ConsignmentEdit = () => {
       ...formdata,
       dispacthtime: formattedTime(formdata.dispacthtime),
       arrivaltime: formattedTime(formdata.arrivaltime),
-      serial: sl,
+      consignment_id: cmsConsignEditData.consignment_id,
+      //serial: sl,
     };
     // console.log("Submitted Form Data:", newFormData);
     setLoading(true);
     try {
       const response = await callApi(
         "POST",
-        `cmsconsignmenteditdivertsave`,
-        newFormData
+        `cmsUpdateConsignment`,
+        newFormData,
       );
       if (response.error) {
         // Handle the error (e.g., alert the user)
@@ -574,7 +575,7 @@ const ConsignmentEdit = () => {
 
                       <InputField
                         label="Dispatch Date"
-                        name="dispacthdate"
+                        name="dispatchdate"
                         type="date"
                         disabled={true}
                         style={{
@@ -585,7 +586,7 @@ const ConsignmentEdit = () => {
 
                       <InputField
                         label="Dispatch Time"
-                        name="dispacthtime"
+                        name="dispatchtime"
                         type="time"
                       />
                     </div>
