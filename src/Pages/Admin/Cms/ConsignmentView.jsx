@@ -328,20 +328,30 @@ const ConsignmentView = () => {
   };
 
   // Handlers to OPEN the confirmation modals
-  const handleDeleteClick = (data) => {
+  const handleDeleteClick = async (data) => {
     setActionTarget({
-      sl: data.serial_no,
-      t: data.tracking_no,
-      p: data.phase,
+      consignmentId: btoa(data),
     });
-    setShowDeleteConfirm(true);
+    setLoading(true);
+    try {
+      const response = await callApi("GET", `cmsConsignmentDeleteReason`);
+      if (response.error) {
+        // Handle the error (e.g., alert the user)
+        toast.error(`Failed to fetch data ${response.message}`);
+      } else {
+        setDeleteReasons(response.data);
+        setShowDeleteConfirm(true);
+      }
+    } catch (err) {
+      toast.error("Unexpected download error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePublishClick = (data) => {
     setActionTarget({
-      sl: data.serial_no,
-      t: data.tracking_no,
-      p: data.phase,
+      consignmentId: btoa(data),
     });
     setShowPublishConfirm(true);
   };
@@ -349,15 +359,15 @@ const ConsignmentView = () => {
   // Handlers for modal CONFIRMATION
   const handlePublishConfirm = () => {
     if (actionTarget) {
-      publishConsignment(actionTarget.sl, actionTarget.t, actionTarget.p);
+      publishConsignment(actionTarget);
     }
     setShowPublishConfirm(false);
     setActionTarget(null);
   };
 
   const handleReasonChange = (e) => {
-    const value = e.target.value;
-    setSelectedReasonId(value);
+    const reason = e.target.value;
+    setSelectedReasonId(reason);
     setValidationError("");
     if (value !== "4") {
       setOtherReason("");
@@ -378,9 +388,7 @@ const ConsignmentView = () => {
     // 3. Deletion/API Call Logic
     if (actionTarget) {
       deleteConsignment(
-        actionTarget.sl,
-        actionTarget.t,
-        actionTarget.p,
+        actionTarget.consignmentId,
         selectedReasonId,
         otherReason.trim(),
       );
@@ -403,14 +411,10 @@ const ConsignmentView = () => {
     setOtherReason("");
   };
   // --------------------------
-  const publishConsignment = async (sl, t, p) => {
+  const publishConsignment = async (data) => {
     setLoading(true);
     try {
-      const response = await callApi("POST", `cmspublishedconsignment`, {
-        db_serial: sl,
-        tracking_no: t,
-        phase: p,
-      });
+      const response = await callApi("POST", `cmsPublishConsignment`, data);
       if (response.error) {
         // Handle the error (e.g., alert the user)
         toast.error(`Failed to fetch data ${response.message}`);
@@ -426,15 +430,13 @@ const ConsignmentView = () => {
     ///////////////////////////////////////////
   };
 
-  const deleteConsignment = async (sl, t, p, sri, or) => {
+  const deleteConsignment = async (id, sri, or) => {
     setLoading(true);
     try {
-      const response = await callApi("POST", `cmsdeleteconsignment`, {
-        db_serial: sl,
-        tracking_no: t,
-        phase: p,
-        reject_reason: sri,
-        reject_reason_others: or,
+      const response = await callApi("POST", `cmsDeleteConsignment`, {
+        consignmentId: id,
+        reasonId: btoa(sri),
+        reasonOther: or,
       });
       if (response.error) {
         // Handle the error (e.g., alert the user)
@@ -608,20 +610,20 @@ const ConsignmentView = () => {
                 <>
                   <button
                     className="flex items-center justify-center px-3 py-1 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700 transition shadow-sm"
-                    onClick={() => handlePublishClick(data)}
+                    onClick={() => handlePublishClick(data.consignment_id)}
                   >
                     <PlusCircle size={14} className="mr-1 hidden sm:inline" />{" "}
                     Publish
                   </button>
                   <button
                     className="flex items-center justify-center px-3 py-1 bg-cyan-600 text-white text-xs rounded-lg hover:bg-cyan-700 transition shadow-sm"
-                    onClick={() => editConsignment(btoa(data.serial_no))}
+                    onClick={() => editConsignment(btoa(data.consignment_id))}
                   >
                     <Edit size={14} className="mr-1 hidden sm:inline" /> Edit
                   </button>
                   <button
                     className="flex items-center justify-center px-3 py-1 bg-red-600 text-white text-xs rounded-lg hover:bg-red-700 transition shadow-sm"
-                    onClick={() => handleDeleteClick(data)}
+                    onClick={() => handleDeleteClick(data.consignment_id)}
                   >
                     <Trash2 size={14} className="mr-1 hidden sm:inline" />{" "}
                     Delete
@@ -854,7 +856,7 @@ const ConsignmentView = () => {
               <option value="">Select Reason</option>
               {deleteReasons.map((reason) => (
                 // Important: Use String(reason.id) for select value consistency
-                <option key={reason.id} value={String(reason.id)}>
+                <option key={reason.reason_id} value={String(reason.reason_id)}>
                   {reason.cause}
                 </option>
               ))}
