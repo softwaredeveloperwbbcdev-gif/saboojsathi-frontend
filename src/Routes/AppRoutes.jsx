@@ -1,23 +1,36 @@
-import { Routes, Route } from "react-router-dom";
-import AuthGuard from "../Components/AuthGuard.jsx";
+//packages
+import { Router, Routes, Route, Outlet } from "react-router-dom";
+//Middleware (custome hook)
+import AuthGuard from "../Components/AuthGuard";
+
+//Layouts
+import Header from "../Components/Frontend/Header";
+import Footer from "../Components/Frontend/Footer";
+import ScrollToTop from "../Components/Frontend/ScrollToTop";
 
 //Public Pages
-import Home from "../Pages/Frontend/Home.jsx";
-import About from "../Pages/Frontend/AboutScheme.jsx";
-import Contacts from "../Pages/Frontend/Contacts.jsx";
-import Enit from "../Pages/Frontend/Enit.jsx";
-import Prebid from "../Pages/Frontend/PreBidMinutes.jsx";
-import TechBid from "../Pages/Frontend/TechnicalBidEvaluation.jsx";
-import FinBid from "../Pages/Frontend/FinancialBidEvaluation.jsx";
-import Synoptic from "../Pages/Frontend/SynopticReport.jsx";
-import DistrictWise from "../Pages/Frontend/DistrictWiseReport.jsx";
-import GenderWise from "../Pages/Frontend/GenderWiseReport.jsx";
-import LoginForm from "../Pages/Frontend/LoginForm.jsx";
+import HomePage from "../Pages/Frontend/HomePage";
+import AboutPage from "../Pages/Frontend/AboutPage";
+import SynopticReport from "../Pages/Frontend/SynopticReport";
+import DistrictWiseReport from "../Pages/Frontend/DistrictWiseReport";
+import GenderWiseReport from "../Pages/Frontend/GenderWiseReport";
+import SocialGroupReport from "../Pages/Frontend/SocialGroupReport";
+import SearchBeneficiary from "../Pages/Frontend/SearchBeneficiary";
+import ContactUs from "../Pages/Frontend/ContactUs";
+import ENit from "../Pages/Frontend/ENit";
+import PreBidMinutes from "../Pages/Frontend/PreBidMinutes";
+import TechnicalEvaluation from "../Pages/Frontend/TechnicalEvaluation";
+import FinancialEvaluation from "../Pages/Frontend/FinancialEvaluation";
+import GrievancePage from "../Pages/Frontend/GrievancePage";
+import StudentLogin from "../Pages/Frontend/StudentLogin";
+
+//Login Pages
 import LoginFormCms from "../Pages/Frontend/LoginFormCms.jsx";
+import LoginForm from "../Pages/Frontend/LoginForm.jsx";
 
 //Admin Pages
-import Dashboard_ from "../Pages/Frontend/Dashboard_.jsx";
-import Dashboard from "../Pages/Frontend/Dashboard.jsx";
+import Dashboard_ from "../Pages/Frontend/Test/Dashboard_.jsx";
+import Dashboard from "../Pages/Frontend/Test/Dashboard.jsx";
 import StudentAdd from "../Pages/Admin/Student/StudentAdd.jsx";
 import ViewProfile from "../Pages/Admin/School/ViewProfile.jsx";
 import StudentEdit from "../Pages/Admin/Student/StudentEdit.jsx";
@@ -67,12 +80,12 @@ import ChallanAllocationStatusReport from "../Pages/Admin/MisReport/ChallanAlloc
 import ChallanAllocationStatusBlockReport from "../Pages/Admin/MisReport/ChallanAllocationStatusBlockReport.jsx";
 import InvoiceViewReport from "../Pages/Admin/MisReport/InvoiceViewReport.jsx";
 
-import SynopticReport from "../Pages/Admin/MisReport/SynopticReport.jsx";
+import AdminSynopticReport from "../Pages/Admin/MisReport/SynopticReport.jsx";
 import CategorywiseReport from "../Pages/Admin/MisReport/CategorywiseReport.jsx"; // rest
-import GenderwiseReport from "../Pages/Admin/MisReport/GenderwiseReport.jsx";
-import GenderwiseReportBlock from "../Pages/Admin/MisReport/GenderwiseReportBlock.jsx";
-import SocialGroupwiseReport from "../Pages/Admin/MisReport/SocialGroupwiseReport.jsx";
-import SocialGroupwiseReportBlock from "../Pages/Admin/MisReport/SocialGroupwiseReportBlock.jsx";
+import AdminGenderwiseReport from "../Pages/Admin/MisReport/GenderwiseReport.jsx";
+import AdminGenderwiseReportBlock from "../Pages/Admin/MisReport/GenderwiseReportBlock.jsx";
+import AdminSocialGroupwiseReport from "../Pages/Admin/MisReport/SocialGroupwiseReport.jsx";
+import AdminSocialGroupwiseReportBlock from "../Pages/Admin/MisReport/SocialGroupwiseReportBlock.jsx";
 import ChallanPaymentReport from "../Pages/Admin/MisReport/ChallanPaymentReport.jsx";
 // old phase report
 import DistributionReportDistrictOldPhase from "../Pages/Admin/MisReport/DistributionReportDistrictOldPhase.jsx";
@@ -107,718 +120,336 @@ import AppsTestTwo from "../Pages/Test/AppsTestTwo.jsx";
 import AccessDeniedPage from "../Components/AccessDeniedPage.jsx";
 
 ///////////////////////////////////// 16-09-25
+
+//A Component which defines the layout of all the publi routes
+const PublicLayout = () => (
+  <div className="min-h-screen bg-white">
+    <Header />
+    <ScrollToTop />
+    <main>
+      <Outlet /> {/* Public pages will render here */}
+    </main>
+    <Footer />
+  </div>
+);
+
 const AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<Home />} />
-      <Route path="/About" element={<About />} />
-      <Route path="/Contacts" element={<Contacts />} />
-      <Route path="/Enit" element={<Enit />} />
-      <Route path="/Prebid" element={<Prebid />} />
-      <Route path="/TechBidEval" element={<TechBid />} />
-      <Route path="/FinBidEval" element={<FinBid />} />
-      <Route path="/Synoptic" element={<Synoptic />} />
-      <Route path="/DistrictWise" element={<DistrictWise />} />
-      <Route path="/GenderWise" element={<GenderWise />} />
+      {/* ================= PUBLIC ROUTES (With Header/Footer) ================= */}
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<HomePage />} />
+        {/* Welcome or landing page */}
+        <Route path="/about" element={<AboutPage />} />
+        {/* About Sabooj Sathi Scheme */}
+
+        {/* Tender Documents routes */}
+
+        <Route path="/tenders/enit" element={<ENit />} />
+        {/* e-Notice inviting tender*/}
+        <Route path="/tenders/pre-bid-minutes" element={<PreBidMinutes />} />
+        {/* Minutes for Pre-bid Meetings */}
+        <Route
+          path="/tenders/technical-bid-evaluation"
+          element={<TechnicalEvaluation />}
+        />
+        {/* Minutes for Technical Bid Evaluation */}
+        <Route
+          path="/tenders/financial-bid-evaluation"
+          element={<FinancialEvaluation />}
+        />
+        {/* Minutes for Financial Bid Evaluation */}
+
+        {/* Tender Documents routes */}
+
+        {/* Public reporting for RTI (Since inception of Scheme) */}
+        <Route path="/reports/synoptic" element={<SynopticReport />} />
+        {/* Year wise Synpotic Report */}
+        <Route path="/reports/district-wise" element={<DistrictWiseReport />} />
+        {/* District wise report since inception of scheme */}
+
+        <Route path="/reports/gender-wise" element={<GenderWiseReport />} />
+        {/* Gender wise report since inception of scheme*/}
+        <Route
+          path="/reports/social-group-wise"
+          element={<SocialGroupReport />}
+        />
+        {/* Social Group wise report since inception of scheme*/}
+        <Route
+          path="/reports/search-beneficiary"
+          element={<SearchBeneficiary />}
+        />
+        {/* Beneficiary Search for individual beneficiary over the Years */}
+        {/* Public reporting for RTI (Since inception of Scheme) */}
+
+        {/* contact us  */}
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/grievance" element={<GrievancePage />} />
+        <Route path="/student-login" element={<StudentLogin />} />
+      </Route>
+      {/* ================= PUBLIC ROUTES (Without Header/Footer) ================= */}
       <Route path="/cms1" element={<LoginFormCms />} />
       <Route path="/Login" element={<LoginForm />} />
+      {/* Public Routes */}
+      {/* //////////////////////////////////////////////////////////////////////////////////////////////////// */}
       {/* Test Routes */}
       <Route path="/Test" element={<AppsTest />} />
       <Route path="/TestTwo" element={<AppsTestTwo />} />
       {/* Protected Routes */}
-      <Route
-        path="/Dashboard"
-        element={
-          <AuthGuard>
-            <Dashboard />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/Dashboard_"
-        element={
-          <AuthGuard>
-            <Dashboard_ />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/DashboardTagging"
-        element={
-          <AuthGuard>
-            <DashboardTagging />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/DashboardChallan"
-        element={
-          <AuthGuard>
-            <DashboardChallan />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/Admin"
-        element={
-          <AuthGuard>
-            <Dashboard />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/StudentAdd/:phaseId"
-        element={
-          <AuthGuard>
-            <StudentAdd />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/StudentProfile/:phaseId"
-        element={
-          <AuthGuard>
-            <ViewProfile />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/StudentEdit/:id/:phaseId"
-        element={
-          <AuthGuard>
-            <StudentEdit />
-          </AuthGuard>
-        }
-      />
-      {/* <Route
-        path="/StudentProfileDownload/:phaseId"
-        element={
-          <AuthGuard>
-            <StudentProfileDownloadExcelView />
-          </AuthGuard>
-        }
-      /> 
-      <Route
-        path="/DownloadDistribution/:phaseId"
-        element={
-          <AuthGuard>
-            <DownloadDistributionView />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ApprovedListView/:phaseId"
-        element={
-          <AuthGuard>
-            <ApprovedListView />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/UploadDistribution/:phaseId"
-        element={
-          <AuthGuard>
-            <DistributionUploadView />
-          </AuthGuard>
-        }
-      />*/}
-      <Route
-        path="/CircleVerifyListSchool/:phaseId"
-        element={
-          <AuthGuard>
-            <ViewPending />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/CircleVerifyListApplicant/:phaseId/:schoolId/:status"
-        element={
-          <AuthGuard>
-            <ViewStudent />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/DownloadDistributionDistrict"
-        element={
-          <AuthGuard>
-            <DistributionUploadViewDistrict />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/DistrictVerifyListSchool"
-        element={
-          <AuthGuard>
-            <DistrictViewPending />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/DistributionLocationProcess/:phaseId"
-        element={
-          <AuthGuard>
-            <DistributionLocationProcess />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/DistributionTagSchool/:phaseId/:location"
-        element={
-          <AuthGuard>
-            <DistributionTagSchool />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/DistributionManageTaggedSchool/:phaseId"
-        element={
-          <AuthGuard>
-            <DistributionManageTaggedSchool />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ApproveChallanView/:phaseId"
-        element={
-          <AuthGuard>
-            <ApproveChallanView />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ChallanView"
-        element={
-          <AuthGuard>
-            <ChallanView />
-          </AuthGuard>
-        }
-      ></Route>
-      <Route
-        path="/DownloadMemorandumView"
-        element={
-          <AuthGuard>
-            <DownloadMemorandumView />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/AllocateChallanView/:phaseId"
-        element={
-          <AuthGuard>
-            <AllocateChallanView />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/AllocateChallanToSchool/:phaseId/:challanId"
-        element={
-          <AuthGuard>
-            <AllocateChallanToSchool />
-          </AuthGuard>
-        }
-      />
-      {/* /// Sangita */}
-      <Route
-        path="/EligibleStudentReportDistrict/:phaseId" //21.07.2025
-        element={
-          <AuthGuard>
-            <EligibleStudentReport />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/EligibleStudentReportBlock/:phaseId/:id" //29.07.2025
-        element={
-          <AuthGuard>
-            <EligibleStudentReportBlock />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/EligibleStudentReportSchool/:phaseId/:id" //29.07.2025
-        element={
-          <AuthGuard>
-            <EligibleStudentReportSchool />
-          </AuthGuard>
-        }
-      />
-      {/* // downlod route for above code  */}
-      <Route
-        path="/ProfileEntryDistrictReport/:phaseId"
-        element={
-          <AuthGuard>
-            <ProfileEntryDistrictReport />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ProfileEntryBlockReport/:phaseId/:id"
-        element={
-          <AuthGuard>
-            <ProfileEntryBlockReport />
-          </AuthGuard>
-        } // 31.07.2025
-      />
-      <Route
-        path="/ProfileEntrySchoolReport/:phaseId/:id"
-        element={
-          <AuthGuard>
-            <ProfileEntrySchoolReport />
-          </AuthGuard>
-        } // 31.07.2025
-      />
-      <Route
-        path="/ProfileEntryStatusReportDist/:phaseId" //22.07.2025
-        element={
-          <AuthGuard>
-            <ProfileEntryStatusReportDist />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ProfileEntryStatusReportBlock/:phaseId/:id"
-        element={
-          <AuthGuard>
-            <ProfileEntryStatusReportBlock />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ProfileEntryStatusReportSchool/:phaseId/:id"
-        element={
-          <AuthGuard>
-            <ProfileEntryStatusReportSchool />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/DistributionReportDistrict/:phaseId"
-        element={
-          <AuthGuard>
-            <DistributionReportDistrict />
-          </AuthGuard>
-        } // 31.07.2025
-      />
-      <Route
-        path="/DistributionReportDistrictOldPhase/:phaseId"
-        element={
-          <AuthGuard>
-            <DistributionReportDistrictOldPhase />
-          </AuthGuard>
-        } // 31.07.2025
-      />
-      <Route
-        path="/DistributionReportBlock/:id/:phaseId"
-        element={
-          <AuthGuard>
-            <DistributionReportBlock />
-          </AuthGuard>
-        } // 04.08.2025
-      />
-      <Route
-        path="/DistributionReportSchool/:id/:phaseId"
-        element={
-          <AuthGuard>
-            <DistributionReportSchool />
-          </AuthGuard>
-        } // 04.08.2025
-      />
-      <Route
-        path="/TaggingDetailsReport/:phaseId" //23.07.2025
-        element={
-          <AuthGuard>
-            <TaggingDetailsReport />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/TaggingDetailsReportOld/:phaseId" //20.09.2025
-        element={
-          <AuthGuard>
-            <TaggingDetailsReportOld />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/TaggingDetailsReportOldBlock/:phaseId/:id" //20.09.2025
-        element={
-          <AuthGuard>
-            <TaggingDetailsReportOldBlock />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/TaggingDetailsReportOldSchool/:phaseId/:id" //20.09.2025
-        element={
-          <AuthGuard>
-            <TaggingDetailsReportOldSchool />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/TaggingDetailsReportBlock/:id/:phaseId" //28.07.2025
-        element={
-          <AuthGuard>
-            <TaggingDetailsReportBlock />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/TaggingDetailsReportSchool/:phaseId/:id" //28.07.2025
-        element={
-          <AuthGuard>
-            <TaggingDetailsReportSchool />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/DistrictChallanReport/:phaseId" //05.08.2025
-        element={
-          <AuthGuard>
-            <DistrictChallanReport />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/BlockChallanReport/:id/:phaseId" //05.08.2025
-        element={
-          <AuthGuard>
-            <BlockChallanReport />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ChallanDetailsByBlock/:id/:phaseId" //05.08.2025
-        element={
-          <AuthGuard>
-            <ChallanDetailsByBlock />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ChallanGenerationReport/:phaseId" //06.08.2025
-        element={
-          <AuthGuard>
-            <ChallanGenerationReport />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ChallanGenerationReportBlock/:phaseId/:id" //07.08.2025 check me
-        element={
-          <AuthGuard>
-            <ChallanGenerationReportBlock />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ChallanGenerationReportSchool" //07.08.2025
-        element={
-          <AuthGuard>
-            <ChallanGenerationReportSchool />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ChallanParticularsView/:phaseId" //08.08.2025
-        element={
-          <AuthGuard>
-            <ChallanParticularsView />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ChallanAllocationStatusReport/:phaseId" //11.08.2025
-        element={
-          <AuthGuard>
-            <ChallanAllocationStatusReport />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ChallanAllocationStatusBlockReport/:id/:phaseId" //11.08.2025
-        element={
-          <AuthGuard>
-            <ChallanAllocationStatusBlockReport />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/InvoiceViewReport/:phaseId" //11.08.2025
-        element={
-          <AuthGuard>
-            <InvoiceViewReport />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ResetPasswordState" //11.08.2025
-        element={
-          <AuthGuard>
-            <ResetPasswordState />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/change-password" // modified
-        element={
-          <AuthGuard>
-            <ChangePassword />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/SynopticReport" // modified
-        element={
-          <AuthGuard>
-            <SynopticReport />
-          </AuthGuard>
-        }
-      />{" "}
-      {/* <Route
-        path="/CategorywiseReport" // modified
-        element={
-          <AuthGuard>
-            <CategorywiseReport />
-          </AuthGuard>
-        }
-      />{" "} */}
-      <Route
-        path="/GenderwiseReport" // modified
-        element={
-          <AuthGuard>
-            <GenderwiseReport />
-          </AuthGuard>
-        }
-      />{" "}
-      <Route
-        path="/GenderwiseReportBlock/:id" // modified
-        element={
-          <AuthGuard>
-            <GenderwiseReportBlock />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/SocialGroupwiseReport"
-        element={
-          <AuthGuard>
-            <SocialGroupwiseReport />
-          </AuthGuard>
-        }
-      />
-      {/* <Route
-        path="/SocialGroupwiseReportBlock/:encodedId/phaseId"
-        element={
-          <AuthGuard>
-            <SocialGroupwiseReportBlock />
-          </AuthGuard>
-        }
-      /> */}
-      <Route
-        path="/SocialGroupwiseReportBlock/:phaseId/:id"
-        element={
-          <AuthGuard>
-            <SocialGroupwiseReportBlock />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/cmsdashboard"
-        element={
-          <AuthGuard>
-            <CmsDashboard />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ChallanPaymentReport/:phaseId"
-        element={
-          <AuthGuard>
-            <ChallanPaymentReport />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ChallanMis/:phaseId"
-        element={
-          <AuthGuard>
-            <ChallanMis />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ChallanMisBlock/:phaseId/:id"
-        element={
-          <AuthGuard>
-            <ChallanMisBlock />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ChallanIssuedMis/:id/:phaseId"
-        element={
-          <AuthGuard>
-            <ChallanIssuedMis />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/cmsdashboard"
-        element={
-          <AuthGuard>
-            <CmsDashboard />
-          </AuthGuard>
-        }
-      />
-      {/* //// Added on 16-09-25 ///// */}
-      <Route
-        path="/consignment_add"
-        element={
-          <AuthGuard>
-            <ConsignmentAdd />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/consignment_view"
-        element={
-          <AuthGuard>
-            <ConsignmentView />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/consignment_view_edit/:consignmentId"
-        element={
-          <AuthGuard>
-            <ConsignmentEdit />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/consignment_unload_view"
-        element={
-          <AuthGuard>
-            <ConsignmentUnloadView />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/admin_p3_district_school_tagged_report"
-        element={
-          <AuthGuard>
-            <AdminDistrictSchoolTaggedReport />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/admin_tagging_unload_report"
-        element={
-          <AuthGuard>
-            <AdminTaggingUnloadReport />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/challan_add"
-        element={
-          <AuthGuard>
-            <ChallanAdd />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/view_challan"
-        element={
-          <AuthGuard>
-            <ViewChallan />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/view_challan_report"
-        element={
-          <AuthGuard>
-            <ViewChallanReport />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/challanCmsEntry"
-        element={
-          <AuthGuard>
-            <ChallanCmsEntry />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/challan_view_filter"
-        element={
-          <AuthGuard>
-            <ChallanViewFilter />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/invoice_add"
-        element={
-          <AuthGuard>
-            <InvoiceAdd />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/invoice_link_challan"
-        element={
-          <AuthGuard>
-            <InvoiceLinkChallan />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/invoice_view"
-        element={
-          <AuthGuard>
-            <InvoiceView />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/challan_view_filter_deo"
-        element={
-          <AuthGuard>
-            <ChallanViewFilterDeo />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/change-password" // modified
-        element={
-          <AuthGuard>
-            <ChangePassword />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/ResetFinalize"
-        element={
-          <AuthGuard>
-            <ResetFinalize />
-          </AuthGuard>
-        }
-      />
-      {/* // Sangita */}
-      <Route
-        path="/AccessDeniedPage"
-        element={
-          <AuthGuard>
-            <AccessDeniedPage />
-          </AuthGuard>
-        }
-      />
+      <Route element={<AuthGuard />}>
+        <Route path="/Dashboard" element={<Dashboard />} />
+        <Route path="/Dashboard_" element={<Dashboard_ />} />
+        <Route path="/DashboardTagging" element={<DashboardTagging />} />
+        <Route path="/DashboardChallan" element={<DashboardChallan />} />
+        <Route path="/Admin" element={<Dashboard />} />
+        <Route path="/StudentAdd/:phaseId" element={<StudentAdd />} />
+        <Route path="/StudentProfile/:phaseId" element={<ViewProfile />} />
+        <Route path="/StudentEdit/:id/:phaseId" element={<StudentEdit />} />
+        <Route
+          path="/CircleVerifyListSchool/:phaseId"
+          element={<ViewPending />}
+        />
+        <Route
+          path="/CircleVerifyListApplicant/:phaseId/:schoolId/:status"
+          element={<ViewStudent />}
+        />
+        <Route
+          path="/DownloadDistributionDistrict"
+          element={<DistributionUploadViewDistrict />}
+        />
+        <Route
+          path="/DistrictVerifyListSchool"
+          element={<DistrictViewPending />}
+        />
+        <Route
+          path="/DistributionLocationProcess/:phaseId"
+          element={<DistributionLocationProcess />}
+        />
+        <Route
+          path="/DistributionTagSchool/:phaseId/:location"
+          element={<DistributionTagSchool />}
+        />
+        <Route
+          path="/DistributionManageTaggedSchool/:phaseId"
+          element={<DistributionManageTaggedSchool />}
+        />
+        <Route
+          path="/ApproveChallanView/:phaseId"
+          element={<ApproveChallanView />}
+        />
+        <Route path="/ChallanView" element={<ChallanView />}></Route>
+        <Route
+          path="/DownloadMemorandumView"
+          element={<DownloadMemorandumView />}
+        />
+        <Route
+          path="/AllocateChallanView/:phaseId"
+          element={<AllocateChallanView />}
+        />
+        <Route
+          path="/AllocateChallanToSchool/:phaseId/:challanId"
+          element={<AllocateChallanToSchool />}
+        />
+        {/* /// Sangita */}
+        <Route
+          path="/EligibleStudentReportDistrict/:phaseId" //21.07.2025
+          element={<EligibleStudentReport />}
+        />
+        <Route
+          path="/EligibleStudentReportBlock/:phaseId/:id" //29.07.2025
+          element={<EligibleStudentReportBlock />}
+        />
+        <Route
+          path="/EligibleStudentReportSchool/:phaseId/:id" //29.07.2025
+          element={<EligibleStudentReportSchool />}
+        />
+        {/* // downlod route for above code  */}
+        <Route
+          path="/ProfileEntryDistrictReport/:phaseId"
+          element={<ProfileEntryDistrictReport />}
+        />
+        <Route
+          path="/ProfileEntryBlockReport/:phaseId/:id"
+          element={<ProfileEntryBlockReport />} // 31.07.2025
+        />
+        <Route
+          path="/ProfileEntrySchoolReport/:phaseId/:id"
+          element={<ProfileEntrySchoolReport />} // 31.07.2025
+        />
+        <Route
+          path="/ProfileEntryStatusReportDist/:phaseId" //22.07.2025
+          element={<ProfileEntryStatusReportDist />}
+        />
+        <Route
+          path="/ProfileEntryStatusReportBlock/:phaseId/:id"
+          element={<ProfileEntryStatusReportBlock />}
+        />
+        <Route
+          path="/ProfileEntryStatusReportSchool/:phaseId/:id"
+          element={<ProfileEntryStatusReportSchool />}
+        />
+        <Route
+          path="/DistributionReportDistrict/:phaseId"
+          element={<DistributionReportDistrict />} // 31.07.2025
+        />
+        <Route
+          path="/DistributionReportDistrictOldPhase/:phaseId"
+          element={<DistributionReportDistrictOldPhase />} // 31.07.2025
+        />
+        <Route
+          path="/DistributionReportBlock/:id/:phaseId"
+          element={<DistributionReportBlock />} // 04.08.2025
+        />
+        <Route
+          path="/DistributionReportSchool/:id/:phaseId"
+          element={<DistributionReportSchool />} // 04.08.2025
+        />
+        <Route
+          path="/TaggingDetailsReport/:phaseId" //23.07.2025
+          element={<TaggingDetailsReport />}
+        />
+        <Route
+          path="/TaggingDetailsReportOld/:phaseId" //20.09.2025
+          element={<TaggingDetailsReportOld />}
+        />
+        <Route
+          path="/TaggingDetailsReportOldBlock/:phaseId/:id" //20.09.2025
+          element={<TaggingDetailsReportOldBlock />}
+        />
+        <Route
+          path="/TaggingDetailsReportOldSchool/:phaseId/:id" //20.09.2025
+          element={<TaggingDetailsReportOldSchool />}
+        />
+        <Route
+          path="/TaggingDetailsReportBlock/:id/:phaseId" //28.07.2025
+          element={<TaggingDetailsReportBlock />}
+        />
+        <Route
+          path="/TaggingDetailsReportSchool/:phaseId/:id" //28.07.2025
+          element={<TaggingDetailsReportSchool />}
+        />
+        <Route
+          path="/DistrictChallanReport/:phaseId" //05.08.2025
+          element={<DistrictChallanReport />}
+        />
+        <Route
+          path="/BlockChallanReport/:id/:phaseId" //05.08.2025
+          element={<BlockChallanReport />}
+        />
+        <Route
+          path="/ChallanDetailsByBlock/:id/:phaseId" //05.08.2025
+          element={<ChallanDetailsByBlock />}
+        />
+        <Route
+          path="/ChallanGenerationReport/:phaseId" //06.08.2025
+          element={<ChallanGenerationReport />}
+        />
+        <Route
+          path="/ChallanGenerationReportBlock/:phaseId/:id" //07.08.2025 check me
+          element={<ChallanGenerationReportBlock />}
+        />
+        <Route
+          path="/ChallanGenerationReportSchool" //07.08.2025
+          element={<ChallanGenerationReportSchool />}
+        />
+        <Route
+          path="/ChallanParticularsView/:phaseId" //08.08.2025
+          element={<ChallanParticularsView />}
+        />
+        <Route
+          path="/ChallanAllocationStatusReport/:phaseId" //11.08.2025
+          element={<ChallanAllocationStatusReport />}
+        />
+        <Route
+          path="/ChallanAllocationStatusBlockReport/:id/:phaseId" //11.08.2025
+          element={<ChallanAllocationStatusBlockReport />}
+        />
+        <Route
+          path="/InvoiceViewReport/:phaseId" //11.08.2025
+          element={<InvoiceViewReport />}
+        />
+        <Route
+          path="/ResetPasswordState" //11.08.2025
+          element={<ResetPasswordState />}
+        />
+        <Route
+          path="/change-password" // modified
+          element={<ChangePassword />}
+        />
+        <Route
+          path="/SynopticReport" // modified
+          element={<AdminSynopticReport />}
+        />
+
+        <Route
+          path="/GenderwiseReport" // modified
+          element={<AdminGenderwiseReport />}
+        />
+        <Route
+          path="/GenderwiseReportBlock/:id" // modified
+          element={<AdminGenderwiseReportBlock />}
+        />
+        <Route
+          path="/SocialGroupwiseReport"
+          element={<AdminSocialGroupwiseReport />}
+        />
+        <Route
+          path="/SocialGroupwiseReportBlock/:phaseId/:id"
+          element={<AdminSocialGroupwiseReportBlock />}
+        />
+        <Route path="/cmsdashboard" element={<CmsDashboard />} />
+        <Route
+          path="/ChallanPaymentReport/:phaseId"
+          element={<ChallanPaymentReport />}
+        />
+        <Route path="/ChallanMis/:phaseId" element={<ChallanMis />} />
+        <Route
+          path="/ChallanMisBlock/:phaseId/:id"
+          element={<ChallanMisBlock />}
+        />
+        <Route
+          path="/ChallanIssuedMis/:id/:phaseId"
+          element={<ChallanIssuedMis />}
+        />
+        <Route path="/cmsdashboard" element={<CmsDashboard />} />
+        <Route path="/consignment_add" element={<ConsignmentAdd />} />
+        <Route path="/consignment_view" element={<ConsignmentView />} />
+        <Route
+          path="/consignment_view_edit/:consignmentId"
+          element={<ConsignmentEdit />}
+        />
+        <Route
+          path="/consignment_unload_view"
+          element={<ConsignmentUnloadView />}
+        />
+        <Route
+          path="/admin_p3_district_school_tagged_report"
+          element={<AdminDistrictSchoolTaggedReport />}
+        />
+        <Route
+          path="/admin_tagging_unload_report"
+          element={<AdminTaggingUnloadReport />}
+        />
+        <Route path="/challan_add" element={<ChallanAdd />} />
+        <Route path="/view_challan" element={<ViewChallan />} />
+        <Route path="/view_challan_report" element={<ViewChallanReport />} />
+        <Route path="/challanCmsEntry" element={<ChallanCmsEntry />} />
+        <Route path="/challan_view_filter" element={<ChallanViewFilter />} />
+        <Route path="/invoice_add" element={<InvoiceAdd />} />
+        <Route path="/invoice_link_challan" element={<InvoiceLinkChallan />} />
+        <Route path="/invoice_view" element={<InvoiceView />} />
+        <Route
+          path="/challan_view_filter_deo"
+          element={<ChallanViewFilterDeo />}
+        />
+        <Route
+          path="/change-password" // modified
+          element={<ChangePassword />}
+        />
+        <Route path="/ResetFinalize" element={<ResetFinalize />} />
+        <Route path="/AccessDeniedPage" element={<AccessDeniedPage />} />
+      </Route>
     </Routes>
   );
 };
