@@ -33,7 +33,7 @@ const useApi = () => {
       if (response.error) {
         if (response.message.includes("Invalid Token")) {
           setPopupMessage(
-            "Your session has expired or is unauthorized. You will be logged out."
+            "Your session has expired or is unauthorized. You will be logged out.",
           );
           setShowPopup(true);
           return { error: true, message: "Invalid Token" }; // Return early

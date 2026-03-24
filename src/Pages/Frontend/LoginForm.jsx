@@ -50,14 +50,12 @@ function LoginForm() {
     fetchData();
   }, []);
 
+  //fetch stakeholder information 
   const fetchData = async () => {
     setLoading(true);
     try {
       const host = window.location.hostname;
       const response = await axios.get(`http://${host}:8000/api/login_list`);
-      // const response = await axios.get(
-      //   `http://192.168.0.192:8000/api/login_list`
-      // );
 
       if (response.error) {
         toast.error("Failed to fetch stakeholder list");
@@ -90,7 +88,6 @@ function LoginForm() {
     try {
       const host = window.location.hostname;
       const response = await axios.post(
-        //`http://192.168.0.192:8000/api/login`,
         `http://${host}:8000/api/login`,
         finalData,
         {

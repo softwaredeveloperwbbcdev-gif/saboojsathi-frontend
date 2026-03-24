@@ -13,7 +13,7 @@ const useApi = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/LoginList");
+    navigate("/Login");
   };
 
   useEffect(() => {
@@ -34,7 +34,7 @@ const useApi = () => {
       // apiCall.js already handles mapping the 401 status to this message.
       if (response.error && response.message.includes("Invalid Token")) {
         setPopupMessage(
-          "Your session has expired or is unauthorized. You will be logged out."
+          "Your session has expired or is unauthorized. You will be logged out.",
         );
         setShowPopup(true);
       }

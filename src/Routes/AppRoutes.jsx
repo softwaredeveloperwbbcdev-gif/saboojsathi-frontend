@@ -189,7 +189,7 @@ const AppRoutes = () => {
         <Route path="/student-login" element={<StudentLogin />} />
       </Route>
       {/* ================= PUBLIC ROUTES (Without Header/Footer) ================= */}
-      <Route path="/cms1" element={<LoginFormCms />} />
+      <Route path="/cms" element={<LoginFormCms />} />
       <Route path="/Login" element={<LoginForm />} />
       {/* Public Routes */}
       {/* //////////////////////////////////////////////////////////////////////////////////////////////////// */}

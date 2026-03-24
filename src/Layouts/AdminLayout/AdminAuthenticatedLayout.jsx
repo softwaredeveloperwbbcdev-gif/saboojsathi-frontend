@@ -10,6 +10,8 @@ import { getBlockSideMenu } from "./SideMenus/BlockSideMenu";
 import { getDistrictSideMenu } from "./SideMenus/DistrictSideMenu";
 import { getStateSideMenu } from "./SideMenus/StateSideMenu";
 import MsgDisplayModalInActive from "../../Components/MsgDisplayModalInActive";
+import useApi from "../../Hooks/useApi";
+import { toast } from "react-toastify";
 
 const MENU_MAP = {
   "0701": getSchoolSideMenu,
@@ -21,10 +23,12 @@ const MENU_MAP = {
 };
 
 function AdminAuthenticatedLayout({ children }) {
+  const { callApi } = useApi();
   const navigate = useNavigate();
   const [showPrompt, setShowPrompt] = useState(false);
   const [remainingTime, setRemainingTime] = useState(60); // 60 seconds countdown
   const countdownRef = useRef(null);
+  const [loading, setLoading] = useState(false);
 
   const { logout } = useContext(TokenContext);
   const token = localStorage.getItem("token");
@@ -36,9 +40,7 @@ function AdminAuthenticatedLayout({ children }) {
   const menuData = menuFn ? menuFn() : { user: "Guest", data: [] };
 
   const handleOnIdle = () => {
-    console.log("User is idle");
-    clearInterval(countdownRef.current); // ✅ important
-    // Final logout after countdown ends
+    clearInterval(countdownRef.current);
     alert("⛔ You have been logged out due to inactivity.");
     localStorage.removeItem("token");
     navigate("/Login");
@@ -82,32 +84,28 @@ function AdminAuthenticatedLayout({ children }) {
   });
 
   const handleLogout = async () => {
+    setLoading(true);
     try {
       const host = window.location.hostname;
-      //const host = `192.168.0.192`;
-      const response = await fetch(`http://${host}:8000/api/logout`, {
-        method: "GET", // or "POST" depending on your API
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // ⬅️ Send token in headers
-        },
-      });
+      const response = await callApi("GET", `http://${host}:8000/api/logout`);
 
-      if (!response.ok) {
-        throw new Error("API request failed");
-      }
-
-      const data = await response.json();
-      if (data.status == "success") {
+      if (response.error) {
+        console.log("Logout Error Details:", JSON.stringify(response));
+        toast.error(`Logout failed: ${response.message}`);
+      } else {
+        console.log("Logout Success:", JSON.stringify(response));
         logout();
         navigate("/Login");
+        toast.success("Logged out successfully");
       }
-
-      // Do something with the data, e.g., update state or navigate
-    } catch (error) {
-      console.error("Error fetching API:", error);
+    } catch (err) {
+      toast.error(`An unexpected error occurred: ${err.message}`);
+      console.error("Critical Logout Error:", err);
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
     <>
       <section className="bg-gray-200 dark:bg-gray-600">

@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { useEffect, useState, useContext } from "react";
+import { Navigate, useLocation, Outlet } from "react-router-dom"; // Added Outlet
 import { TokenContext } from "../ContextProvider/TokenContext";
-import { useContext } from "react";
 
-const TOKEN_KEY = "token"; // Replace with your actual key
+const TOKEN_KEY = "token";
 
 const AuthGuard = ({ children }) => {
   const [showPrompt, setShowPrompt] = useState(false);
@@ -15,6 +14,9 @@ const AuthGuard = ({ children }) => {
     const token = localStorage.getItem(TOKEN_KEY);
     if (!token) {
       setShowPrompt(true);
+    } else {
+      // If a token exists, make sure we aren't showing the prompt
+      setShowPrompt(false);
     }
   }, [location]);
 
@@ -23,10 +25,12 @@ const AuthGuard = ({ children }) => {
     setRedirect(true);
   };
 
+  // 1. Handle explicit redirection
   if (redirect) {
-    return <Navigate to="/LoginList" replace state={{ from: location }} />;
+    return <Navigate to="/Login" replace state={{ from: location }} />;
   }
 
+  // 2. Handle missing token / Session expired UI
   if (showPrompt) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -48,7 +52,7 @@ const AuthGuard = ({ children }) => {
     );
   }
 
-  return children;
+  return children ? children : <Outlet />;
 };
 
 export default AuthGuard;
