@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import LightLogo from "../../assets/images/Admin/Askoka-stambha-light.png";
 import DarkLogo from "../../assets/images/Admin/Askoka-stambha-dark.png";
 import { usePhaseStore } from "../../Store/phaseStore";
+import { useThemeStore } from "../../Store/themeStore";
 
 import {
   ChevronDown,
@@ -35,11 +36,8 @@ export default function Sidebar({
 
   const [openMenus, setOpenMenus] = useState({});
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [theme, setTheme] = useState("light");
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
+  // Dark Mode State
+  const { theme, toggleTheme } = useThemeStore();
 
   const toggleMenu = (id) => {
     if (!sidebarOpen) setSidebarOpen(true);
@@ -106,9 +104,7 @@ export default function Sidebar({
             </button>
             {sidebarOpen && (
               <button
-                onClick={() =>
-                  setTheme((prev) => (prev === "dark" ? "light" : "dark"))
-                }
+                onClick={toggleTheme}
                 className="p-2 rounded bg-gray-100 dark:bg-gray-900"
               >
                 {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}

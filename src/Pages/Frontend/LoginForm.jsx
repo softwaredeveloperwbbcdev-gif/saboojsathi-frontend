@@ -16,6 +16,7 @@ import axios from "axios";
 import MD5 from "crypto-js/md5"; // Import MD5
 import { useForm } from "react-hook-form"; // Import Hook Form
 import { TokenContext } from "../../ContextProvider/TokenContext"; // Import Context
+import { useThemeStore } from "../../Store/themeStore";
 
 function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -32,25 +33,13 @@ function LoginForm() {
   } = useForm();
 
   // Dark Mode State
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem("theme") === "dark";
-  });
-
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [darkMode]);
+  const { darkMode, toggleTheme } = useThemeStore();
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  //fetch stakeholder information 
+  //fetch stakeholder information
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -144,7 +133,7 @@ function LoginForm() {
         </Link>
 
         <button
-          onClick={() => setDarkMode(!darkMode)}
+          onClick={toggleTheme}
           className="p-3 rounded-full bg-white/90 dark:bg-gray-800/90 text-yellow-500 dark:text-blue-300 shadow-lg hover:scale-110 transition-transform"
         >
           {darkMode ? <FaMoon /> : <FaSun />}
