@@ -50,10 +50,12 @@ import DownloadMemorandumView from "../Pages/Admin/Block/DownloadMemorandumView.
 import DistrictViewPending from "../Pages/Admin/District/DistrictViewPending.jsx";
 import AllocateChallanView from "../Pages/Admin/Block/AllocateChallanView.jsx";
 import AllocateChallanToSchool from "../Pages/Admin/Block/AllocateChallanToSchool.jsx";
-// sangita
+// MIS Report (State, District, Block)
+// Eligible Student Report
 import EligibleStudentReport from "../Pages/Admin/MisReport/EligibleStudentReport.jsx";
 import EligibleStudentReportBlock from "../Pages/Admin/MisReport/EligibleStudentReportBlock.jsx";
 import EligibleStudentReportSchool from "../Pages/Admin/MisReport/EligibleStudentReportSchool.jsx";
+//
 import ProfileEntryDistrictReport from "../Pages/Admin/MisReport/ProfileEntryDistrictReport.jsx";
 import ProfileEntryBlockReport from "../Pages/Admin/MisReport/ProfileEntryBlockReport.jsx";
 import ProfileEntrySchoolReport from "../Pages/Admin/MisReport/ProfileEntrySchoolReport.jsx";
@@ -251,60 +253,64 @@ const AppRoutes = () => {
           path="/AllocateChallanToSchool/:phaseId/:challanId"
           element={<AllocateChallanToSchool />}
         />
-        {/* /// Sangita */}
+        {/* State MIS Reports */}
+
+        {/* Eligible Student Report */}
         <Route
-          path="/EligibleStudentReportDistrict/:phaseId" //21.07.2025
+          path="/EligibleStudentReportDistrict" //District Wise
           element={<EligibleStudentReport />}
         />
         <Route
-          path="/EligibleStudentReportBlock/:phaseId/:id" //29.07.2025
+          path="/EligibleStudentReportBlock/:id" //Block Wise
           element={<EligibleStudentReportBlock />}
         />
         <Route
-          path="/EligibleStudentReportSchool/:phaseId/:id" //29.07.2025
+          path="/EligibleStudentReportSchool/:id" //School Wise
           element={<EligibleStudentReportSchool />}
         />
-        {/* // downlod route for above code  */}
+
+        {/* Profile Entry Report */}
         <Route
-          path="/ProfileEntryDistrictReport/:phaseId"
+          path="/ProfileEntryDistrictReport" // District Wise
           element={<ProfileEntryDistrictReport />}
         />
         <Route
-          path="/ProfileEntryBlockReport/:phaseId/:id"
-          element={<ProfileEntryBlockReport />} // 31.07.2025
+          path="/ProfileEntryBlockReport/:id"
+          element={<ProfileEntryBlockReport />} // Block Wise
         />
         <Route
-          path="/ProfileEntrySchoolReport/:phaseId/:id"
-          element={<ProfileEntrySchoolReport />} // 31.07.2025
+          path="/ProfileEntrySchoolReport/:id"
+          element={<ProfileEntrySchoolReport />} // School Wise
         />
+
+        {/* Profile Entry Status Report */}
         <Route
-          path="/ProfileEntryStatusReportDist/:phaseId" //22.07.2025
+          path="/ProfileEntryStatusReportDist" //District Wise
           element={<ProfileEntryStatusReportDist />}
         />
         <Route
-          path="/ProfileEntryStatusReportBlock/:phaseId/:id"
+          path="/ProfileEntryStatusReportBlock/:id" // Block Wise
           element={<ProfileEntryStatusReportBlock />}
         />
         <Route
-          path="/ProfileEntryStatusReportSchool/:phaseId/:id"
+          path="/ProfileEntryStatusReportSchool/:id" // School Wise
           element={<ProfileEntryStatusReportSchool />}
         />
+
+        {/* Distribution Detail Report  */}
         <Route
-          path="/DistributionReportDistrict/:phaseId"
-          element={<DistributionReportDistrict />} // 31.07.2025
+          path="/DistributionReportDistrict"
+          element={<DistributionReportDistrict />} // District Wise
         />
         <Route
-          path="/DistributionReportDistrictOldPhase/:phaseId"
-          element={<DistributionReportDistrictOldPhase />} // 31.07.2025
+          path="/DistributionReportBlock/:id"
+          element={<DistributionReportBlock />} // Block Wise
         />
         <Route
-          path="/DistributionReportBlock/:id/:phaseId"
-          element={<DistributionReportBlock />} // 04.08.2025
+          path="/DistributionReportSchool/:id"
+          element={<DistributionReportSchool />} // School Wise
         />
-        <Route
-          path="/DistributionReportSchool/:id/:phaseId"
-          element={<DistributionReportSchool />} // 04.08.2025
-        />
+
         <Route
           path="/TaggingDetailsReport/:phaseId" //23.07.2025
           element={<TaggingDetailsReport />}

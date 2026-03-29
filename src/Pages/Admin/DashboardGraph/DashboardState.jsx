@@ -211,36 +211,28 @@ const DashboardState = ({ graphData, setLoading }) => {
             subText="District Wise Eligibility"
             icon={UserCheck}
             colorClass="from-blue-500 to-blue-700"
-            onClick={() =>
-              navigate(`/EligibleStudentReportDistrict/${encodedPhaseId}`)
-            }
+            onClick={() => navigate(`/EligibleStudentReportDistrict`)}
           />
           <ActionCard
             title="District Wise Report"
             subText="Overall Profile Summary"
             icon={PieChart}
             colorClass="from-indigo-500 to-indigo-700"
-            onClick={() =>
-              navigate(`/ProfileEntryDistrictReport/${encodedPhaseId}`)
-            }
+            onClick={() => navigate(`/ProfileEntryDistrictReport`)}
           />
           <ActionCard
             title="Profile Entry Status"
             subText="Data Entry Tracking"
             icon={Activity}
             colorClass="from-purple-500 to-purple-700"
-            onClick={() =>
-              navigate(`/ProfileEntryStatusReportDist/${encodedPhaseId}`)
-            }
+            onClick={() => navigate(`/ProfileEntryStatusReportDist`)}
           />
           <ActionCard
             title="Distribution Detail Report"
             subText="Cycle Delivery Progress"
             icon={Truck}
             colorClass="from-emerald-500 to-emerald-700"
-            onClick={() =>
-              navigate(`/DistributionReportDistrict/${encodedPhaseId}`)
-            }
+            onClick={() => navigate(`/DistributionReportDistrict`)}
           />
           <ActionCard
             title="District Tagging Report"
