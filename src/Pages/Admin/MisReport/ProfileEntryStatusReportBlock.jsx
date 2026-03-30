@@ -1,149 +1,204 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import {
+  ArrowLeft,
+  Database,
+  CheckCircle2,
+  Bike,
+  FileCheck,
+  MapPin,
+  Info,
+} from "lucide-react";
+
 import AdminAuthenticatedLayout from "../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
-import { Link } from "react-router-dom";
 import Loader from "../../../Components/Loader";
-import { useParams } from "react-router-dom";
 import useApi from "../../../Hooks/useApi";
 import LogoutPopup from "../../../Components/LogoutPopup";
-import { toast } from "react-toastify";
+import { usePhaseStore } from "../../../Store/phaseStore";
 import {
   phaseYearId,
   defaultPhaseYear,
 } from "../../../Utils/Constants/Constants";
 
 const ProfileEntryStatusReportBlock = () => {
-  const { phaseId, id } = useParams();
+  const phaseId = usePhaseStore((state) => state.phaseId);
+  const { id } = useParams();
+  const navigate = useNavigate();
   const phaseDetails = phaseYearId[phaseId] || defaultPhaseYear;
+
   const { callApi, showPopup, popupMessage, handleLogout, setShowPopup } =
     useApi();
+
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+
+  // Memoized totals for the 9-column summary
+  const totals = useMemo(() => {
+    return data.reduce(
+      (acc, val) => ({
+        imported:
+          acc.imported + (Number(val.imported_from_banglar_siksha) || 0),
+        rejected:
+          acc.rejected +
+          (Number(val.imported_from_banglar_siksha_rejected) || 0),
+        verified: acc.verified + (Number(val.banglar_siksha_verified) || 0),
+        newEntry: acc.newEntry + (Number(val.profile_entry_class_ix_new) || 0),
+        finalized: acc.finalized + (Number(val.finalyse_class_ix_total) || 0),
+        validated: acc.validated + (Number(val.approved_class_ix_total) || 0),
+        receivedCycle:
+          acc.receivedCycle +
+          (Number(val.all_ready_get_cycle_yes_ix_total) || 0),
+        eligible: acc.eligible + (Number(val.eligible_ix_total) || 0),
+      }),
+      {
+        imported: 0,
+        rejected: 0,
+        verified: 0,
+        newEntry: 0,
+        finalized: 0,
+        validated: 0,
+        receivedCycle: 0,
+        eligible: 0,
+      },
+    );
+  }, [data]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await callApi("POST", `profileEntryStatusReport`, {
+        phaseId: phaseId,
+        distId: id,
+      });
+      if (response.error) {
+        toast.error(`Failed to fetch data: ${response.message}`);
+      } else {
+        setData(response.data || []);
+      }
+    } catch (err) {
+      toast.error(`An unexpected error occurred: ${err}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchData();
   }, [phaseId, id]);
 
-  const fetchData = async () => {
-    ////////////////////////////////////////////////
-    try {
-      setLoading(true);
-      const response = await callApi(
-        "GET",
-        `profile-entry-status-block-report/${phaseId}/${id}`
-      ); // API call
-      if (response.error) {
-        console.log(JSON.stringify(response));
-        toast(`Failed to fetch data: ${response.message}`);
-      } else {
-        setData(response.data);
-      }
-    } catch (err) {
-      toast(`An unexpected error occurred: ${err}`);
-    } finally {
-      setLoading(false);
-    }
-    ///////////////////////////////////////////////
-  };
-
-  const total_imported_from_bs = data.reduce((acc, value) => {
-    return acc + value.imported_from_banglar_siksha;
-  }, 0);
-
-  const total_imported_from_banglar_siksha_rejected = data.reduce(
-    (acc, value) => {
-      return acc + value.imported_from_banglar_siksha_rejected;
-    },
-    0
-  );
-
-  const total_banglar_siksha_verified = data.reduce((acc, value) => {
-    return acc + value.banglar_siksha_verified;
-  }, 0);
-
-  const total_profile_entry_class_ix_new = data.reduce((acc, value) => {
-    return acc + value.profile_entry_class_ix_new;
-  }, 0);
-
-  const total_finalyse_class_ix_total = data.reduce((acc, value) => {
-    return acc + value.finalyse_class_ix_total;
-  }, 0);
-
-  const total_all_ready_get_cycle_yes_ix_total = data.reduce((acc, value) => {
-    return acc + value.all_ready_get_cycle_yes_ix_total;
-  }, 0);
-
-  const total_eligible_ix_total = data.reduce((acc, value) => {
-    return acc + value.eligible_ix_total;
-  }, 0);
-
-  const total_approved_class_ix_total = data.reduce((acc, value) => {
-    return acc + value.approved_class_ix_total;
-  }, 0);
-
   return (
-    <>
-      <AdminAuthenticatedLayout>
-        <section className="p-4 md:p-8 lg:p-12 bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-300">
-          <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-8 tracking-tight">
-            Block Wise Profile Entry Status IX {"("}
-            {phaseDetails.phase}
-            <sup>th</sup>&nbsp;Phase
-            {")"}
-            {"("}Academic Year {phaseDetails.year}
-            {")"}
+    <AdminAuthenticatedLayout>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-8 transition-colors duration-500">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-indigo-500 hover:text-indigo-600 mb-4 text-sm font-bold transition-all group"
+        >
+          <ArrowLeft
+            size={18}
+            className="group-hover:-translate-x-1 transition-transform"
+          />
+          Back to Districts
+        </button>
+
+        {/* Header Section */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            Block Wise <span className="text-indigo-500">Status Report</span>
           </h1>
-          {/* <p className="text-sm text-gray-600 mt-2">
-                        Last updated: {time}
-                    </p> */}
-          {/* <div className="text-gray-600 block p-3.5 relative">
-                            &nbsp;&nbsp;
-                            Download Button
-                            <button className="absolute right-5 top-2 bg-sky-500 text-white px-4 py-2 rounded-md hover:bg-sky-600 focus:outline-none">
-                                Download
-                            </button>
-                        </div> */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-colors duration-300 overflow-x-auto">
-            <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400 border-separate border-spacing-0">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                  <th scope="col" className="p-4 rounded-tr-lg">
-                    Serial. No.
+          <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium flex items-center gap-2">
+            <Info size={16} className="text-indigo-500" />
+            Phase {phaseDetails.phase} • Academic Year {phaseDetails.year}
+          </p>
+        </div>
+
+        {/* Summary Stat Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <StatMiniCard
+            title="Imported (BS)"
+            value={totals.imported}
+            icon={Database}
+            color="text-blue-500"
+            bg="bg-blue-50 dark:bg-blue-900/20"
+          />
+          <StatMiniCard
+            title="Validated (SI)"
+            value={totals.validated}
+            icon={CheckCircle2}
+            color="text-emerald-500"
+            bg="bg-emerald-50 dark:bg-emerald-900/20"
+          />
+          <StatMiniCard
+            title="Cycle Received"
+            value={totals.receivedCycle}
+            icon={Bike}
+            color="text-orange-500"
+            bg="bg-orange-50 dark:bg-orange-900/20"
+          />
+          <StatMiniCard
+            title="Eligible Total"
+            value={totals.eligible}
+            icon={FileCheck}
+            color="text-indigo-500"
+            bg="bg-indigo-50 dark:bg-indigo-900/20"
+          />
+        </div>
+
+        {/* Table Section */}
+        <div className="bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-separate border-spacing-0">
+              <thead>
+                <tr className="bg-slate-50/50 dark:bg-slate-800/50 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  <th className="p-5 border-b border-slate-100 dark:border-slate-800">
+                    #
                   </th>
-                  <th scope="col" className="p-4">
-                    Block Name
+                  <th className="p-5 border-b border-slate-100 dark:border-slate-800">
+                    Block
                   </th>
-                  <th scope="col" className="p-4">
-                    Imported from Banglar Siksha
+                  <th className="p-5 border-b border-slate-100 dark:border-slate-800 text-center">
+                    Imported from <br />
+                    Banglar Siksha
                   </th>
-                  <th scope="col" className="p-4">
-                    Rejected by HOI/SI
+                  <th className="p-5 border-b border-slate-100 dark:border-slate-800 text-center text-rose-400">
+                    Rejected <br />
+                    by HOI/SI
                   </th>
-                  <th scope="col" className="p-4">
-                    Banglar Siksha Data Verified (Not Finalized)
+                  <th className="p-5 border-b border-slate-100 dark:border-slate-800 text-center">
+                    Banglar Siksha <br />
+                    Data Verified <br />
+                    (Not Finalized)
                   </th>
-                  <th scope="col" className="p-4">
-                    New Entry by School
+                  <th className="p-5 border-b border-slate-100 dark:border-slate-800 text-center text-sky-500">
+                    New Entry <br />
+                    by School
                   </th>
-                  <th scope="col" className="p-4">
-                    Data Finalized (Not Validated)
+                  <th className="p-5 border-b border-slate-100 dark:border-slate-800 text-center">
+                    Data Finalized <br />
+                    (Not Validated)
                   </th>
-                  <th scope="col" className="p-4 rounded-tl-lg">
-                    Data Validated by SI
+                  <th className="p-5 border-b border-slate-100 dark:border-slate-800 text-center text-emerald-500">
+                    Data Validated <br />
+                    by SI
                   </th>
-                  <th scope="col" className="p-4">
-                    Already Received bicycle(YES)
+                  <th className="p-5 border-b border-slate-100 dark:border-slate-800 text-center">
+                    Already Received <br />
+                    bicycle(YES)
                   </th>
-                  <th scope="col" className="p-4">
+                  <th className="p-5 border-b border-slate-100 dark:border-slate-800 text-center bg-indigo-50/30 dark:bg-indigo-900/10 text-indigo-600">
                     Eligible Students
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                 {data.length === 0 ? (
-                  // Show this row if no student data is available
-                  <tr className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                    <td colSpan="10" className="text-center p-2 text-gray-500">
-                      No records found
+                  <tr>
+                    <td
+                      colSpan="10"
+                      className="p-12 text-center text-slate-400 font-medium italic"
+                    >
+                      No block records found.
                     </td>
                   </tr>
                 ) : (
@@ -151,65 +206,82 @@ const ProfileEntryStatusReportBlock = () => {
                     {data.map((value, index) => (
                       <tr
                         key={index}
-                        className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                        className="group hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
                       >
-                        <td className="p-4">{index + 1}</td>
-                        <td className="p-4">
+                        <td className="p-5 text-xs font-bold text-slate-300 text-center">
+                          {index + 1}
+                        </td>
+                        <td className="p-5">
                           <Link
-                            to={`/ProfileEntryStatusReportSchool/${phaseId}/${btoa(
-                              value.block_id_pk
-                            )}`}
+                            to={`/ProfileEntryStatusReportSchool/${btoa(value.block_id_pk)}`}
+                            className="text-sm font-black text-slate-700 dark:text-slate-200 hover:text-indigo-500 flex items-center gap-2 group/link"
                           >
                             {value.block_name}
                           </Link>
                         </td>
-                        <td className="p-4">
+                        <td className="p-5 text-center text-xs font-semibold text-slate-500">
                           {value.imported_from_banglar_siksha}
                         </td>
-                        <td className="p-4">
+                        <td className="p-5 text-center text-xs font-bold text-rose-500/80">
                           {value.imported_from_banglar_siksha_rejected}
                         </td>
-                        <td className="p-4">{value.banglar_siksha_verified}</td>
-                        <td className="p-4">
+                        <td className="p-5 text-center text-xs font-semibold text-slate-500">
+                          {value.banglar_siksha_verified}
+                        </td>
+                        <td className="p-5 text-center text-xs font-bold text-sky-600">
                           {value.profile_entry_class_ix_new}
                         </td>
-                        <td className="p-4">{value.finalyse_class_ix_total}</td>
-                        <td className="p-4">{value.approved_class_ix_total}</td>
-                        <td className="p-4">
+                        <td className="p-5 text-center text-xs font-bold text-slate-700 dark:text-slate-300">
+                          {value.finalyse_class_ix_total}
+                        </td>
+                        <td className="p-5 text-center text-xs font-black text-emerald-600">
+                          {value.approved_class_ix_total}
+                        </td>
+                        <td className="p-5 text-center text-xs font-semibold text-slate-500">
                           {value.all_ready_get_cycle_yes_ix_total}
                         </td>
-                        <td className="p-4">{value.eligible_ix_total}</td>
+                        <td className="p-5 text-center text-sm font-black text-indigo-600 bg-indigo-50/5">
+                          {value.eligible_ix_total}
+                        </td>
                       </tr>
                     ))}
-                    <tr className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                      <td colSpan="2" className="p-4 text-center">
-                        Total
+                    {/* Grand Total Row */}
+                    <tr className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black">
+                      <td
+                        colSpan="2"
+                        className="p-6 text-xs uppercase tracking-widest text-right"
+                      >
+                        Block Total
                       </td>
-                      <td className="p-4">{total_imported_from_bs}</td>
-                      <td className="p-4">
-                        {total_imported_from_banglar_siksha_rejected}
+                      <td className="p-5 text-center">{totals.imported}</td>
+                      <td className="p-5 text-center text-rose-400 dark:text-rose-600">
+                        {totals.rejected}
                       </td>
-                      <td className="p-4">{total_banglar_siksha_verified}</td>
-                      <td className="p-4">
-                        {total_profile_entry_class_ix_new}
+                      <td className="p-5 text-center">{totals.verified}</td>
+                      <td className="p-5 text-center text-sky-400 dark:text-sky-600">
+                        {totals.newEntry}
                       </td>
-                      <td className="p-4">{total_finalyse_class_ix_total}</td>
-
-                      <td className="p-4">{total_approved_class_ix_total}</td>
-                      <td className="p-4">
-                        {total_all_ready_get_cycle_yes_ix_total}
+                      <td className="p-5 text-center">{totals.finalized}</td>
+                      <td className="p-5 text-center text-emerald-400 dark:text-emerald-600">
+                        {totals.validated}
                       </td>
-                      <td className="p-4">{total_eligible_ix_total}</td>
+                      <td className="p-5 text-center">
+                        {totals.receivedCycle}
+                      </td>
+                      <td className="p-5 text-center text-lg bg-indigo-600 text-white">
+                        {totals.eligible}
+                      </td>
                     </tr>
                   </>
                 )}
               </tbody>
             </table>
           </div>
-          {loading && <Loader />} {/* 👈 show the loader component */}
-        </section>
-      </AdminAuthenticatedLayout>
-      {/* Modal section */}
+        </div>
+
+        {loading && <Loader />}
+      </div>
+
       {showPopup && (
         <LogoutPopup
           message={popupMessage}
@@ -219,9 +291,25 @@ const ProfileEntryStatusReportBlock = () => {
           }}
         />
       )}
-      {/* Modal section */}
-    </>
+    </AdminAuthenticatedLayout>
   );
 };
+
+/* Internal Stat Card Component */
+const StatMiniCard = ({ title, value, icon: Icon, color, bg }) => (
+  <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-4 hover:shadow-md transition-all">
+    <div className={`p-4 rounded-2xl ${bg} ${color}`}>
+      <Icon size={22} />
+    </div>
+    <div>
+      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+        {title}
+      </p>
+      <p className="text-xl font-black text-slate-900 dark:text-white leading-none mt-1">
+        {value.toLocaleString()}
+      </p>
+    </div>
+  </div>
+);
 
 export default ProfileEntryStatusReportBlock;
