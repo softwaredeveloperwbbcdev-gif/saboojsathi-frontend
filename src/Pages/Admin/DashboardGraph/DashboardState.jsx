@@ -246,16 +246,14 @@ const DashboardState = ({ graphData, setLoading }) => {
             subText="Phase Specific Management"
             icon={ClipboardCheck}
             colorClass="from-rose-500 to-rose-700"
-            onClick={() => navigate(`/DistrictChallanReport/${encodedPhaseId}`)}
+            onClick={() => navigate(`/DistrictChallanReport`)}
           />
           <ActionCard
             title="Challan Generation"
             subText="Batch Process Tracking"
             icon={FileText}
             colorClass="from-cyan-500 to-cyan-700"
-            onClick={() =>
-              navigate(`/ChallanGenerationReport/${encodedPhaseId}`)
-            }
+            onClick={() => navigate(`/ChallanGenerationReport`)}
           />
           <ActionCard
             title="Challan View"
