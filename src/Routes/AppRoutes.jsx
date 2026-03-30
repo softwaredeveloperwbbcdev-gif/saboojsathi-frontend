@@ -311,21 +311,10 @@ const AppRoutes = () => {
           element={<DistributionReportSchool />} // School Wise
         />
 
+        {/* School Tagging Detail Report  */}
         <Route
-          path="/TaggingDetailsReport/:phaseId" //23.07.2025
+          path="/TaggingDetailsReport/:phaseId" // District Wise
           element={<TaggingDetailsReport />}
-        />
-        <Route
-          path="/TaggingDetailsReportOld/:phaseId" //20.09.2025
-          element={<TaggingDetailsReportOld />}
-        />
-        <Route
-          path="/TaggingDetailsReportOldBlock/:phaseId/:id" //20.09.2025
-          element={<TaggingDetailsReportOldBlock />}
-        />
-        <Route
-          path="/TaggingDetailsReportOldSchool/:phaseId/:id" //20.09.2025
-          element={<TaggingDetailsReportOldSchool />}
         />
         <Route
           path="/TaggingDetailsReportBlock/:id/:phaseId" //28.07.2025
@@ -335,30 +324,50 @@ const AppRoutes = () => {
           path="/TaggingDetailsReportSchool/:phaseId/:id" //28.07.2025
           element={<TaggingDetailsReportSchool />}
         />
+
+        {/* School Tagging Detail Old Report  */}
         <Route
-          path="/DistrictChallanReport/:phaseId" //05.08.2025
+          path="/TaggingDetailsReportOld/:phaseId" // District Wise
+          element={<TaggingDetailsReportOld />}
+        />
+        <Route
+          path="/TaggingDetailsReportOldBlock/:phaseId/:id" // Block Wise
+          element={<TaggingDetailsReportOldBlock />}
+        />
+        <Route
+          path="/TaggingDetailsReportOldSchool/:phaseId/:id" // School Wise
+          element={<TaggingDetailsReportOldSchool />}
+        />
+
+        {/* Challan MIS Report  */}
+        <Route
+          path="/DistrictChallanReport" // District Wise
           element={<DistrictChallanReport />}
         />
         <Route
-          path="/BlockChallanReport/:id/:phaseId" //05.08.2025
+          path="/BlockChallanReport/:id" // Block Wise
           element={<BlockChallanReport />}
         />
         <Route
-          path="/ChallanDetailsByBlock/:id/:phaseId" //05.08.2025
+          path="/ChallanDetailsByBlock/:id" // Challan Wise
           element={<ChallanDetailsByBlock />}
         />
+
+        {/* Challan Generation Report  */}
         <Route
-          path="/ChallanGenerationReport/:phaseId" //06.08.2025
+          path="/ChallanGenerationReport" // District Wise
           element={<ChallanGenerationReport />}
         />
         <Route
-          path="/ChallanGenerationReportBlock/:phaseId/:id" //07.08.2025 check me
+          path="/ChallanGenerationReportBlock/:id" // Block Wise
           element={<ChallanGenerationReportBlock />}
         />
         <Route
-          path="/ChallanGenerationReportSchool" //07.08.2025
+          path="/ChallanGenerationReportSchool/:id" // School Wise
           element={<ChallanGenerationReportSchool />}
         />
+
+
         <Route
           path="/ChallanParticularsView/:phaseId" //08.08.2025
           element={<ChallanParticularsView />}

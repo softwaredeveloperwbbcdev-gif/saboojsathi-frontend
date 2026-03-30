@@ -1,159 +1,226 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import {
+  FileText,
+  ClipboardCheck,
+  CheckCircle2,
+  Info,
+  Building2,
+  ArrowLeft,
+  School,
+} from "lucide-react";
+
 import AdminAuthenticatedLayout from "../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
 import Loader from "../../../Components/Loader";
-import { useParams } from "react-router-dom";
 import useApi from "../../../Hooks/useApi";
 import LogoutPopup from "../../../Components/LogoutPopup";
-import { toast } from "react-toastify";
 import { usePhaseStore } from "../../../Store/phaseStore";
 import {
   phaseYearId,
   defaultPhaseYear,
 } from "../../../Utils/Constants/Constants";
 
-function ChallanGenerationReportBlock() {
+const ChallanGenerationReportBlock = () => {
+  const navigate = useNavigate();
   const phaseId = usePhaseStore((state) => state.phaseId);
   const phaseDetails = phaseYearId[phaseId] || defaultPhaseYear;
+
   const { callApi, showPopup, popupMessage, handleLogout, setShowPopup } =
     useApi();
 
+  // Retrieve user data from localStorage
   const user = JSON.parse(atob(localStorage.getItem("user")));
   const id = user.internal_code;
+
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
 
-  useEffect(() => {
-    fetchData();
-  }, [phaseId, id]);
+  // Memoized totals for consistency and performance
+  const totals = useMemo(() => {
+    return data.reduce(
+      (acc, val) => ({
+        musterRoll:
+          acc.musterRoll + (Number(val.total_muster_roll_generated) || 0),
+        allocation: acc.allocation + (Number(val.total_allocation) || 0),
+        uploaded: acc.uploaded + (Number(val.total_updated) || 0),
+        boysMuster:
+          acc.boysMuster + (Number(val.boys_muster_roll_generated) || 0),
+        girlsMuster:
+          acc.girlsMuster + (Number(val.girls_muster_roll_generated) || 0),
+        boysAlloc: acc.boysAlloc + (Number(val.boys_allocation) || 0),
+        girlsAlloc: acc.girlsAlloc + (Number(val.girls_allocation) || 0),
+        boysUpdated: acc.boysUpdated + (Number(val.boys_updated) || 0),
+        girlsUpdated: acc.girlsUpdated + (Number(val.girls_updated) || 0),
+      }),
+      {
+        musterRoll: 0,
+        allocation: 0,
+        uploaded: 0,
+        boysMuster: 0,
+        girlsMuster: 0,
+        boysAlloc: 0,
+        girlsAlloc: 0,
+        boysUpdated: 0,
+        girlsUpdated: 0,
+      },
+    );
+  }, [data]);
 
   const fetchData = async () => {
-    /////////////////////////////////////////////////////////////////
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await callApi(
-        "GET",
-        `challan_generation_report_school/${phaseId}/${id}`,
-      ); // API call
+      const response = await callApi("POST", `challanGenerationReport`, {
+        phaseId: phaseId,
+        blockId: id,
+      });
       if (response.error) {
-        console.log(JSON.stringify(response));
-        toast(`Failed to fetch data: ${response.message}`);
+        toast.error(`Failed to fetch data: ${response.message}`);
       } else {
-        setData(response.data);
+        setData(response.data || []);
       }
     } catch (err) {
-      toast(`An unexpected error occurred: ${err}`);
+      toast.error(`An unexpected error occurred: ${err}`);
     } finally {
       setLoading(false);
     }
-    ////////////////////////////////////////////////////////////////
   };
 
-  const boys_musterroll_generated_total = data.reduce((acc, value) => {
-    return acc + value.boys_muster_roll_generated;
-  }, 0);
-
-  const girls_musterroll_generated_total = data.reduce((acc, value) => {
-    return acc + value.girls_muster_roll_generated;
-  }, 0);
-  const total_muster_roll_generated_total = data.reduce((acc, value) => {
-    return acc + value.total_muster_roll_generated;
-  }, 0);
-  const boys_updated_total = data.reduce((acc, value) => {
-    return acc + value.boys_updated;
-  }, 0);
-  const girls_updated_total = data.reduce((acc, value) => {
-    return acc + value.girls_updated;
-  }, 0);
-
-  const total_updated_total = data.reduce((acc, value) => {
-    return acc + value.total_updated;
-  }, 0);
-  const boys_allocation_total = data.reduce((acc, value) => {
-    return acc + parseInt(value.boys_allocation); // (Number(value.boys_allocation) || 0) //change the view or function data type
-  }, 0);
-  const girls_allocation_total = data.reduce((acc, value) => {
-    return acc + parseInt(value.girls_allocation);
-  }, 0);
-  const total_allocation_total = data.reduce((acc, value) => {
-    return acc + parseInt(value.total_allocation);
-  }, 0);
+  useEffect(() => {
+    if (id) fetchData();
+  }, [phaseId, id]);
 
   return (
-    <>
-      <AdminAuthenticatedLayout>
-        <section className="p-4 md:p-8 lg:p-12 bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-300">
-          <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-8 tracking-tight">
-            Challan Generation Report {"("}Phase {phaseDetails.phaseName}
-            {")"}
+    <AdminAuthenticatedLayout>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-8 transition-colors duration-500">
+        {/* Navigation Action */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-indigo-500 hover:text-indigo-600 mb-4 text-sm font-bold transition-all group"
+        >
+          <ArrowLeft
+            size={18}
+            className="group-hover:-translate-x-1 transition-transform"
+          />
+          Back to Blocks
+        </button>
+
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            School-wise <span className="text-indigo-500">Report</span>
           </h1>
-          {/* <p className="text-sm text-gray-600 mt-2">Last updated: {"time"}</p> */}
-          <div className="w-full pb-2 flex justify-end">
-            &nbsp;&nbsp;
-            {/* Download Button */}
-            {/* <button className="absolute right-5 top-2 bg-sky-500 text-white px-4 py-2 rounded-md hover:bg-sky-600 focus:outline-none">
-              Download
-            </button> */}
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-colors duration-300 overflow-x-auto">
-            <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400 border-separate border-spacing-0">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                  <th rowSpan="2" scope="col" className="p-4 rounded-tr-lg">
-                    Serial. No.
+          <p className="text-slate-500 dark:text-slate-400 mt-1 font-medium flex items-center gap-2">
+            <Info size={16} className="text-indigo-500" />
+            Phase {phaseDetails.phaseName} • Institution Level Overview
+          </p>
+        </div>
+
+        {/* Stat Cards Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+          <StatMiniCard
+            title="Muster Roll Generated"
+            value={totals.musterRoll}
+            icon={ClipboardCheck}
+            color="text-amber-500"
+            bg="bg-amber-50 dark:bg-amber-900/20"
+          />
+          <StatMiniCard
+            title="Bicycles Allocated"
+            value={totals.allocation}
+            icon={FileText}
+            color="text-indigo-500"
+            bg="bg-indigo-50 dark:bg-indigo-900/20"
+          />
+          <StatMiniCard
+            title="Records Uploaded"
+            value={totals.uploaded}
+            icon={CheckCircle2}
+            color="text-emerald-500"
+            bg="bg-emerald-50 dark:bg-emerald-900/20"
+          />
+        </div>
+
+        {/* Data Table */}
+        <div className="bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-separate border-spacing-0">
+              <thead>
+                <tr className="bg-slate-50/50 dark:bg-slate-800/50 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  <th
+                    rowSpan="2"
+                    className="p-5 border-b border-slate-100 dark:border-slate-800"
+                  >
+                    #
                   </th>
-                  <th rowSpan="2" scope="col" className="p-4">
+                  <th
+                    rowSpan="2"
+                    className="p-5 border-b border-slate-100 dark:border-slate-800"
+                  >
                     School Name
                   </th>
-
-                  <th rowSpan="2" scope="col" className="p-4">
+                  <th
+                    rowSpan="2"
+                    className="p-5 border-b border-slate-100 dark:border-slate-800"
+                  >
                     Supplier
                   </th>
-
-                  <th colSpan="3" scope="col" className="p-4 text-center">
-                    Muster Roll Generated
+                  <th
+                    colSpan="3"
+                    className="p-3 border-b border-slate-100 dark:border-slate-800 text-center bg-amber-50/30 dark:bg-amber-900/10"
+                  >
+                    Muster Roll
                   </th>
-                  <th colSpan="3" scope="col" className="p-4 text-center">
-                    Bicycle Allocated
+                  <th
+                    colSpan="3"
+                    className="p-3 border-b border-slate-100 dark:border-slate-800 text-center bg-indigo-50/30 dark:bg-indigo-900/10"
+                  >
+                    Allocated
                   </th>
-                  <th colSpan="3" scope="col" className="p-4 text-center">
-                    Distribution Record Uploaded
+                  <th
+                    colSpan="3"
+                    className="p-3 border-b border-slate-100 dark:border-slate-800 text-center bg-emerald-50/30 dark:bg-emerald-900/10"
+                  >
+                    Uploaded
                   </th>
                 </tr>
-                <tr>
-                  <th scope="col" className="p-4">
-                    Boys
+                <tr className="bg-slate-50/30 dark:bg-slate-800/30 text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+                  <th className="p-3 border-b border-slate-100 dark:border-slate-800 text-center text-xs">
+                    B
                   </th>
-                  <th scope="col" className="p-4">
-                    Girls
+                  <th className="p-3 border-b border-slate-100 dark:border-slate-800 text-center text-xs">
+                    G
                   </th>
-                  <th scope="col" className="p-4">
+                  <th className="p-3 border-b border-slate-100 dark:border-slate-800 text-center font-black text-slate-600">
                     Total
                   </th>
-                  <th scope="col" className="p-4">
-                    Boys
+                  <th className="p-3 border-b border-slate-100 dark:border-slate-800 text-center text-xs">
+                    B
                   </th>
-                  <th scope="col" className="p-4">
-                    Girls
+                  <th className="p-3 border-b border-slate-100 dark:border-slate-800 text-center text-xs">
+                    G
                   </th>
-                  <th scope="col" className="p-4">
+                  <th className="p-3 border-b border-slate-100 dark:border-slate-800 text-center font-black text-slate-600">
                     Total
                   </th>
-                  <th scope="col" className="p-4">
-                    Boys
+                  <th className="p-3 border-b border-slate-100 dark:border-slate-800 text-center text-xs">
+                    B
                   </th>
-                  <th scope="col" className="p-4">
-                    Girls
+                  <th className="p-3 border-b border-slate-100 dark:border-slate-800 text-center text-xs">
+                    G
                   </th>
-                  <th scope="col" className="p-4">
+                  <th className="p-3 border-b border-slate-100 dark:border-slate-800 text-center font-black text-slate-600">
                     Total
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                 {data.length === 0 ? (
-                  // Show this row if no student data is available
-                  <tr className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                    <td colSpan="10" className="text-center p-2 text-gray-500">
+                  <tr>
+                    <td
+                      colSpan="12"
+                      className="p-12 text-center text-slate-400 font-medium italic"
+                    >
                       No records found
                     </td>
                   </tr>
@@ -162,65 +229,86 @@ function ChallanGenerationReportBlock() {
                     {data.map((value, index) => (
                       <tr
                         key={index}
-                        className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                        className="group hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
                       >
-                        <td className="p-4">{index + 1}</td>
-                        <td className="p-4">{value.school}</td>
-                        <td className="p-4">
-                          {/* {value.supplier} */}
-                          {value.supplier
-                            ? value.supplier
-                            : "No supplier available"}
+                        <td className="p-4 text-xs font-bold text-slate-300 text-center">
+                          {index + 1}
                         </td>
-
                         <td className="p-4">
+                          <p className="text-sm font-black text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                            <School size={14} className="text-indigo-400" />
+                            {value.school}
+                          </p>
+                        </td>
+                        <td className="p-4">
+                          <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                            <Building2 size={12} className="text-slate-400" />
+                            {value.supplier || "N/A"}
+                          </p>
+                        </td>
+                        <td className="p-3 text-center text-xs text-slate-500">
                           {value.boys_muster_roll_generated}
                         </td>
-                        <td className="p-4">
+                        <td className="p-3 text-center text-xs text-slate-500">
                           {value.girls_muster_roll_generated}
                         </td>
-                        <td className="p-4">
+                        <td className="p-3 text-center text-xs font-bold text-amber-600 bg-amber-50/20">
                           {value.total_muster_roll_generated}
                         </td>
-                        <td className="p-4">{value.boys_allocation}</td>
-                        <td className="p-4">{value.girls_allocation}</td>
-                        <td className="p-4">{value.total_allocation}</td>
-                        <td className="p-4">{value.boys_updated}</td>
-                        <td className="p-4">{value.girls_updated}</td>
-                        <td className="p-4">{value.total_updated}</td>
+                        <td className="p-3 text-center text-xs text-slate-500">
+                          {value.boys_allocation}
+                        </td>
+                        <td className="p-3 text-center text-xs text-slate-500">
+                          {value.girls_allocation}
+                        </td>
+                        <td className="p-3 text-center text-xs font-bold text-indigo-600 bg-indigo-50/20">
+                          {value.total_allocation}
+                        </td>
+                        <td className="p-3 text-center text-xs text-slate-500">
+                          {value.boys_updated}
+                        </td>
+                        <td className="p-3 text-center text-xs text-slate-500">
+                          {value.girls_updated}
+                        </td>
+                        <td className="p-3 text-center text-xs font-bold text-emerald-600 bg-emerald-50/20">
+                          {value.total_updated}
+                        </td>
                       </tr>
                     ))}
-                    <tr className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                      <td colSpan="3" className="text-center font-semibold p-4">
-                        Total
+                    {/* Grand Total Footer */}
+                    <tr className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black">
+                      <td
+                        colSpan="3"
+                        className="p-5 text-[10px] uppercase tracking-widest text-right"
+                      >
+                        Grand Totals
                       </td>
-                      <td className="font-semibold p-4">
-                        {boys_musterroll_generated_total}
+                      <td className="p-3 text-center text-xs">
+                        {totals.boysMuster}
                       </td>
-                      <td className="font-semibold p-4">
-                        {girls_musterroll_generated_total}
+                      <td className="p-3 text-center text-xs">
+                        {totals.girlsMuster}
                       </td>
-                      <td className="font-semibold p-4">
-                        {total_muster_roll_generated_total}
+                      <td className="p-3 text-center text-xs bg-amber-500 text-white">
+                        {totals.musterRoll}
                       </td>
-                      <td className="font-semibold p-4">
-                        {boys_allocation_total}
+                      <td className="p-3 text-center text-xs">
+                        {totals.boysAlloc}
                       </td>
-                      <td className="font-semibold p-4">
-                        {girls_allocation_total}
+                      <td className="p-3 text-center text-xs">
+                        {totals.girlsAlloc}
                       </td>
-                      <td className="font-semibold p-4">
-                        {total_allocation_total}
+                      <td className="p-3 text-center text-xs bg-indigo-600 text-white">
+                        {totals.allocation}
                       </td>
-
-                      <td className="font-semibold p-4">
-                        {boys_updated_total}
+                      <td className="p-3 text-center text-xs">
+                        {totals.boysUpdated}
                       </td>
-                      <td className="font-semibold p-4">
-                        {girls_updated_total}
+                      <td className="p-3 text-center text-xs">
+                        {totals.girlsUpdated}
                       </td>
-                      <td className="font-semibold p-4">
-                        {total_updated_total}
+                      <td className="p-3 text-center text-xs bg-emerald-600 text-white">
+                        {totals.uploaded}
                       </td>
                     </tr>
                   </>
@@ -228,10 +316,10 @@ function ChallanGenerationReportBlock() {
               </tbody>
             </table>
           </div>
-          {loading && <Loader />} {/* 👈 show the loader component */}
-        </section>
-      </AdminAuthenticatedLayout>
-      {/* Modal section */}
+        </div>
+        {loading && <Loader />}
+      </div>
+
       {showPopup && (
         <LogoutPopup
           message={popupMessage}
@@ -241,9 +329,24 @@ function ChallanGenerationReportBlock() {
           }}
         />
       )}
-      {/* Modal section */}
-    </>
+    </AdminAuthenticatedLayout>
   );
-}
+};
+
+const StatMiniCard = ({ title, value, icon: Icon, color, bg }) => (
+  <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-4">
+    <div className={`p-4 rounded-2xl ${bg} ${color}`}>
+      <Icon size={22} />
+    </div>
+    <div>
+      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+        {title}
+      </p>
+      <p className="text-xl font-black text-slate-900 dark:text-white leading-none mt-1">
+        {Number(value).toLocaleString()}
+      </p>
+    </div>
+  </div>
+);
 
 export default ChallanGenerationReportBlock;
