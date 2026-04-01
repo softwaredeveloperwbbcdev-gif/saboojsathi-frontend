@@ -313,15 +313,15 @@ const AppRoutes = () => {
 
         {/* School Tagging Detail Report  */}
         <Route
-          path="/TaggingDetailsReport/:phaseId" // District Wise
+          path="/TaggingDetailsReport" // District Wise
           element={<TaggingDetailsReport />}
         />
         <Route
-          path="/TaggingDetailsReportBlock/:id/:phaseId" //28.07.2025
+          path="/TaggingDetailsReportBlock/:id" // Block Wise
           element={<TaggingDetailsReportBlock />}
         />
         <Route
-          path="/TaggingDetailsReportSchool/:phaseId/:id" //28.07.2025
+          path="/TaggingDetailsReportSchool/:id" // School Wise
           element={<TaggingDetailsReportSchool />}
         />
 
@@ -367,23 +367,28 @@ const AppRoutes = () => {
           element={<ChallanGenerationReportSchool />}
         />
 
+        {/* Challan Allocation Status Report */}
+        <Route
+          path="/ChallanAllocationStatusReport" // District Wise View
+          element={<ChallanAllocationStatusReport />}
+        />
+        <Route
+          path="/ChallanAllocationStatusBlockReport/:id/" //11.08.2025
+          element={<ChallanAllocationStatusBlockReport />}
+        />
 
+        {/* Challan View */}
         <Route
           path="/ChallanParticularsView/:phaseId" //08.08.2025
           element={<ChallanParticularsView />}
         />
-        <Route
-          path="/ChallanAllocationStatusReport/:phaseId" //11.08.2025
-          element={<ChallanAllocationStatusReport />}
-        />
-        <Route
-          path="/ChallanAllocationStatusBlockReport/:id/:phaseId" //11.08.2025
-          element={<ChallanAllocationStatusBlockReport />}
-        />
+
+        {/* Invoice View */}
         <Route
           path="/InvoiceViewReport/:phaseId" //11.08.2025
           element={<InvoiceViewReport />}
         />
+
         <Route
           path="/ResetPasswordState" //11.08.2025
           element={<ResetPasswordState />}
