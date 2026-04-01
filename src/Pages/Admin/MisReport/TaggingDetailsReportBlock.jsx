@@ -1,150 +1,218 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import {
+  Map,
+  Tags,
+  Users,
+  GraduationCap,
+  Info,
+  ArrowRight,
+  ArrowLeft,
+} from "lucide-react";
+
 import AdminAuthenticatedLayout from "../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
-import { Link } from "react-router-dom";
 import Loader from "../../../Components/Loader";
-import { useParams } from "react-router-dom";
 import useApi from "../../../Hooks/useApi";
 import LogoutPopup from "../../../Components/LogoutPopup";
-import { toast } from "react-toastify";
+import { usePhaseStore } from "../../../Store/phaseStore";
 import {
   phaseYearId,
   defaultPhaseYear,
 } from "../../../Utils/Constants/Constants";
 
 const TaggingDetailsReportBlock = () => {
-  const { phaseId, id } = useParams();
+  const phaseId = usePhaseStore((state) => state.phaseId);
+  const { id } = useParams();
   const phaseDetails = phaseYearId[phaseId] || defaultPhaseYear;
-
+  const navigate = useNavigate();
   const { callApi, showPopup, popupMessage, handleLogout, setShowPopup } =
     useApi();
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchData();
-  }, [phaseId, id]);
-  ////////////////////////////////////////////////////////////////
+  // Optimized: Single pass reduction for all block-level tagging totals
+  const totals = useMemo(() => {
+    return data.reduce(
+      (acc, val) => ({
+        schools: acc.schools + (Number(val.no_of_school) || 0),
+        taggedSchools: acc.taggedSchools + (Number(val.tagged_school) || 0),
+        tBoys: acc.tBoys + (Number(val.tagged_boys) || 0),
+        tGirls: acc.tGirls + (Number(val.tagged_girls) || 0),
+        tTotal: acc.tTotal + (Number(val.tagged_total) || 0),
+        eBoys: acc.eBoys + (Number(val.eligible_boys) || 0),
+        eGirls: acc.eGirls + (Number(val.eligible_girls) || 0),
+        eTotal: acc.eTotal + (Number(val.eligible_total) || 0),
+      }),
+      {
+        schools: 0,
+        taggedSchools: 0,
+        tBoys: 0,
+        tGirls: 0,
+        tTotal: 0,
+        eBoys: 0,
+        eGirls: 0,
+        eTotal: 0,
+      },
+    );
+  }, [data]);
+
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await callApi(
-        "GET",
-        `blockwise_tagging_report/${phaseId}/${id}`
-      ); // API call
+      const response = await callApi("POST", `taggingReport`, {
+        phaseId: phaseId,
+        distId: id,
+      });
       if (response.error) {
-        console.log(JSON.stringify(response));
-        toast(`Failed to fetch data: ${response.message}`);
+        toast.error(`Error: ${response.message}`);
       } else {
-        setData(response.data);
+        setData(response.data || []);
       }
     } catch (err) {
-      toast(`An unexpected error occurred: ${err}`);
+      toast.error(`Unexpected error: ${err}`);
     } finally {
       setLoading(false);
     }
   };
-  ///////////////////////////////////////////////////////////////
-  const total_no_of_schools = data.reduce((acc, value) => {
-    return acc + value.no_of_schools;
-  }, 0);
 
-  const total_no_of_schools_tagged = data.reduce((acc, value) => {
-    return acc + value.no_of_schools_tagged;
-  }, 0);
-
-  const total_tagged_boys = data.reduce((acc, value) => {
-    return acc + value.tagged_boys;
-  }, 0);
-
-  const total_tagged_girls = data.reduce((acc, value) => {
-    return acc + value.tagged_girls;
-  }, 0);
-
-  const total_tagged = data.reduce((acc, value) => {
-    return acc + value.total_tagged;
-  }, 0);
-
-  const total_eligible_boys = data.reduce((acc, value) => {
-    return acc + value.eligible_boys;
-  }, 0);
-
-  const total_eligible_girls = data.reduce((acc, value) => {
-    return acc + value.eligible_girls;
-  }, 0);
-  const total_eligible = data.reduce((acc, value) => {
-    return acc + value.total_eligible;
-  }, 0);
+  useEffect(() => {
+    fetchData();
+  }, [phaseId, id]);
 
   return (
-    <>
-      <AdminAuthenticatedLayout>
-        <section className="p-4 md:p-8 lg:p-12 bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-300">
-          <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-8 tracking-tight">
-            Block Wise Delivery Center School Tagging Report{" "}
-            {phaseDetails.phase}
-            <sup>th</sup> Phase {"("}For Academic Year {phaseDetails.year}
-            {")"}
+    <AdminAuthenticatedLayout>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-8 transition-colors duration-500">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-indigo-500 hover:text-indigo-600 mb-4 text-sm font-bold transition-all group"
+        >
+          <ArrowLeft
+            size={18}
+            className="group-hover:-translate-x-1 transition-transform"
+          />
+          Back to District Report
+        </button>
+
+        {/* Header Section */}
+        <div className="mb-8">
+          <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+            Block-Wise{" "}
+            <span className="text-indigo-600">Tagging Progression</span>
           </h1>
-          {/* <p className="text-sm text-gray-600 mt-2">Last updated: {"time"}</p> */}
-          {/* Download Button */}
-          {/* <button className="absolute right-5 top-2 bg-sky-500 text-white px-4 py-2 rounded-md hover:bg-sky-600 focus:outline-none">
-                Download
-              </button> */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-colors duration-300 overflow-x-auto">
-            <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400 border-separate border-spacing-0">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                  <th rowSpan="2" scope="col" className="p-4 rounded-tr-lg">
-                    Serial. No.
+          <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium flex items-center gap-2">
+            <Info size={16} className="text-indigo-500" />
+            Phase {phaseDetails.phase} • Delivery Center Monitoring (AY{" "}
+            {phaseDetails.year})
+          </p>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <StatMiniCard
+            title="Total Schools"
+            value={totals.schools}
+            icon={Map}
+            color="text-blue-600"
+            bg="bg-blue-50 dark:bg-blue-900/20"
+          />
+          <StatMiniCard
+            title="Schools Tagged"
+            value={totals.taggedSchools}
+            icon={Tags}
+            color="text-emerald-600"
+            bg="bg-emerald-50 dark:bg-emerald-900/20"
+          />
+          <StatMiniCard
+            title="Tagged Students"
+            value={totals.tTotal}
+            icon={Users}
+            color="text-indigo-600"
+            bg="bg-indigo-50 dark:bg-indigo-900/20"
+          />
+          <StatMiniCard
+            title="Eligible Students"
+            value={totals.eTotal}
+            icon={GraduationCap}
+            color="text-rose-600"
+            bg="bg-rose-50 dark:bg-rose-900/20"
+          />
+        </div>
+
+        {/* Table Container */}
+        <div className="bg-white dark:bg-slate-900 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-separate border-spacing-0">
+              <thead>
+                <tr className="bg-slate-50/50 dark:bg-slate-800/50 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  <th
+                    rowSpan="2"
+                    className="p-5 border-b border-slate-100 dark:border-slate-800"
+                  >
+                    #
                   </th>
-                  <th rowSpan="2" scope="col" className="p-4">
+                  <th
+                    rowSpan="2"
+                    className="p-5 border-b border-slate-100 dark:border-slate-800"
+                  >
                     Block Name
                   </th>
-
-                  <th rowSpan="2" scope="col" className="p-4">
-                    Total No. of Schools
+                  <th
+                    rowSpan="2"
+                    className="p-5 border-b border-slate-100 dark:border-slate-800 text-center bg-blue-50/30 dark:bg-blue-900/10"
+                  >
+                    Total Schools
                   </th>
-
-                  <th rowSpan="2" scope="col" className="p-4">
-                    No. of Schools Tagged
+                  <th
+                    rowSpan="2"
+                    className="p-5 border-b border-slate-100 dark:border-slate-800 text-center bg-emerald-50/30 dark:bg-emerald-900/10"
+                  >
+                    Tagged Schools
                   </th>
-
-                  <th colSpan="3" scope="col" className="p-4 text-center">
-                    Students in Tagged School
+                  <th
+                    colSpan="3"
+                    className="p-3 border-b border-slate-100 dark:border-slate-800 text-center bg-indigo-50/30 dark:bg-indigo-900/10"
+                  >
+                    Tagged Students
                   </th>
-                  <th colSpan="3" scope="col" className="p-4 text-center">
+                  <th
+                    colSpan="3"
+                    className="p-3 border-b border-slate-100 dark:border-slate-800 text-center bg-rose-50/30 dark:bg-rose-900/10"
+                  >
                     Eligible Students
                   </th>
                 </tr>
-                <tr>
-                  <th scope="col" className="p-4">
+                <tr className="bg-slate-50/30 dark:bg-slate-800/30 text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+                  <th className="p-3 border-b border-slate-100 dark:border-slate-800 text-center">
                     Boys
                   </th>
-                  <th scope="col" className="p-4">
+                  <th className="p-3 border-b border-slate-100 dark:border-slate-800 text-center">
                     Girls
                   </th>
-                  <th scope="col" className="p-4">
+                  <th className="p-3 border-b border-slate-100 dark:border-slate-800 text-center font-black text-slate-600 dark:text-slate-300">
                     Total
                   </th>
-
-                  <th scope="col" className="p-4">
+                  <th className="p-3 border-b border-slate-100 dark:border-slate-800 text-center">
                     Boys
                   </th>
-                  <th scope="col" className="p-4">
+                  <th className="p-3 border-b border-slate-100 dark:border-slate-800 text-center">
                     Girls
                   </th>
-                  <th scope="col" className="p-4">
+                  <th className="p-3 border-b border-slate-100 dark:border-slate-800 text-center font-black text-slate-600 dark:text-slate-300">
                     Total
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                 {data.length === 0 ? (
-                  // Show this row if no student data is available
-                  <tr className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                    <td colSpan="10" className="text-center p-2 text-gray-500">
-                      No records found
+                  <tr>
+                    <td
+                      colSpan="10"
+                      className="p-12 text-center text-slate-400 font-medium italic"
+                    >
+                      No block-level tagging data available
                     </td>
                   </tr>
                 ) : (
@@ -152,63 +220,94 @@ const TaggingDetailsReportBlock = () => {
                     {data.map((value, index) => (
                       <tr
                         key={index}
-                        className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                        className="group hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
                       >
-                        <td className="p-4">{index + 1}</td>
+                        <td className="p-4 text-xs font-bold text-slate-300 text-center">
+                          {index + 1}
+                        </td>
                         <td className="p-4">
                           <Link
-                            to={`/TaggingDetailsReportSchool/${phaseId}/${btoa(
-                              value.block_id
-                            )}`}
+                            to={`/TaggingDetailsReportSchool/${btoa(value.block_id_pk)}`}
+                            className="text-sm font-black text-slate-700 dark:text-slate-200 flex items-center gap-2 hover:text-indigo-600 transition-colors"
                           >
                             {value.block_name}
+                            <ArrowRight
+                              size={12}
+                              className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
+                            />
                           </Link>
                         </td>
-                        <td className="p-4">{value.no_of_schools}</td>
+                        <td className="p-3 text-center text-xs text-slate-500 bg-blue-50/10">
+                          {value.no_of_school}
+                        </td>
+                        <td className="p-3 text-center text-xs text-slate-500 bg-emerald-50/10">
+                          {value.tagged_school}
+                        </td>
 
-                        <td className="p-4">{value.no_of_schools_tagged}</td>
-                        <td className="p-4">{value.tagged_boys}</td>
-                        <td className="p-4">{value.tagged_girls}</td>
+                        <td className="p-3 text-center text-xs text-slate-500">
+                          {value.tagged_boys}
+                        </td>
+                        <td className="p-3 text-center text-xs text-slate-500">
+                          {value.tagged_girls}
+                        </td>
+                        <td className="p-3 text-center text-xs font-bold text-indigo-600 bg-indigo-50/20">
+                          {value.tagged_total}
+                        </td>
 
-                        <td className="p-4">{value.total_tagged}</td>
-                        <td className="p-4">{value.eligible_boys}</td>
-                        <td className="p-4">{value.eligible_girls}</td>
-                        <td className="p-4">{value.total_eligible}</td>
+                        <td className="p-3 text-center text-xs text-slate-500">
+                          {value.eligible_boys}
+                        </td>
+                        <td className="p-3 text-center text-xs text-slate-500">
+                          {value.eligible_girls}
+                        </td>
+                        <td className="p-3 text-center text-xs font-bold text-rose-600 bg-rose-50/20">
+                          {value.eligible_total}
+                        </td>
                       </tr>
                     ))}
-                    <tr className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                      <td colSpan="2" className="text-center font-semibold p-4">
-                        Total
+                    {/* Grand Total Row */}
+                    <tr className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black">
+                      <td
+                        colSpan="2"
+                        className="p-5 text-[10px] uppercase tracking-widest text-right"
+                      >
+                        Totals
                       </td>
-
-                      <td className="font-semibold p-4">
-                        {total_no_of_schools}
+                      <td className="p-3 text-center text-xs bg-blue-600 text-white">
+                        {totals.schools}
                       </td>
-                      <td className="font-semibold p-4">
-                        {total_no_of_schools_tagged}
+                      <td className="p-3 text-center text-xs bg-emerald-600 text-white">
+                        {totals.taggedSchools}
                       </td>
-                      <td className="font-semibold p-4">{total_tagged_boys}</td>
-                      <td className="font-semibold p-4">
-                        {total_tagged_girls}
+                      <td className="p-3 text-center text-xs">
+                        {totals.tBoys}
                       </td>
-                      <td className="font-semibold p-4">{total_tagged}</td>
-                      <td className="font-semibold p-4">
-                        {total_eligible_boys}
+                      <td className="p-3 text-center text-xs">
+                        {totals.tGirls}
                       </td>
-                      <td className="font-semibold p-4">
-                        {total_eligible_girls}
+                      <td className="p-3 text-center text-xs bg-indigo-600 text-white">
+                        {totals.tTotal}
                       </td>
-                      <td className="font-semibold p-4">{total_eligible}</td>
+                      <td className="p-3 text-center text-xs">
+                        {totals.eBoys}
+                      </td>
+                      <td className="p-3 text-center text-xs">
+                        {totals.eGirls}
+                      </td>
+                      <td className="p-3 text-center text-xs bg-rose-600 text-white">
+                        {totals.eTotal}
+                      </td>
                     </tr>
                   </>
                 )}
               </tbody>
             </table>
           </div>
-          {loading && <Loader />}
-        </section>
-      </AdminAuthenticatedLayout>
-      {/* Modal section */}
+        </div>
+
+        {loading && <Loader />}
+      </div>
+
       {showPopup && (
         <LogoutPopup
           message={popupMessage}
@@ -218,9 +317,25 @@ const TaggingDetailsReportBlock = () => {
           }}
         />
       )}
-      {/* Modal section */}
-    </>
+    </AdminAuthenticatedLayout>
   );
 };
+
+// Internal Sub-component
+const StatMiniCard = ({ title, value, icon: Icon, color, bg }) => (
+  <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm flex items-center gap-4">
+    <div className={`p-4 rounded-2xl ${bg} ${color}`}>
+      <Icon size={22} />
+    </div>
+    <div>
+      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+        {title}
+      </p>
+      <p className="text-xl font-black text-slate-900 dark:text-white leading-none mt-1">
+        {Number(value).toLocaleString()}
+      </p>
+    </div>
+  </div>
+);
 
 export default TaggingDetailsReportBlock;

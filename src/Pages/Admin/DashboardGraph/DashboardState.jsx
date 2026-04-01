@@ -239,7 +239,7 @@ const DashboardState = ({ graphData, setLoading }) => {
             subText="Mapping & Verification"
             icon={Tags}
             colorClass="from-amber-500 to-amber-700"
-            onClick={() => navigate(`/TaggingDetailsReport/${encodedPhaseId}`)}
+            onClick={() => navigate(`/TaggingDetailsReport`)}
           />
           <ActionCard
             title="Challan MIS"
@@ -269,9 +269,7 @@ const DashboardState = ({ graphData, setLoading }) => {
             subText="Challan/Bicycle Mapping"
             icon={ListChecks}
             colorClass="from-teal-500 to-teal-700"
-            onClick={() =>
-              navigate(`/ChallanAllocationStatusReport/${encodedPhaseId}`)
-            }
+            onClick={() => navigate(`/ChallanAllocationStatusReport`)}
           />
           <ActionCard
             title="Invoice View"
