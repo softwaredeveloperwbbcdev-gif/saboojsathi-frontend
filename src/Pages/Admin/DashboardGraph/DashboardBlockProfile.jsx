@@ -129,7 +129,7 @@ const DashboardBlockProfile = ({ graphData, setLoading }) => {
   );
 
   return (
-    <div className="p-4 md:p-10 bg-[#f8fafc] dark:bg-gray-950 min-h-screen transition-colors duration-300">
+    <div className="p-4 md:p-10 bg-[#e9ebed] dark:bg-gray-950 min-h-screen transition-colors duration-300">
       {/* Header */}
       <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="text-center md:text-left">

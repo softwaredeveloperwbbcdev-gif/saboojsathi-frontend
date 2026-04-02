@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import AdminAuthenticatedLayout from "../../../Layouts/AdminLayout/AdminAuthenticatedLayout";
 import Loader from "../../../Components/Loader";
-import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import InputLabel from "../../../Components/InputLabel";
 import SelectInput from "../../../Components/SelectInput";
@@ -11,6 +10,7 @@ import useApi from "../../../Hooks/useApi";
 import LogoutPopup from "../../../Components/LogoutPopup";
 import { toast } from "react-toastify";
 import ChallanDetailsModal from "../../../Components/ChallanDetailsModal";
+import { usePhaseStore } from "../../../Store/phaseStore";
 import {
   phaseYearId,
   defaultPhaseYear,
@@ -20,7 +20,7 @@ const useDarkMode = () => {
   const [isDark, setIsDark] = useState(
     () =>
       window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches
+      window.matchMedia("(prefers-color-scheme: dark)").matches,
   );
 
   useEffect(() => {
@@ -50,7 +50,7 @@ const useDarkMode = () => {
 };
 
 function InvoiceViewReport() {
-  const { phaseId } = useParams();
+  const phaseId = usePhaseStore((state) => state.phaseId);
   const phaseDetails = phaseYearId[phaseId] || defaultPhaseYear;
   const { callApi, showPopup, popupMessage, handleLogout, setShowPopup } =
     useApi();
@@ -82,12 +82,11 @@ function InvoiceViewReport() {
     setValue("phaseId", phaseId);
     setLoading(true);
     try {
-      const response = await callApi("POST", `cycledetails`); // API call
+      const response = await callApi("POST", `invoiceviewsearch`); // API call
       if (response.error) {
-        console.log(JSON.stringify(response));
         toast(`Failed to fetch data: ${response.message}`);
       } else {
-        setCycleSuppliers(response.data);
+        setCycleSuppliers(response.data.supplier);
       }
     } catch (err) {
       toast(`An unexpected error occurred: ${err}`);
@@ -101,7 +100,7 @@ function InvoiceViewReport() {
     console.log("Form Data Submitted: ", data);
     setLoading(true);
     try {
-      const response = await callApi("POST", `invoice_view`, data); // API call
+      const response = await callApi("POST", `invoiceviewlistoneandall`, data); // API call
       if (response.error) {
         console.log(JSON.stringify(response));
         toast(`Failed to fetch data: ${response.message}`);
@@ -220,7 +219,7 @@ function InvoiceViewReport() {
     },
     {
       name: "Invoice Date",
-      selector: (data) => data.invoice_date,
+      selector: (data) => data.inv_date,
       center: true,
     },
     {
@@ -241,12 +240,12 @@ function InvoiceViewReport() {
 
     {
       name: "TDS on GST",
-      selector: (data) => data.tds,
+      selector: (data) => data.tds_on_gst,
       center: true,
     },
     {
       name: "Net Payable Amount",
-      selector: (data) => data.net_payable_amount,
+      selector: (data) => data.net_pay_amount,
       center: true,
     },
     {

@@ -87,7 +87,7 @@ const DashboardBlockChallan = ({ graphData, setLoading }) => {
   // --- Components ---
 
   const StatCard = ({ title, value, icon: Icon, colorClass, gradient }) => (
-    <div className="relative overflow-hidden bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md group">
+    <div className="relative overflow-hidden bg-[#e9ebed] dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md group">
       <div className="flex items-center justify-between z-10 relative">
         <div>
           <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">

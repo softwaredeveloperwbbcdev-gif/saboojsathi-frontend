@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -17,9 +17,6 @@ import {
   XCircle,
   UserCheck,
   Truck,
-  FileCheck,
-  Download,
-  FileSpreadsheet,
   Tags,
   ListChecks,
   Calendar,
@@ -110,7 +107,7 @@ const DashboardState = ({ graphData, setLoading }) => {
   );
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 p-4 md:p-8 transition-colors duration-500">
+    <div className="min-h-screen bg-[#e9ebed] dark:bg-slate-950 p-4 md:p-8 transition-colors duration-500">
       {/* Header Section */}
       <div className="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
@@ -150,52 +147,52 @@ const DashboardState = ({ graphData, setLoading }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4 mb-12">
         <StatCard
           title="Total Entry"
-          value={showData.general?.[0]?.application || 0}
+          value={showData?.total_application || 0}
           icon={Users}
           colorClass="bg-blue-500"
-          gradient="bg-blue-500"
+          gradient="bg-gradient-to-r from-blue-400 to-blue-600"
         />
         <StatCard
           title="Verified"
-          value={showData.general?.[0]?.verified || 0}
+          value={showData?.verified_application || 0}
           icon={ShieldCheck}
           colorClass="bg-indigo-500"
-          gradient="bg-indigo-500"
+          gradient="bg-gradient-to-r from-indigo-400 to-indigo-600"
         />
         <StatCard
           title="Finalized"
-          value={showData.general?.[0]?.finalization || 0}
+          value={showData?.finalized_application || 0}
           icon={ClipboardCheck}
           colorClass="bg-purple-500"
-          gradient="bg-purple-500"
+          gradient="bg-gradient-to-r from-purple-400 to-purple-600"
         />
         <StatCard
           title="Approved"
-          value={showData.general?.[0]?.approved || 0}
+          value={showData?.approved_application || 0}
           icon={BadgeCheck}
           colorClass="bg-emerald-500"
-          gradient="bg-emerald-500"
+          gradient="bg-gradient-to-r from-emerald-400 to-emerald-600"
         />
         <StatCard
           title="Rejected"
-          value={showData.general?.[0]?.rejected || 0}
+          value={showData?.rejected_application || 0}
           icon={XCircle}
           colorClass="bg-rose-500"
-          gradient="bg-rose-500"
+          gradient="bg-gradient-to-r from-rose-400 to-rose-600"
         />
         <StatCard
           title="Eligible"
-          value={showData.general?.[0]?.eligible || 0}
+          value={showData?.eligible_application || 0}
           icon={UserCheck}
           colorClass="bg-amber-500"
-          gradient="bg-amber-500"
+          gradient="bg-gradient-to-r from-amber-400 to-amber-600"
         />
         <StatCard
           title="Distributed"
-          value={showData.general?.[0]?.distributed || 0}
+          value={showData?.distributed_bicycle_application || 0}
           icon={Truck}
           colorClass="bg-cyan-500"
-          gradient="bg-cyan-500"
+          gradient="bg-gradient-to-r from-cyan-400 to-cyan-600"
         />
       </div>
 
@@ -276,7 +273,7 @@ const DashboardState = ({ graphData, setLoading }) => {
             subText="Billing & Records"
             icon={Receipt}
             colorClass="from-pink-500 to-pink-700"
-            onClick={() => navigate(`/InvoiceViewReport/${encodedPhaseId}`)}
+            onClick={() => navigate(`/InvoiceViewReport`)}
           />
           <ActionCard
             title="Challan Payment"

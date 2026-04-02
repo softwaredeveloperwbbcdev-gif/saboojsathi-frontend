@@ -23,6 +23,7 @@ import {
   HiClipboardDocumentList, // For Muster Roll
   HiArrowPathRoundedSquare, // For Update Record
 } from "react-icons/hi2";
+import { ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom"; // Assuming you use react-router
 
 import { useStudentDownload } from "../School/SchoolAction";
@@ -63,14 +64,6 @@ const DashboardSchool = ({ graphData, setLoading }) => {
     setLoading(isDownloading);
   }, [isDownloading]);
 
-  const profileStats = {
-    application: showData.general?.[0]?.application || 0,
-    verified: showData.general?.[0]?.verified || 0,
-    finalization: showData.general?.[0]?.finalization || 0,
-    rejected: showData.general?.[0]?.rejected || 0,
-    approved: showData.general?.[0]?.approved || 0,
-  };
-
   const genderData = {
     boys: showData.gender?.[0]?.boys || 0,
     girls: showData.gender?.[0]?.girls || 0,
@@ -92,6 +85,7 @@ const DashboardSchool = ({ graphData, setLoading }) => {
       : [],
   };
 
+  // --- Sub-Components ---
   const StatCard = ({ title, value, icon: Icon, colorClass, gradient }) => (
     <div className="relative overflow-hidden bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md group">
       <div className="flex items-center justify-between z-10 relative">
@@ -104,42 +98,67 @@ const DashboardSchool = ({ graphData, setLoading }) => {
           </h3>
         </div>
         <div className={`p-3 rounded-xl shadow-lg ${colorClass} text-white`}>
-          <Icon className="text-xl" />
+          <Icon size={20} />
         </div>
       </div>
-      {/* Decorative Background Icon */}
       <div className="absolute -bottom-4 -right-4 opacity-[0.03] dark:opacity-[0.05] text-gray-900 dark:text-white transition-transform group-hover:-translate-y-1 group-hover:-translate-x-1">
         <Icon size={90} />
       </div>
-      {/* Bottom Gradient Line */}
       <div className={`absolute bottom-0 left-0 w-full h-1 ${gradient}`} />
     </div>
   );
 
   // Helper for Functional Link Cards
+  // const ActionCard = ({ title, subText, icon: Icon, onClick, colorClass }) => (
+  //   <button
+  //     onClick={onClick}
+  //     className="flex items-center gap-4 p-5 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-300 hover:shadow-lg active:scale-95 text-left w-full group"
+  //   >
+  //     <div
+  //       className={`p-3 rounded-xl ${colorClass} text-white shadow-md group-hover:scale-110 transition-transform`}
+  //     >
+  //       <Icon className="text-2xl" />
+  //     </div>
+  //     <div>
+  //       <h4 className="text-sm font-bold text-gray-800 dark:text-white">
+  //         {title}
+  //       </h4>
+  //       <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wide">
+  //         {subText}
+  //       </p>
+  //     </div>
+  //   </button>
+  // );
+
   const ActionCard = ({ title, subText, icon: Icon, onClick, colorClass }) => (
     <button
       onClick={onClick}
-      className="flex items-center gap-4 p-5 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-300 hover:shadow-lg active:scale-95 text-left w-full group"
+      className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-indigo-500 dark:hover:border-indigo-500 transition-all duration-300 hover:shadow-lg group w-full"
     >
-      <div
-        className={`p-3 rounded-xl ${colorClass} text-white shadow-md group-hover:scale-110 transition-transform`}
-      >
-        <Icon className="text-2xl" />
+      <div className="flex items-center gap-4">
+        <div
+          className={`p-3 rounded-lg bg-gradient-to-br ${colorClass} text-white shadow-sm group-hover:rotate-3 transition-transform`}
+        >
+          <Icon size={18} />
+        </div>
+        <div>
+          <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+            {title}
+          </h4>
+          <p className="text-[9px] text-slate-400 font-medium uppercase tracking-tighter italic">
+            {subText}
+          </p>
+        </div>
       </div>
-      <div>
-        <h4 className="text-sm font-bold text-gray-800 dark:text-white">
-          {title}
-        </h4>
-        <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wide">
-          {subText}
-        </p>
-      </div>
+      <ChevronRight
+        size={14}
+        className="text-slate-300 group-hover:translate-x-1 transition-transform"
+      />
     </button>
   );
 
   return (
-    <div className="p-4 bg-[#f8fafc] dark:bg-gray-950 min-h-screen transition-colors duration-300">
+    <div className="p-4 bg-[#e9ebed] dark:bg-gray-950 min-h-screen transition-colors duration-300">
       {/* Header */}
       <div className="mb-8 flex flex-col  md:flex-row md:items-center justify-between gap-4">
         <div className="text-center md:text-left">
@@ -162,35 +181,35 @@ const DashboardSchool = ({ graphData, setLoading }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <StatCard
           title="Profile Entered"
-          value={profileStats.application}
+          value={showData?.total_application || 0}
           icon={HiUsers}
           colorClass="bg-blue-500"
           gradient="bg-gradient-to-r from-blue-400 to-blue-600"
         />
         <StatCard
           title="Profile Verified"
-          value={profileStats.verified}
+          value={showData?.verified_application || 0}
           icon={HiShieldCheck}
           colorClass="bg-indigo-500"
           gradient="bg-gradient-to-r from-indigo-400 to-indigo-600"
         />
         <StatCard
           title="Profile Finalized"
-          value={profileStats.finalization}
+          value={showData?.finalized_application || 0}
           icon={HiPresentationChartLine}
           colorClass="bg-purple-500"
           gradient="bg-gradient-to-r from-purple-400 to-purple-600"
         />
         <StatCard
           title="Approved Profile"
-          value={profileStats.approved}
+          value={showData?.approved_application || 0}
           icon={HiCheckBadge}
           colorClass="bg-emerald-500"
           gradient="bg-gradient-to-r from-emerald-400 to-emerald-600"
         />
         <StatCard
           title="Rejected Profile"
-          value={profileStats.rejected}
+          value={showData?.rejected_application || 0}
           icon={HiXCircle}
           colorClass="bg-red-500"
           gradient="bg-gradient-to-r from-red-400 to-red-600"
