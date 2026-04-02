@@ -15,7 +15,7 @@ const useDarkMode = () => {
   const [isDark, setIsDark] = useState(
     () =>
       window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches
+      window.matchMedia("(prefers-color-scheme: dark)").matches,
   );
 
   useEffect(() => {
@@ -112,7 +112,7 @@ const InvoiceView = () => {
       const response = await callApi(
         "POST",
         `invoiceviewlistoneandall`,
-        searchdata
+        searchdata,
       );
       if (response.error) {
         // Handle the error (e.g., alert the user)
@@ -230,7 +230,7 @@ const InvoiceView = () => {
     },
     {
       name: "Invoice Date",
-      selector: (row) => row.invoice_date,
+      selector: (row) => row.inv_date,
       center: true,
     },
     {
@@ -456,14 +456,14 @@ const InvoiceView = () => {
                   className="w-full border rounded p-2 dark:bg-gray-800"
                   name="phase"
                   id="phase"
-                  {...register("phase", {})}
+                  {...register("phaseId", {})}
                   onChange={(e) =>
                     handleOnChange(e.target.name, e.target.value)
                   }
                 >
                   <option value="">Select Phase</option>
                   {phases.map((p) => (
-                    <option key={p.id} value={p.id}>
+                    <option key={p.id} value={btoa(p.id)}>
                       {p.desc}
                     </option>
                   ))}

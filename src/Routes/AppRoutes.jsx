@@ -30,7 +30,7 @@ import LoginForm from "../Pages/Frontend/LoginForm.jsx";
 
 //Admin Pages
 import Dashboard_ from "../Pages/Frontend/Test/Dashboard_.jsx";
-import Dashboard from "../Pages/Frontend/Test/Dashboard.jsx";
+import Dashboard from "../Pages/Admin/Dashboard.jsx";
 import StudentAdd from "../Pages/Admin/Student/StudentAdd.jsx";
 import ViewProfile from "../Pages/Admin/School/ViewProfile.jsx";
 import StudentEdit from "../Pages/Admin/Student/StudentEdit.jsx";
@@ -385,7 +385,7 @@ const AppRoutes = () => {
 
         {/* Invoice View */}
         <Route
-          path="/InvoiceViewReport/:phaseId" //11.08.2025
+          path="/InvoiceViewReport" //11.08.2025
           element={<InvoiceViewReport />}
         />
 
