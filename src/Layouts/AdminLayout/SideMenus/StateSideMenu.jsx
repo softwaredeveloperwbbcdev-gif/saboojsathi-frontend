@@ -9,36 +9,12 @@ export const getStateSideMenu = () => {
     { id: btoa(11), label: "Phase X AY 2024" },
     { id: btoa(10), label: "Phase IX AY 2023" },
     { id: btoa(9), label: "Phase VIII AY 2022" },
+    { id: btoa(8), label: "Phase VII AY 2021" },
+    { id: btoa(7), label: "Phase VI AY 2020" },
   ];
 
   // Logic for older phases that don't follow the modern dynamic pattern
   const legacyPhases = [
-    {
-      id: 25,
-      label: "Phase VI",
-      items: [
-        { label: "Profile Entry Status 2020", to: "Admin.dashboard" },
-        { label: "2020 Eligible Students", to: "Admin.dashboard" },
-        {
-          label: "Distribution Details Report",
-          to: `/DistributionReportDistrict/${btoa("7")}`,
-        },
-        { label: "P-6 Challan MIS", to: `/ChallanMis/${btoa("7")}` },
-      ],
-    },
-    {
-      id: 26,
-      label: "Phase VI",
-      items: [
-        { label: "Profile Entry Status 2020", to: "Admin.dashboard" },
-        { label: "2020 Eligible Students", to: "Admin.dashboard" },
-        {
-          label: "Distribution Details Report",
-          to: `/DistributionReportDistrict/${btoa("7")}`,
-        },
-        { label: "P-6 Challan MIS", to: `/ChallanMis/${btoa("7")}` },
-      ],
-    },
     {
       id: 27,
       label: "Phase V",
@@ -58,7 +34,6 @@ export const getStateSideMenu = () => {
         { label: "P-5 Challan MIS", to: `/ChallanMis/${btoa("6")}` },
       ],
     },
-    // ... Additional legacy phases can be added here
   ];
 
   // Helper to generate standard report submenus for a phase
