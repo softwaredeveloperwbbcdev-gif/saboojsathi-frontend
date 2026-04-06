@@ -2,14 +2,14 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { MdOutlineMenu } from "react-icons/md";
 import { FaCircle } from "react-icons/fa";
-import AshokeStambhaLogo from "../assets/images/Admin/Askoka-stambha.png";
-import ProfileLogo from "../assets/images/Admin/user2-160x160.jpg";
-import Accordian from "./AdminLayout/Accordion"; // Make sure this path is correct
+import AshokeStambhaLogo from "../../assets/images/Admin/Askoka-stambha-dark.png";
+import ProfileLogo from "../../assets/images/Admin/user2-160x160.jpg";
+import Accordian from "../../Layouts/AdminLayout/Accordion"; // Make sure this path is correct
 import { useContext } from "react";
-import { TokenContext } from "../ContextProvider/TokenContext"; // Adjust path if needed
+import { TokenContext } from "../../ContextProvider/TokenContext"; // Adjust path if needed
 import { useNavigate } from "react-router-dom";
 import { useIdleTimer } from "react-idle-timer";
-import MsgDisplayModalInActive from "../Components/MsgDisplayModalInActive";
+import MsgDisplayModalInActive from "../../Components/MsgDisplayModalInActive";
 //import { jwtDecode } from "jwt-decode";
 
 function AdminAuthenticatedLayoutCopy({ children }) {
