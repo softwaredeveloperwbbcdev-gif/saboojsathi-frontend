@@ -22,6 +22,7 @@ import PreBidMinutes from "../Pages/Frontend/PreBidMinutes";
 import TechnicalEvaluation from "../Pages/Frontend/TechnicalEvaluation";
 import FinancialEvaluation from "../Pages/Frontend/FinancialEvaluation";
 import GrievancePage from "../Pages/Frontend/GrievancePage";
+import TrackGrievance from "../Pages/Frontend/TrackGrievance";
 import StudentLogin from "../Pages/Frontend/StudentLogin";
 
 //Login Pages
@@ -188,6 +189,7 @@ const AppRoutes = () => {
         {/* contact us  */}
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/grievance" element={<GrievancePage />} />
+        <Route path="/track-grievance" element={<TrackGrievance />} />
         <Route path="/student-login" element={<StudentLogin />} />
       </Route>
       {/* ================= PUBLIC ROUTES (Without Header/Footer) ================= */}

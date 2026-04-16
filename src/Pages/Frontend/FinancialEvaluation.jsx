@@ -9,46 +9,100 @@ import {
   FileSpreadsheet,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import phaseI from "../../assets/downloads/frontend/tender/financialBidEvaluation/financial_bid_evaluation_phase_I.pdf";
+import phaseII from "../../assets/downloads/frontend/tender/financialBidEvaluation/financial_bid_evaluation_phase_II.pdf";
+import phaseIII from "../../assets/downloads/frontend/tender/financialBidEvaluation/financial_bid_evaluation_phase_III.pdf";
+import phaseIV from "../../assets/downloads/frontend/tender/financialBidEvaluation/financial_bid_evaluation_phase_IV.pdf";
+import phaseV from "../../assets/downloads/frontend/tender/financialBidEvaluation/financial_bid_evaluation_phase_V.pdf";
+import phaseVIVII from "../../assets/downloads/frontend/tender/financialBidEvaluation/financial_bid_evaluation_phase_VI_VII.pdf";
+import phaseVIII from "../../assets/downloads/frontend/tender/financialBidEvaluation/financial_bid_evaluation_phase_VIII.pdf";
+import phaseIX from "../../assets/downloads/frontend/tender/financialBidEvaluation/financial_bid_evaluation_phase_IX.pdf";
+import phaseX from "../../assets/downloads/frontend/tender/financialBidEvaluation/financial_bid_evaluation_phase_X.pdf";
+import phaseXI from "../../assets/downloads/frontend/tender/financialBidEvaluation/financial_bid_evaluation_phase_XI.pdf";
 
 const FinancialEvaluation = () => {
   const financialReports = [
     {
-      id: "FIN-01",
-      title: "FINANCIAL BID SUMMARY - PHASE I",
-      date: "15-12-2023",
-      size: "1.8 MB",
-      l1_status: "Determined",
+      id: "01",
+      title: "PHASE I",
+      message: "SUMMARY",
+      date: "07-07-2015",
+      size: "1.30 MB",
+      file: phaseI,
     },
     {
-      id: "FIN-02",
-      title: "FINANCIAL BID SUMMARY - PHASE II",
-      date: "22-01-2024",
-      size: "1.4 MB",
-      l1_status: "Determined",
+      id: "02",
+      title: "PHASE II",
+      message: "SUMMARY",
+      date: "25-07-2016",
+      size: "411 KB",
+      file: phaseII,
     },
     {
-      id: "FIN-03",
-      title: "FINANCIAL BID SUMMARY - PHASE III",
-      date: "05-02-2024",
-      size: "2.5 MB",
-      l1_status: "Determined",
+      id: "03",
+      title: "PHASE III",
+      message: "SUMMARY",
+      date: "29-03-2017",
+      size: "97 KB",
+      file: phaseIII,
     },
     {
-      id: "FIN-04",
-      title: "FINANCIAL BID SUMMARY - PHASE IV",
-      date: "10-03-2024",
-      size: "2.1 MB",
-      l1_status: "Determined",
+      id: "04",
+      title: "PHASE IV",
+      message: "SUMMARY",
+      date: "27-03-2018",
+      size: "496 KB",
+      file: phaseIV,
     },
     {
-      id: "FIN-05",
-      title: "FINANCIAL BID SUMMARY - PHASE V",
-      date: "28-03-2024",
-      size: "1.9 MB",
-      l1_status: "Under Review",
+      id: "05",
+      title: "PHASE V",
+      message: "SUMMARY",
+      date: "26-03-2019",
+      size: "201 KB",
+      file: phaseV,
+    },
+    {
+      id: "06",
+      title: "PHASE VI & VII",
+      message: "SUMMARY",
+      date: "01-12-2020",
+      size: "1.80 MB",
+      file: phaseVIVII,
+    },
+    {
+      id: "07",
+      title: "PHASE VIII",
+      message: "SUMMARY",
+      date: "17-11-2022",
+      size: "1.01 MB",
+      file: phaseVIII,
+    },
+    {
+      id: "08",
+      title: "PHASE IX",
+      message: "SUMMARY",
+      date: "09-10-2023",
+      size: "1.08 MB",
+      file: phaseIX,
+    },
+    {
+      id: "09",
+      title: "PHASE X",
+      message: "SUMMARY",
+      date: "19-11-2024",
+      size: "267 KB",
+      file: phaseX,
+    },
+    {
+      id: "10",
+      title: "PHASE XI",
+      message: "SUMMARY",
+      date: "17-06-2025",
+      size: "276 KB",
+      file: phaseXI,
     },
   ];
-
   return (
     <div className="min-h-screen bg-gray-50 pb-20 font-sans">
       {/* --- BOLD SYNOPTIC HEADER --- */}
@@ -63,10 +117,10 @@ const FinancialEvaluation = () => {
             <ArrowLeft size={14} /> Back to Home
           </Link>
           <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight leading-none uppercase">
-            Financial <span className="text-yellow-400">Evaluation</span>
+            Financial Bid<span className="text-yellow-400">Evaluation</span>
           </h1>
           <p className="text-emerald-100/60 text-xs mt-3 font-medium uppercase tracking-[0.3em]">
-            Commercial Bid Opening • L1 Determination Summary
+            Financial Bid Opening • L1 Determination Summary
           </p>
         </div>
       </div>
@@ -98,9 +152,9 @@ const FinancialEvaluation = () => {
               <thead>
                 <tr className="bg-gray-900 text-white text-[10px] uppercase tracking-[0.2em]">
                   <th className="px-8 py-6 font-black text-center">ID No.</th>
-                  <th className="px-8 py-6 font-black">Financial Document</th>
+                  <th className="px-8 py-6 font-black">Description / Phase</th>
                   <th className="px-8 py-6 font-black">Opening Date</th>
-                  <th className="px-8 py-6 font-black">Status</th>
+                  <th className="px-8 py-6 font-black">Size</th>
                   <th className="px-8 py-6 text-right font-black">Action</th>
                 </tr>
               </thead>
@@ -117,15 +171,15 @@ const FinancialEvaluation = () => {
                     </td>
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">
-                        <div className="bg-gray-100 p-2 rounded-lg text-gray-400 group-hover:bg-amber-600 group-hover:text-white transition-all">
+                        <div className="bg-gray-100 p-2 rounded-lg text-gray-400 group-hover:bg-emerald-600 group-hover:text-white transition-all">
                           <FileSpreadsheet size={18} />
                         </div>
                         <div>
                           <p className="font-black text-gray-900 text-sm tracking-tight">
                             {report.title}
                           </p>
-                          <p className="text-[10px] font-bold text-amber-600 uppercase tracking-widest">
-                            {report.size}
+                          <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">
+                            {report.message}
                           </p>
                         </div>
                       </div>
@@ -137,19 +191,19 @@ const FinancialEvaluation = () => {
                     </td>
                     <td className="px-8 py-6">
                       <span
-                        className={`text-[10px] font-black px-3 py-1 rounded-full tracking-wider uppercase ${
-                          report.l1_status === "Determined"
-                            ? "bg-emerald-100 text-emerald-700"
-                            : "bg-blue-100 text-blue-700"
-                        }`}
+                        className={`text-[10px] font-black px-3 py-1 rounded-full tracking-wider uppercase`}
                       >
-                        {report.l1_status}
+                        {report.size}
                       </span>
                     </td>
                     <td className="px-8 py-6 text-right">
-                      <button className="inline-flex items-center gap-2 bg-slate-900 hover:bg-amber-600 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95">
+                      <a
+                        href={report.file}
+                        download
+                        className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95"
+                      >
                         <Download size={14} /> DOWNLOAD
-                      </button>
+                      </a>
                     </td>
                   </tr>
                 ))}
@@ -160,7 +214,8 @@ const FinancialEvaluation = () => {
 
         {/* Footer Note */}
         <p className="mt-8 text-center text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em]">
-          Finalized Procurement Documentation • Sabooj Sathi Online Portal
+          West Bengal SC, ST and OBC Development & Finance Corporation •
+          Government of West Bengal
         </p>
       </div>
     </div>

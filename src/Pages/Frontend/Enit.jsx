@@ -7,6 +7,22 @@ import {
   Calendar,
   FileType,
 } from "lucide-react";
+import phaseI from "../../assets/downloads/frontend/tender/eNit/e-NIT_phase_I.pdf";
+import phaseII from "../../assets/downloads/frontend/tender/eNit/e-NIT_phase_II.pdf";
+import phaseIII from "../../assets/downloads/frontend/tender/eNit/e-NIT_phase_III.pdf";
+import phaseIV from "../../assets/downloads/frontend/tender/eNit/e-NIT_phase_IV.pdf";
+import phaseV from "../../assets/downloads/frontend/tender/eNit/e-NIT_phase_V.pdf";
+import phaseVIVIIFirst from "../../assets/downloads/frontend/tender/eNit/e-NIT_phase_VI_VII_First_Call.pdf";
+import phaseVIVIISecond from "../../assets/downloads/frontend/tender/eNit/e-NIT_phase_VI_VII_Second_Call.pdf";
+import phaseVIIIFirst from "../../assets/downloads/frontend/tender/eNit/e-NIT_phase_VI_VII_Second_Call.pdf";
+import phaseVIIISecond from "../../assets/downloads/frontend/tender/eNit/e-NIT_phase_VIII_Second_Call.pdf";
+import phaseIX from "../../assets/downloads/frontend/tender/eNit/e-NIT_phase_IX.pdf";
+import phaseIXEOIFirst from "../../assets/downloads/frontend/tender/eNit/e-NIT_phase_IX_EOI_First_Call.pdf";
+import phaseIXEOISecond from "../../assets/downloads/frontend/tender/eNit/e-NIT_phase_IX_EOI_Second_Call.pdf";
+import phaseX from "../../assets/downloads/frontend/tender/eNit/e-NIT_phase_X.pdf";
+import phaseXI from "../../assets/downloads/frontend/tender/eNit/e-NIT_phase_XI.pdf";
+import phaseXII from "../../assets/downloads/frontend/tender/eNit/e-NIT_phase_XII.pdf";
+
 import { Link } from "react-router-dom";
 
 const ENit = () => {
@@ -14,37 +30,122 @@ const ENit = () => {
     {
       id: "01",
       title: "PHASE I",
-      date: "12-10-2023",
-      size: "1.2 MB",
+      date: "11-06-2015",
+      size: "142 KB",
       status: "Official",
+      file: phaseI, // Correct way to reference the imported PDF
     },
     {
       id: "02",
       title: "PHASE II",
-      date: "15-11-2023",
-      size: "850 KB",
+      date: "27-06-2016",
+      size: "149 KB",
       status: "Official",
+      file: phaseII,
     },
     {
       id: "03",
       title: "PHASE III",
-      date: "05-01-2024",
-      size: "1.5 MB",
+      date: "02-03-2017",
+      size: "179 KB",
       status: "Official",
+      file: phaseIII,
     },
     {
       id: "04",
       title: "PHASE IV",
-      date: "20-02-2024",
-      size: "2.1 MB",
+      date: "28-02-2018",
+      size: "220 KB",
       status: "Official",
+      file: phaseIV,
     },
     {
       id: "05",
       title: "PHASE V",
-      date: "10-03-2024",
+      date: "27-02-2019",
       size: "1.8 MB",
       status: "Official",
+      file: phaseV,
+    },
+    {
+      id: "06",
+      title: "PHASE VI & VII (1st Call)",
+      date: "07-10-2020",
+      size: "308 KB",
+      status: "Official",
+      file: phaseVIVIIFirst,
+    },
+    {
+      id: "07",
+      title: "PHASE VI & VII (2nd Call)",
+      date: "12-11-2020",
+      size: "178 KB",
+      status: "Official",
+      file: phaseVIVIISecond,
+    },
+    {
+      id: "08",
+      title: "PHASE VIII",
+      date: "15-09-2022",
+      size: "185 KB",
+      status: "Official",
+      file: phaseVIIIFirst,
+    },
+    {
+      id: "09",
+      title: "PHASE VIII (2nd Call)",
+      date: "19-10-2022",
+      size: "186 KB",
+      status: "Official",
+      file: phaseVIIISecond,
+    },
+    {
+      id: "11",
+      title: "PHASE IX",
+      date: "11-08-2023",
+      size: "325 KB",
+      status: "Official",
+      file: phaseIX,
+    },
+    {
+      id: "12",
+      title: "PHASE IX LOCAL MANUFACTURERS",
+      date: "12-12-2023",
+      size: "730 KB",
+      status: "Official",
+      file: phaseIXEOIFirst,
+    },
+    {
+      id: "13",
+      title: "PHASE IX LOCAL MANUFACTURERS(2nd Call)",
+      date: "04-01-2024",
+      size: "740 KB",
+      status: "Official",
+      file: phaseIXEOISecond,
+    },
+    {
+      id: "14",
+      title: "PHASE X",
+      date: "03-10-2024",
+      size: "453 KB",
+      status: "Official",
+      file: phaseX,
+    },
+    {
+      id: "15",
+      title: "PHASE XI",
+      date: "22-05-2025",
+      size: "461 KB",
+      status: "Official",
+      file: phaseXI,
+    },
+    {
+      id: "16",
+      title: "PHASE XII",
+      date: "23-12-2025",
+      size: "3.59 MB",
+      status: "Official",
+      file: phaseXII,
     },
   ];
 
@@ -63,10 +164,10 @@ const ENit = () => {
             <ArrowLeft size={14} /> Back to Home
           </Link>
           <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight leading-none">
-            E-NIT <span className="text-yellow-400">TENDERS</span>
+            E-<span className="text-yellow-400">NIT</span>
           </h1>
           <p className="text-emerald-100/60 text-xs mt-3 font-medium uppercase tracking-[0.3em]">
-            Notice Inviting Tenders • Sabooj Sathi Scheme
+            Notice Inviting Tender • Sabooj Sathi Scheme
           </p>
         </div>
       </div>
@@ -82,12 +183,12 @@ const ENit = () => {
           <InfoCard
             icon={<ShieldCheck className="text-emerald-500" />}
             label="Verification"
-            value="Digitally Signed"
+            value="Digitally/Manually Signed"
           />
           <InfoCard
             icon={<Calendar className="text-blue-500" />}
             label="Last Updated"
-            value="March 2024"
+            value="December 2025"
           />
         </div>
 
@@ -141,9 +242,13 @@ const ENit = () => {
                       </span>
                     </td>
                     <td className="px-8 py-6 text-right">
-                      <button className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95">
+                      <a
+                        href={phase.file}
+                        download
+                        className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95"
+                      >
                         <Download size={14} /> PDF
-                      </button>
+                      </a>
                     </td>
                   </tr>
                 ))}
@@ -154,7 +259,8 @@ const ENit = () => {
 
         {/* Footer Note */}
         <p className="mt-8 text-center text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em]">
-          SPMU • West Bengal SC, ST & OBC Development & Finance Corporation
+          West Bengal SC, ST and OBC Development & Finance Corporation •
+          Government of West Bengal
         </p>
       </div>
     </div>

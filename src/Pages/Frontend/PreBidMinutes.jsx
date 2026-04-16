@@ -10,42 +10,117 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import phaseI from "../../assets/downloads/frontend/tender/preBidMinutes/pre_bid_minutes_phase_I.pdf";
+import phaseII from "../../assets/downloads/frontend/tender/preBidMinutes/pre_bid_minutes_phase_II.pdf";
+import phaseIII from "../../assets/downloads/frontend/tender/preBidMinutes/pre_bid_minutes_phase_III.pdf";
+import phaseIV from "../../assets/downloads/frontend/tender/preBidMinutes/pre_bid_minutes_phase_IV.pdf";
+import phaseV from "../../assets/downloads/frontend/tender/preBidMinutes/pre_bid_minutes_phase_V.pdf";
+import phaseVIVII from "../../assets/downloads/frontend/tender/preBidMinutes/pre_bid_minutes_phase_VI_VII.pdf";
+import phaseVIIIFirst from "../../assets/downloads/frontend/tender/preBidMinutes/pre_bid_minutes_phase_VIII_first_call.pdf";
+import phaseVIIISecond from "../../assets/downloads/frontend/tender/preBidMinutes/pre_bid_minutes_phase_VIII_second_call.pdf";
+import phaseIX from "../../assets/downloads/frontend/tender/preBidMinutes/pre_bid_minutes_phase_IX.pdf";
+import phaseX from "../../assets/downloads/frontend/tender/preBidMinutes/pre_bid_minutes_phase_X.pdf";
+import phaseXEOI from "../../assets/downloads/frontend/tender/preBidMinutes/pre_bid_minutes_phase_X_EOI.pdf";
+import phaseXI from "../../assets/downloads/frontend/tender/preBidMinutes/pre_bid_minutes_phase_XI.pdf";
+
 const PreBidMinutes = () => {
   const minutesList = [
     {
       id: "01",
       title: "PRE-BID MINUTES - PHASE I",
-      date: "24-09-2023",
-      size: "920 KB",
-      type: "Meeting Record",
+      date: "19-06-2015",
+      size: "1.41 MB",
+      type: "Meeting Minutes",
+      file: phaseI, // Added
     },
     {
       id: "02",
       title: "PRE-BID MINUTES - PHASE II",
-      date: "02-11-2023",
-      size: "1.1 MB",
-      type: "Meeting Record",
+      date: "05-07-2016",
+      size: "1.17 MB",
+      type: "Meeting Minutes",
+      file: phaseII, // Added
     },
     {
       id: "03",
       title: "PRE-BID MINUTES - PHASE III",
-      date: "28-12-2023",
-      size: "1.4 MB",
-      type: "Meeting Record",
+      date: "14-03-2017",
+      size: "138 KB",
+      type: "Meeting Minutes",
+      file: phaseIII, // Added
     },
     {
       id: "04",
       title: "PRE-BID MINUTES - PHASE IV",
-      date: "15-02-2024",
-      size: "1.2 MB",
-      type: "Meeting Record",
+      date: "07-03-2018",
+      size: "159 KB",
+      type: "Meeting Minutes",
+      file: phaseIV, // Added
     },
     {
       id: "05",
       title: "PRE-BID MINUTES - PHASE V",
-      date: "01-03-2024",
-      size: "1.6 MB",
-      type: "Meeting Record",
+      date: "07-03-2019",
+      size: "906 KB",
+      type: "Meeting Minutes",
+      file: phaseV, // Added
+    },
+    {
+      id: "06",
+      title: "PRE-BID MINUTES - PHASE VI - VII",
+      date: "17-11-2020",
+      size: "164 KB",
+      type: "Meeting Minutes",
+      file: phaseVIVII, // Added
+    },
+    {
+      id: "07",
+      title: "PRE-BID MINUTES - PHASE VIII (1st Call)",
+      date: "23-09-2022",
+      size: "759 KB",
+      type: "Meeting Minutes",
+      file: phaseVIIIFirst, // Added
+    },
+    {
+      id: "08",
+      title: "PRE-BID MINUTES - PHASE VIII (2nd Call)",
+      date: "28-10-2022",
+      size: "1.42 MB",
+      type: "Meeting Minutes",
+      file: phaseVIIISecond, // Added
+    },
+    {
+      id: "09",
+      title: "PRE-BID MINUTES - PHASE IX",
+      date: "21-08-2023",
+      size: "975 KB",
+      type: "Meeting Minutes",
+      file: phaseIX, // Added
+    },
+    {
+      id: "10",
+      title: "PRE-BID MINUTES - PHASE X",
+      date: "23-10-2024",
+      size: "1.37 MB",
+      type: "Meeting Minutes",
+      file: phaseX, // Added
+    },
+    {
+      id: "11",
+      title:
+        "PRE-BID MINUTES - PHASE X - EOI for procurement of up to 1,00,000 bicycles",
+      date: "10-01-2025",
+      size: "280 KB",
+      type: "Meeting Minutes",
+      file: phaseXEOI, // Added
+    },
+    {
+      id: "12",
+      title: "PRE-BID MINUTES - PHASE XI",
+      date: "29-05-2025",
+      size: "804 KB",
+      type: "Meeting Minutes",
+      file: phaseXI, // Added
     },
   ];
 
@@ -98,7 +173,7 @@ const PreBidMinutes = () => {
               <thead>
                 <tr className="bg-gray-900 text-white text-[10px] uppercase tracking-[0.2em]">
                   <th className="px-8 py-6 font-black text-center">SL.</th>
-                  <th className="px-8 py-6 font-black">Meeting Description</th>
+                  <th className="px-8 py-6 font-black">Description / Phase</th>
                   <th className="px-8 py-6 font-black">Meeting Date</th>
                   <th className="px-8 py-6 font-black">File Size</th>
                   <th className="px-8 py-6 text-right font-black">Action</th>
@@ -142,9 +217,13 @@ const PreBidMinutes = () => {
                       </span>
                     </td>
                     <td className="px-8 py-6 text-right">
-                      <button className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95">
+                      <a
+                        href={item.file}
+                        download
+                        className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95"
+                      >
                         <Download size={14} /> DOWNLOAD
-                      </button>
+                      </a>
                     </td>
                   </tr>
                 ))}
@@ -155,7 +234,8 @@ const PreBidMinutes = () => {
 
         {/* Footer Note */}
         <p className="mt-8 text-center text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em]">
-          Official Portal for Sabooj Sathi Scheme Procurement
+          West Bengal SC, ST and OBC Development & Finance Corporation •
+          Government of West Bengal
         </p>
       </div>
     </div>
