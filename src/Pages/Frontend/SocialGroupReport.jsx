@@ -1,63 +1,87 @@
-import React, { useState } from "react";
-import { ArrowLeft, Search, FileSpreadsheet, Clock } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import {
+  ArrowLeft,
+  Search,
+  FileSpreadsheet,
+  Clock,
+  Filter,
+} from "lucide-react";
 import { Link } from "react-router-dom";
+import Loader from "../../Components/Loader";
+import { toast } from "react-toastify";
+
+const phases = [
+  { phaseId: 1, Phase: "Phase I" },
+  { phaseId: 2, Phase: "Phase II" },
+  { phaseId: 3, Phase: "Phase III" },
+  { phaseId: 5, Phase: "Phase IV" },
+  { phaseId: 6, Phase: "Phase V" },
+  { phaseId: 7, Phase: "Phase VI" },
+  { phaseId: 8, Phase: "Phase VII" },
+  { phaseId: 9, Phase: "Phase VIII" },
+  { phaseId: 10, Phase: "Phase IX" },
+  { phaseId: 11, Phase: "Phase X" },
+  { phaseId: 12, Phase: "Phase XI" },
+  { phaseId: 13, Phase: "Phase XII" },
+];
 
 const SocialGroupReport = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [socialData, setSocialData] = useState([]);
+  const [selectedPhase, setSelectedPhase] = useState(btoa(13)); // Default Phase XII
 
-  // Real-time timestamp
   const generatedOn = new Date().toLocaleString("en-IN", {
     dateStyle: "long",
     timeStyle: "short",
   });
 
-  const socialData = [
-    { name: "ALIPURDUAR", sc: 209, st: 19, obc: 78, general: 69, minority: 45 },
-    { name: "BANKURA", sc: 208, st: 71, obc: 79, general: 153, minority: 227 },
-    {
-      name: "BIRBHUM",
-      sc: 1039,
-      st: 103,
-      obc: 58,
-      general: 404,
-      minority: 693,
-    },
-    {
-      name: "COOCH BIHAR",
-      sc: 150,
-      st: 0,
-      obc: 11,
-      general: 24,
-      minority: 209,
-    },
-    {
-      name: "DAKSHIN DINAJPUR",
-      sc: 190,
-      st: 147,
-      obc: 20,
-      general: 170,
-      minority: 171,
-    },
-    { name: "HOOGHLY", sc: 475, st: 67, obc: 60, general: 505, minority: 263 },
-    { name: "HOWRAH", sc: 131, st: 2, obc: 14, general: 244, minority: 531 },
-    { name: "JALPAIGURI", sc: 222, st: 69, obc: 18, general: 27, minority: 75 },
-    { name: "JHARGRAM", sc: 17, st: 24, obc: 16, general: 27, minority: 22 },
-  ];
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const host = window.location.hostname;
+      // Added phaseId to the post request payload
+      const response = await axios.post(
+        `http://${host}:8000/api/catagoryWiseDistributionReportWeb`,
+        { phaseId: selectedPhase },
+      );
+
+      if (response.data.error) {
+        toast.error("Failed to fetch stakeholder list");
+      } else {
+        setSocialData(response.data);
+      }
+    } catch (err) {
+      toast.error(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Triggers fetchData whenever selectedPhase changes
+  useEffect(() => {
+    fetchData();
+  }, [selectedPhase]);
 
   const filteredData = socialData.filter((item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    item.district_name?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const totals = filteredData.reduce(
     (acc, curr) => ({
-      sc: acc.sc + curr.sc,
-      st: acc.st + curr.st,
-      obc: acc.obc + curr.obc,
-      gen: acc.gen + curr.general,
-      min: acc.min + curr.minority,
+      sc: acc.sc + (Number(curr.sc_total) || 0),
+      st: acc.st + (Number(curr.st_total) || 0),
+      obc: acc.obc + (Number(curr.obc_total) || 0),
+      gen: acc.gen + (Number(curr.gen_total) || 0),
+      min: acc.min + (Number(curr.mi_total) || 0),
       grand:
         acc.grand +
-        (curr.sc + curr.st + curr.obc + curr.general + curr.minority),
+        ((Number(curr.sc_total) || 0) +
+          (Number(curr.st_total) || 0) +
+          (Number(curr.obc_total) || 0) +
+          (Number(curr.gen_total) || 0) +
+          (Number(curr.mi_total) || 0)),
     }),
     { sc: 0, st: 0, obc: 0, gen: 0, min: 0, grand: 0 },
   );
@@ -77,7 +101,6 @@ const SocialGroupReport = () => {
             <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-2">
               Social Group Wise Report
             </h1>
-            {/* GENERATED ON TIMESTAMP */}
             <p className="text-emerald-100/80 text-xs font-medium flex items-center justify-center md:justify-start gap-2">
               <Clock size={14} /> Generated on: {generatedOn}
             </p>
@@ -89,23 +112,47 @@ const SocialGroupReport = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-6 -mt-8">
-        {/* Simple Search */}
-        <div className="bg-white rounded-2xl shadow-xl p-2 mb-6 border border-gray-100">
-          <div className="relative">
-            <Search
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-              size={20}
-            />
-            <input
-              type="text"
-              placeholder="Search district name..."
-              className="w-full pl-12 pr-4 py-4 rounded-xl focus:outline-none font-bold text-gray-700 bg-gray-50/50"
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+        {/* Filters Area */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {/* Search Input */}
+          <div className="md:col-span-2 bg-white rounded-2xl shadow-xl p-2 border border-gray-100">
+            <div className="relative">
+              <Search
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                size={20}
+              />
+              <input
+                type="text"
+                placeholder="Search district name..."
+                className="w-full pl-12 pr-4 py-4 rounded-xl focus:outline-none font-bold text-gray-700 bg-gray-50/50"
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Phase Select Input */}
+          <div className="bg-white rounded-2xl shadow-xl p-2 border border-gray-100">
+            <div className="relative">
+              <Filter
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600"
+                size={20}
+              />
+              <select
+                value={selectedPhase}
+                onChange={(e) => setSelectedPhase(e.target.value)}
+                className="w-full pl-12 pr-4 py-4 rounded-xl focus:outline-none font-bold text-gray-700 bg-emerald-50/30 appearance-none cursor-pointer"
+              >
+                {phases.map((p) => (
+                  <option key={btoa(p.phaseId)} value={btoa(p.phaseId)}>
+                    {p.Phase}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* Clean Table */}
+        {/* Table Area */}
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -121,42 +168,52 @@ const SocialGroupReport = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-sm">
-                {filteredData.map((row, i) => (
-                  <tr
-                    key={i}
-                    className="hover:bg-emerald-50/30 transition-colors"
-                  >
-                    <td className="px-6 py-4 font-bold text-gray-900">
-                      {row.name}
-                    </td>
-                    <td className="px-6 py-4 text-center font-mono text-gray-600">
-                      {row.sc}
-                    </td>
-                    <td className="px-6 py-4 text-center font-mono text-gray-600">
-                      {row.st}
-                    </td>
-                    <td className="px-6 py-4 text-center font-mono text-gray-600">
-                      {row.obc}
-                    </td>
-                    <td className="px-6 py-4 text-center font-mono text-gray-600">
-                      {row.general}
-                    </td>
-                    <td className="px-6 py-4 text-center font-mono text-gray-600">
-                      {row.minority}
-                    </td>
-                    <td className="px-6 py-4 text-right font-black text-emerald-700">
-                      {(
-                        row.sc +
-                        row.st +
-                        row.obc +
-                        row.general +
-                        row.minority
-                      ).toLocaleString("en-IN")}
+                {filteredData.length > 0 ? (
+                  filteredData.map((row, i) => (
+                    <tr
+                      key={i}
+                      className="hover:bg-emerald-50/30 transition-colors"
+                    >
+                      <td className="px-6 py-4 font-bold text-gray-900">
+                        {row.district_name}
+                      </td>
+                      <td className="px-6 py-4 text-center font-mono text-gray-600">
+                        {row.sc_total}
+                      </td>
+                      <td className="px-6 py-4 text-center font-mono text-gray-600">
+                        {row.st_total}
+                      </td>
+                      <td className="px-6 py-4 text-center font-mono text-gray-600">
+                        {row.obc_total}
+                      </td>
+                      <td className="px-6 py-4 text-center font-mono text-gray-600">
+                        {row.gen_total}
+                      </td>
+                      <td className="px-6 py-4 text-center font-mono text-gray-600">
+                        {row.mi_total}
+                      </td>
+                      <td className="px-6 py-4 text-right font-black text-emerald-700">
+                        {(
+                          (Number(row.sc_total) || 0) +
+                          (Number(row.st_total) || 0) +
+                          (Number(row.obc_total) || 0) +
+                          (Number(row.gen_total) || 0) +
+                          (Number(row.mi_total) || 0)
+                        ).toLocaleString("en-IN")}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="7"
+                      className="px-6 py-10 text-center text-gray-400 font-medium"
+                    >
+                      No records found for the selected phase.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
-              {/* Grand Total Footer */}
               <tfoot className="bg-gray-50 border-t-2 border-gray-200">
                 <tr className="font-black text-gray-900 text-sm">
                   <td className="px-6 py-6 uppercase tracking-widest">
@@ -186,11 +243,11 @@ const SocialGroupReport = () => {
           </div>
         </div>
 
-        {/* Footer Note */}
         <p className="text-center mt-6 text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">
           End of Social Group Wise Report
         </p>
       </div>
+      {loading && <Loader />}
     </div>
   );
 };

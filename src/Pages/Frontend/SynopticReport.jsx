@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FileSpreadsheet, ArrowLeft, Download, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
-
+import axios from "axios";
+import { toast } from "react-toastify";
+import Loader from "../../Components/Loader";
 const SynopticReport = () => {
   // Logic to get current Date and Time
   const generatedTime = new Date().toLocaleString("en-IN", {
@@ -9,31 +11,80 @@ const SynopticReport = () => {
     timeStyle: "short",
   });
 
-  const reportData = [
-    {
-      year: "2015-16",
-      phase: "Phase I",
-      eligible:
-        "All students of class X, XI, XII and girl students of class IX of 8 districts (AY-2015)",
-      received: 2517908,
-    },
-    {
-      year: "2016-17",
-      phase: "Phase II",
-      eligible:
-        "Rest of the girl students and all boy students of class IX (AY-2015)",
-      received: 947537,
-    },
-    {
-      year: "2017-18",
-      phase: "Phase III",
-      eligible: "Class IX of AY-2016 and Class IX of AY-2017",
-      received: 2414544,
-    },
-  ];
+  const [loading, setLoading] = useState(false);
+  const [reportData, setReportData] = useState([]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const host = window.location.hostname;
+      // Added phaseId to the post request payload
+      const response = await axios.post(
+        `http://${host}:8000/api/synopticReportWeb`,
+      );
+
+      if (response.data.error) {
+        toast.error("Failed to fetch stakeholder list");
+      } else {
+        console.log(response.data);
+        setReportData(response.data);
+      }
+    } catch (err) {
+      toast.error(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const downloadExcel = async () => {
+    setLoading(true);
+    const host = window.location.hostname;
+    try {
+      const response = await axios({
+        url: `http://${host}:8000/api/synopticReportWeb`,
+        method: "POST",
+        responseType: "blob",
+        data: { download: 1 },
+      });
+
+      // 1. Create a URL for the blob data
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = window.URL.createObjectURL(blob);
+
+      // 2. Create a temporary anchor element
+      const link = document.createElement("a");
+      link.href = url;
+
+      // 3. Set the file name
+      link.setAttribute("download", `Synoptic_report.xlsx`);
+
+      // 4. Append, trigger click, and cleanup
+      document.body.appendChild(link);
+      link.click();
+
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Download started successfully");
+    } catch (err) {
+      // Axios puts the error details in err.response
+      const errorMessage =
+        err.response?.data?.message || "Unexpected download error.";
+      toast.error(errorMessage);
+      console.error("Download Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const totalReceived = reportData.reduce(
-    (sum, item) => sum + item.received,
+    (sum, item) => sum + Number(item.total),
     0,
   );
 
@@ -56,7 +107,10 @@ const SynopticReport = () => {
               <Clock size={14} /> Generated on: {generatedTime}
             </p>
           </div>
-          <button className="flex items-center gap-2 bg-yellow-400 text-emerald-950 px-6 py-3 rounded-xl font-black shadow-lg hover:bg-yellow-300 transition-all text-xs uppercase tracking-widest active:scale-95">
+          <button
+            onClick={downloadExcel}
+            className="flex items-center gap-2 bg-yellow-400 text-emerald-950 px-6 py-3 rounded-xl font-black shadow-lg hover:bg-yellow-300 transition-all text-xs uppercase tracking-widest active:scale-95"
+          >
             <FileSpreadsheet size={18} /> Export Excel
           </button>
         </div>
@@ -93,13 +147,13 @@ const SynopticReport = () => {
                       {row.year}
                     </td>
                     <td className="px-6 py-5 font-extrabold text-gray-500 text-xs uppercase">
-                      {row.phase}
+                      {row.phase_name}
                     </td>
                     <td className="px-6 py-5 text-gray-600 leading-relaxed max-w-md font-medium">
-                      {row.eligible}
+                      {row.eligible_students}
                     </td>
                     <td className="px-6 py-5 text-right font-black text-gray-900 font-mono text-base">
-                      {row.received.toLocaleString("en-IN")}
+                      {row.total.toLocaleString("en-IN")}
                     </td>
                   </tr>
                 ))}
@@ -132,6 +186,7 @@ const SynopticReport = () => {
           <div className="h-[1px] bg-gray-200 flex-grow"></div>
         </div>
       </div>
+      {loading && <Loader />}
     </div>
   );
 };

@@ -9,43 +9,187 @@ import {
   History,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import phaseI from "../../assets/downloads/frontend/tender/technicalBidEvaluation/technical_bid_evaluation_phase_I.pdf";
+import phaseII from "../../assets/downloads/frontend/tender/technicalBidEvaluation/technical_bid_evaluation_phase_II.pdf";
+import phaseIII from "../../assets/downloads/frontend/tender/technicalBidEvaluation/technical_bid_evaluation_phase_III.pdf";
+import phaseIV from "../../assets/downloads/frontend/tender/technicalBidEvaluation/technical_bid_evaluation_phase_IV.pdf";
+import phaseV from "../../assets/downloads/frontend/tender/technicalBidEvaluation/technical_bid_evaluation_phase_V.pdf";
+import phaseVIVII from "../../assets/downloads/frontend/tender/technicalBidEvaluation/technical_bid_evaluation_phase_VI_VII.pdf";
+import phaseVIII from "../../assets/downloads/frontend/tender/technicalBidEvaluation/technical_bid_evaluation_phase_VIII.pdf";
+import phaseIX from "../../assets/downloads/frontend/tender/technicalBidEvaluation/technical_bid_evaluation_phase_IX.pdf";
+import phaseX from "../../assets/downloads/frontend/tender/technicalBidEvaluation/technical_bid_evaluation_phase_X.pdf";
+import phaseXEOI from "../../assets/downloads/frontend/tender/technicalBidEvaluation/technical_bid_evaluation_phase_X_EOI.pdf";
+import phaseXI from "../../assets/downloads/frontend/tender/technicalBidEvaluation/technical_bid_evaluation_phase_XI.pdf";
 
 const TechnicalEvaluation = () => {
+  // const evaluationList = [
+  //   {
+  //     id: "01",
+  //     title: "PHASE I",
+  //     message: "SUMMARY",
+  //     date: "06-07-2015",
+  //     size: "355 KB",
+  //   },
+  //   {
+  //     id: "02",
+  //     title: "PHASE II",
+  //     message: "SUMMARY",
+  //     date: "20-07-2016",
+  //     size: "255 KB",
+  //   },
+  //   {
+  //     id: "03",
+  //     title: "PHASE III",
+  //     message: "SUMMARY",
+  //     date: "27-03-2017",
+  //     size: "818 KB",
+  //   },
+  //   {
+  //     id: "04",
+  //     title: "PHASE IV",
+  //     message: "SUMMARY",
+  //     date: "26-03-2018",
+  //     size: "2.69 MB",
+  //   },
+  //   {
+  //     id: "05",
+  //     title: "PHASE V",
+  //     message: "SUMMARY",
+  //     date: "25-03-2019",
+  //     size: "422 KB",
+  //   },
+  //   {
+  //     id: "06",
+  //     title: "PHASE VI & VII",
+  //     message: "SUMMARY",
+  //     date: "30-11-2020",
+  //     size: "255 KB",
+  //   },
+  //   {
+  //     id: "07",
+  //     title: "PHASE VIII",
+  //     message: "SUMMARY",
+  //     date: "14-11-2022",
+  //     size: "375 KB",
+  //   },
+  //   {
+  //     id: "08",
+  //     title: "PHASE IX",
+  //     message: "SUMMARY",
+  //     date: "05-10-2023",
+  //     size: "860 KB",
+  //   },
+  //   {
+  //     id: "09",
+  //     title: "PHASE X",
+  //     message: "SUMMARY",
+  //     date: "18-11-2024",
+  //     size: "1.66 MB",
+  //   },
+  //   {
+  //     id: "10",
+  //     title: "PHASE X - EOI for procurement of up to 1,00,000 bicycles",
+  //     message: "SUMMARY",
+  //     date: "22-01-2025",
+  //     size: "178 KB",
+  //   },
+  //   {
+  //     id: "11",
+  //     title: "PHASE XI",
+  //     message: "SUMMARY",
+  //     date: "16-06-2025",
+  //     size: "285 KB",
+  //   },
+  // ];
+
   const evaluationList = [
     {
-      id: "T-01",
-      title: "TECHNICAL EVALUATION REPORT - PHASE I",
-      date: "05-11-2023",
-      size: "2.4 MB",
-      status: "Qualified",
+      id: "01",
+      title: "PHASE I",
+      message: "SUMMARY",
+      date: "06-07-2015",
+      size: "355 KB",
+      file: phaseI, // Added
     },
     {
-      id: "T-02",
-      title: "TECHNICAL EVALUATION REPORT - PHASE II",
-      date: "18-12-2023",
-      size: "1.9 MB",
-      status: "Qualified",
+      id: "02",
+      title: "PHASE II",
+      message: "SUMMARY",
+      date: "20-07-2016",
+      size: "255 KB",
+      file: phaseII, // Added
     },
     {
-      id: "T-03",
-      title: "TECHNICAL EVALUATION REPORT - PHASE III",
-      date: "12-01-2024",
-      size: "3.1 MB",
-      status: "Qualified",
+      id: "03",
+      title: "PHASE III",
+      message: "SUMMARY",
+      date: "27-03-2017",
+      size: "818 KB",
+      file: phaseIII, // Added
     },
     {
-      id: "T-04",
-      title: "TECHNICAL EVALUATION REPORT - PHASE IV",
-      date: "28-02-2024",
-      size: "2.8 MB",
-      status: "Qualified",
+      id: "04",
+      title: "PHASE IV",
+      message: "SUMMARY",
+      date: "26-03-2018",
+      size: "2.69 MB",
+      file: phaseIV, // Added
     },
     {
-      id: "T-05",
-      title: "TECHNICAL EVALUATION REPORT - PHASE V",
-      date: "15-03-2024",
-      size: "2.2 MB",
-      status: "Qualified",
+      id: "05",
+      title: "PHASE V",
+      message: "SUMMARY",
+      date: "25-03-2019",
+      size: "422 KB",
+      file: phaseV, // Added
+    },
+    {
+      id: "06",
+      title: "PHASE VI & VII",
+      message: "SUMMARY",
+      date: "30-11-2020",
+      size: "255 KB",
+      file: phaseVIVII, // Added
+    },
+    {
+      id: "07",
+      title: "PHASE VIII",
+      message: "SUMMARY",
+      date: "14-11-2022",
+      size: "375 KB",
+      file: phaseVIII, // Added
+    },
+    {
+      id: "08",
+      title: "PHASE IX",
+      message: "SUMMARY",
+      date: "05-10-2023",
+      size: "860 KB",
+      file: phaseIX, // Added
+    },
+    {
+      id: "09",
+      title: "PHASE X",
+      message: "SUMMARY",
+      date: "18-11-2024",
+      size: "1.66 MB",
+      file: phaseX, // Added
+    },
+    {
+      id: "10",
+      title: "PHASE X - EOI for procurement of up to 1,00,000 bicycles",
+      message: "SUMMARY",
+      date: "22-01-2025",
+      size: "178 KB",
+      file: phaseXEOI, // Added
+    },
+    {
+      id: "11",
+      title: "PHASE XI",
+      message: "SUMMARY",
+      date: "16-06-2025",
+      size: "285 KB",
+      file: phaseXI, // Added
     },
   ];
 
@@ -63,7 +207,7 @@ const TechnicalEvaluation = () => {
             <ArrowLeft size={14} /> Back to Home
           </Link>
           <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight leading-none uppercase">
-            Technical <span className="text-yellow-400">Evaluation</span>
+            Technical Bid <span className="text-yellow-400">Evaluation</span>
           </h1>
           <p className="text-emerald-100/60 text-xs mt-3 font-medium uppercase tracking-[0.3em]">
             Bidder Qualification Summary • Technical Compliance
@@ -87,7 +231,7 @@ const TechnicalEvaluation = () => {
           <InfoCard
             icon={<History className="text-emerald-500" />}
             label="Archive"
-            value="Current Selection"
+            value="Current & Previous Bidder Selection"
           />
         </div>
 
@@ -97,10 +241,10 @@ const TechnicalEvaluation = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-900 text-white text-[10px] uppercase tracking-[0.2em]">
-                  <th className="px-8 py-6 font-black text-center">Ref No.</th>
-                  <th className="px-8 py-6 font-black">Evaluation Summary</th>
+                  <th className="px-8 py-6 font-black text-center">Sl. No.</th>
+                  <th className="px-8 py-6 font-black">Description / Phase</th>
                   <th className="px-8 py-6 font-black">Published On</th>
-                  <th className="px-8 py-6 font-black">Compliance</th>
+                  <th className="px-8 py-6 font-black">File Size</th>
                   <th className="px-8 py-6 text-right font-black">Action</th>
                 </tr>
               </thead>
@@ -117,15 +261,15 @@ const TechnicalEvaluation = () => {
                     </td>
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">
-                        <div className="bg-gray-100 p-2 rounded-lg text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                        <div className="bg-gray-100 p-2 rounded-lg text-gray-400 group-hover:bg-emerald-600 group-hover:text-white transition-all">
                           <FileSearch size={18} />
                         </div>
                         <div>
                           <p className="font-black text-gray-900 text-sm tracking-tight">
                             {item.title}
                           </p>
-                          <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">
-                            {item.size}
+                          <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">
+                            {item.message}
                           </p>
                         </div>
                       </div>
@@ -139,14 +283,18 @@ const TechnicalEvaluation = () => {
                       <div className="flex items-center gap-2">
                         <CheckCircle2 size={14} className="text-emerald-500" />
                         <span className="text-[10px] font-black uppercase text-gray-600 tracking-wider">
-                          {item.status}
+                          {item.size}
                         </span>
                       </div>
                     </td>
                     <td className="px-8 py-6 text-right">
-                      <button className="inline-flex items-center gap-2 bg-slate-900 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95">
-                        <Download size={14} /> VIEW REPORT
-                      </button>
+                      <a
+                        href={item.file}
+                        download
+                        className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95"
+                      >
+                        <Download size={14} /> Download
+                      </a>
                     </td>
                   </tr>
                 ))}
@@ -157,7 +305,8 @@ const TechnicalEvaluation = () => {
 
         {/* Footer Note */}
         <p className="mt-8 text-center text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em]">
-          Department of SC, ST & OBC Development • Government of West Bengal
+          West Bengal SC, ST and OBC Development & Finance Corporation •
+          Government of West Bengal
         </p>
       </div>
     </div>
