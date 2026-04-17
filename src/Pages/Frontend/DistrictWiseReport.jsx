@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   FileSpreadsheet,
   ArrowLeft,
@@ -7,6 +7,9 @@ import {
   Download,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import Loader from "../../Components/Loader";
 
 const DistrictWiseReport = () => {
   const generatedTime = new Date().toLocaleString("en-IN", {
@@ -14,71 +17,56 @@ const DistrictWiseReport = () => {
     timeStyle: "short",
   });
 
-  const districtData = [
-    {
-      name: "ALIPURDUAR",
-      phases: [
-        49864, 24938, 43417, 20719, 20804, 21847, 16381, 19444, 19558, 18892,
-        15315, 289,
-      ],
-    },
-    {
-      name: "BANKURA",
-      phases: [
-        106711, 56969, 114920, 56616, 58813, 60435, 34592, 53283, 52834, 52598,
-        44356, 535,
-      ],
-    },
-    {
-      name: "BIRBHUM",
-      phases: [
-        121964, 25509, 104121, 53018, 53665, 54579, 35707, 55005, 54376, 52348,
-        46276, 1803,
-      ],
-    },
-    {
-      name: "COOCH BIHAR",
-      phases: [
-        100653, 54989, 95407, 45402, 46711, 47987, 33241, 42501, 45525, 43960,
-        35649, 43,
-      ],
-    },
-    {
-      name: "DAKSHIN DINAJPUR",
-      phases: [
-        45000, 22000, 41000, 20000, 21000, 22000, 15000, 18000, 19000, 17000,
-        14000, 100,
-      ],
-    },
-    {
-      name: "DARJEELING",
-      phases: [
-        32000, 15000, 30000, 14000, 15000, 16000, 11000, 12000, 13000, 12000,
-        10000, 50,
-      ],
-    },
-    {
-      name: "HOOGHLY",
-      phases: [
-        95000, 48000, 92000, 46000, 47000, 49000, 31000, 44000, 45000, 43000,
-        36000, 400,
-      ],
-    },
-    {
-      name: "HOWRAH",
-      phases: [
-        88000, 44000, 85000, 42000, 43000, 45000, 29000, 41000, 42000, 40000,
-        33000, 350,
-      ],
-    },
-    {
-      name: "JALPAIGURI",
-      phases: [
-        55000, 27000, 52000, 25000, 26000, 27000, 18000, 24000, 25000, 23000,
-        19000, 200,
-      ],
-    },
-  ];
+  const [loading, setLoading] = useState(false);
+  const [districtData, setDistrictData] = useState([]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const host = window.location.hostname;
+      // Added phaseId to the post request payload
+      const response = await axios.post(
+        `http://${host}:8000/api/districtWiseDistributionReportWeb`,
+      );
+
+      if (response.data.error) {
+        toast.error("Failed to fetch stakeholder list");
+      } else {
+        const transformedData = response.data.map((item) => {
+          const phases = [
+            parseInt(item.total_p1 || 0),
+            parseInt(item.total_p2 || 0),
+            parseInt(item.total_p3 || 0),
+            parseInt(item.total_p4 || 0),
+            parseInt(item.total_p5 || 0),
+            parseInt(item.total_p6 || 0),
+            parseInt(item.total_p7 || 0),
+            parseInt(item.total_p8 || 0),
+            parseInt(item.total_p9 || 0),
+            parseInt(item.total_p10 || 0),
+            parseInt(item.total_p11 || 0),
+            parseInt(item.total_p12 || 0),
+          ];
+
+          return {
+            name: item.district_name,
+            phases: phases,
+            total: phases.reduce((a, b) => a + b, 0),
+          };
+        });
+        console.log(transformedData);
+        setDistrictData(transformedData);
+      }
+    } catch (err) {
+      toast.error(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const districtRows = districtData.map((d) => ({
     ...d,
@@ -86,7 +74,7 @@ const DistrictWiseReport = () => {
   }));
 
   const phaseTotals = Array(12).fill(0);
-  districtRows.forEach((row) => {
+  districtData.forEach((row) => {
     row.phases.forEach((val, i) => (phaseTotals[i] += val));
   });
 
@@ -105,6 +93,49 @@ const DistrictWiseReport = () => {
     "XI",
     "XII",
   ];
+
+  const downloadExcel = async () => {
+    setLoading(true);
+    const host = window.location.hostname;
+    try {
+      const response = await axios({
+        url: `http://${host}:8000/api/districtWiseDistributionReportWeb`,
+        method: "POST",
+        responseType: "blob",
+        data: { download: 1 },
+      });
+
+      // 1. Create a URL for the blob data
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = window.URL.createObjectURL(blob);
+
+      // 2. Create a temporary anchor element
+      const link = document.createElement("a");
+      link.href = url;
+
+      // 3. Set the file name
+      link.setAttribute("download", `District_Wise_Report.xlsx`);
+
+      // 4. Append, trigger click, and cleanup
+      document.body.appendChild(link);
+      link.click();
+
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Download started successfully");
+    } catch (err) {
+      // Axios puts the error details in err.response
+      const errorMessage =
+        err.response?.data?.message || "Unexpected download error.";
+      toast.error(errorMessage);
+      console.error("Download Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20 font-sans">
@@ -131,8 +162,11 @@ const DistrictWiseReport = () => {
               </span>
             </div>
           </div>
-          <button className="flex items-center gap-2 bg-white text-[#065f46] px-8 py-4 rounded-2xl font-black shadow-xl hover:bg-gray-100 transition-all text-xs uppercase tracking-widest active:scale-95">
-            <Download size={18} /> Export Data
+          <button
+            onClick={downloadExcel}
+            className="flex items-center gap-2 bg-yellow-400 text-emerald-950 px-6 py-3 rounded-xl font-black shadow-lg hover:bg-yellow-300 transition-all text-xs uppercase tracking-widest active:scale-95"
+          >
+            <Download size={18} /> Export Excel
           </button>
         </div>
       </div>

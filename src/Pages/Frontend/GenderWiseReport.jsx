@@ -34,7 +34,7 @@ const GenderWiseReport = () => {
       const host = window.location.hostname;
       // Added phaseId to the post request payload
       const response = await axios.post(
-        `http://${host}:8000/api/genderWiseDistributionWeb`,
+        `http://${host}:8000/api/genderWiseDistributionReportWeb`,
       );
 
       if (response.data.error) {
@@ -87,6 +87,49 @@ const GenderWiseReport = () => {
     return acc;
   }, {});
 
+  const downloadExcel = async () => {
+    setLoading(true);
+    const host = window.location.hostname;
+    try {
+      const response = await axios({
+        url: `http://${host}:8000/api/genderWiseDistributionReportWeb`,
+        method: "POST",
+        responseType: "blob",
+        data: { download: 1 },
+      });
+
+      // 1. Create a URL for the blob data
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = window.URL.createObjectURL(blob);
+
+      // 2. Create a temporary anchor element
+      const link = document.createElement("a");
+      link.href = url;
+
+      // 3. Set the file name
+      link.setAttribute("download", `Gender_Wise_Report.xlsx`);
+
+      // 4. Append, trigger click, and cleanup
+      document.body.appendChild(link);
+      link.click();
+
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Download started successfully");
+    } catch (err) {
+      // Axios puts the error details in err.response
+      const errorMessage =
+        err.response?.data?.message || "Unexpected download error.";
+      toast.error(errorMessage);
+      console.error("Download Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20 font-sans">
       {/* Header Area */}
@@ -111,7 +154,10 @@ const GenderWiseReport = () => {
               </span>
             </div>
           </div>
-          <button className="flex items-center gap-2 bg-white text-[#065f46] px-8 py-4 rounded-2xl font-black shadow-xl hover:bg-gray-100 transition-all text-xs uppercase tracking-widest active:scale-95">
+          <button
+            onClick={downloadExcel}
+            className="flex items-center gap-2 bg-yellow-400 text-emerald-950 px-6 py-3 rounded-xl font-black shadow-lg hover:bg-yellow-300 transition-all text-xs uppercase tracking-widest active:scale-95"
+          >
             <Download size={18} /> Export Excel
           </button>
         </div>
