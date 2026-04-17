@@ -26,7 +26,6 @@ const SynopticReport = () => {
       if (response.data.error) {
         toast.error("Failed to fetch stakeholder list");
       } else {
-        console.log(response.data);
         setReportData(response.data);
       }
     } catch (err) {

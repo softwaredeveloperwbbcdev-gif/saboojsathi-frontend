@@ -3,6 +3,8 @@ import { ChevronDown, Menu, X, Phone, Mail, Clock, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import SaboojLogo from "../../assets/images/sabooj_sathi_logo_icon.jpg";
 import { Link, useLocation } from "react-router-dom"; // Restored your Link import
+import SOP from "../../assets/downloads/frontend/downloads/SOP_for_Enrolment_SS_Ph_XII_AY_2026.pdf";
+import impact from "../../assets/downloads/frontend/impactStudy/Final_Sabooj_sathi_Pratichi_22_09_17.pdf";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -190,11 +192,7 @@ const Header = () => {
             >
               About Scheme
             </Link>
-            <NavItem
-              label="Impact Study"
-              isDownloadLink
-              fileUrl="/pdfs/Impact_Study_Report.pdf"
-            />
+            <NavItem label="Impact Study" isDownloadLink fileUrl={impact} />
             <NavItem
               label="Tenders"
               isDropdown
@@ -222,7 +220,7 @@ const Header = () => {
               items={[
                 {
                   label: "SOP SABOOJ SATHI",
-                  downloadUrl: "/assets/SOP_Sabooj_Sathi.pdf",
+                  downloadUrl: SOP,
                 },
               ]}
             />
@@ -277,7 +275,7 @@ const Header = () => {
               About Scheme
             </Link>
             <a
-              href="/pdfs/Impact_Study_Report.pdf"
+              href={impact}
               download
               className="py-4 hover:text-yellow-400 transition-colors"
             >
