@@ -59,10 +59,10 @@ function LoginForm() {
   };
 
   // Password Hashing Helper
-  const handleHash = (password) => {
-    const hash = MD5(password).toString();
-    return hash;
-  };
+  // const handleHash = (password) => {
+  //   const hash = MD5(password).toString();
+  //   return hash;
+  // };
 
   // Submit Logic
   const onSubmit = async (data) => {
@@ -71,7 +71,8 @@ function LoginForm() {
     // Hash the password before sending
     const finalData = {
       ...data,
-      password: handleHash(data.password),
+      // password: handleHash(data.password),
+      password: data.password,
     };
 
     try {
@@ -79,24 +80,30 @@ function LoginForm() {
       const response = await axios.post(
         `http://${host}:8000/api/login`,
         finalData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
+        { headers: { "Content-Type": "application/json" } },
       );
 
-      // Handle successful login
-      if (response.data.status) {
-        login(response.data.data.token, response.data.data.user);
+      const resData = response.data;
+
+      // 1. Check for the "update" status code first
+      if (resData.status === "success" && resData.status_code === "update") {
+        toast.info("Verification required. Please update your password.");
+
+        // Redirect to Update Password page and pass the data via state
+        navigate("/update-password", { state: { userData: resData.data } });
+        return;
+      }
+
+      // 2. Handle standard successful login
+      if (resData.status) {
+        login(resData.data.token, resData.data.user);
         toast.success("Login Successful!");
         navigate("/Dashboard");
       }
     } catch (error) {
-      // Check if it's a validation error (HTTP 422)
+      // ... your existing error handling (422, etc.)
       if (error.response && error.response.status === 422) {
         const backendErrors = error.response.data.errors;
-        // Loop through the backend errors and set them for react-hook-form
         for (const field in backendErrors) {
           if (Object.prototype.hasOwnProperty.call(backendErrors, field)) {
             setError(field, {

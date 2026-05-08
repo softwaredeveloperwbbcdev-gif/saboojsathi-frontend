@@ -34,8 +34,11 @@ const GrievancePage = () => {
   useEffect(() => {
     if (userType === "public") {
       const fetchSettings = async () => {
+        const host = window.location.hostname;
         try {
-          const response = await axios.get("/api/getGrievanceType");
+          const response = await axios.get(
+            `http://${host}:8000/api/getGrievanceType`,
+          );
           if (response.data.status) {
             setGrievanceTypes(response.data.types || []);
             setPriorities(response.data.priorities || []);
@@ -78,15 +81,17 @@ const GrievancePage = () => {
     e.preventDefault();
     setLoading(true);
     setErrors({});
-
     const formData = new FormData(e.currentTarget);
     formData.append("user_type", 1);
     files.forEach((fileObj) => {
       formData.append("documents[]", fileObj.file);
     });
-
+    const host = window.location.hostname;
     try {
-      const response = await axios.post("/api/lodgeGrievance", formData);
+      const response = await axios.post(
+        `http://${host}:8000/api/lodgeGrievance`,
+        formData,
+      );
       setSubmittedTicket(response.data.data.ticket_no);
       setFiles([]);
       e.target.reset();
@@ -254,6 +259,7 @@ const GrievancePage = () => {
                   label="Mobile"
                   icon={<Phone size={16} />}
                   placeholder="10-digit number"
+                  maxLength={10}
                   error={errors.mobile}
                 />
               </div>
