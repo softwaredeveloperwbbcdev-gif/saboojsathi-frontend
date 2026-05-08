@@ -28,6 +28,7 @@ import StudentLogin from "../Pages/Frontend/StudentLogin";
 //Login Pages
 import LoginFormCms from "../Pages/Frontend/LoginFormCms.jsx";
 import LoginForm from "../Pages/Frontend/LoginForm.jsx";
+import UpdatePasswordForm from "../Pages/Frontend/UpdatePasswordForm.jsx";
 
 //Admin Pages
 import Dashboard_ from "../Pages/Frontend/Test/Dashboard_.jsx";
@@ -195,6 +196,7 @@ const AppRoutes = () => {
       {/* ================= PUBLIC ROUTES (Without Header/Footer) ================= */}
       <Route path="/cms" element={<LoginFormCms />} />
       <Route path="/Login" element={<LoginForm />} />
+      <Route path="/update-password" element={<UpdatePasswordForm />} />
       {/* Public Routes */}
       {/* //////////////////////////////////////////////////////////////////////////////////////////////////// */}
       {/* Test Routes */}
