@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { MapContainer, GeoJSON, Marker } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -11,103 +11,55 @@ import {
   Venus,
   Fingerprint,
   HandHeart,
+  Globe,
 } from "lucide-react";
 
 import wbDistData from "../../Data/wb-districts.json";
 
 const Coverage = () => {
+  const [apiData, setApiData] = useState(null);
   const [hoveredData, setHoveredData] = useState(null);
+  const [districtsStats, setDistrictsStats] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  // Demographic Statistics for the left panel
-  const impactStats = [
-    {
-      label: "Total Distribution",
-      val: "1,24,89,307",
-      icon: <BarChart3 />,
-      color: "bg-emerald-600 text-white",
-      span: "col-span-2",
-    },
-    {
-      label: "Girls",
-      val: "65.20 L",
-      icon: <Venus />, // Distinct icon for Girls
-      color: "bg-white",
-      span: "col-span-1",
-    },
-    {
-      label: "Boys",
-      val: "59.69 L",
-      icon: <Mars />, // Standard User for Boys
-      color: "bg-white",
-      span: "col-span-1",
-    },
-    {
-      label: "Scheduled Caste",
-      val: "28.45 L",
-      icon: <ShieldCheck />, // Security/Shield for Protected Status
-      color: "bg-white",
-      span: "col-span-1",
-    },
-    {
-      label: "Scheduled Tribe",
-      val: "12.10 L",
-      icon: <Fingerprint />, // Unique/Ancestral Identity
-      color: "bg-white",
-      span: "col-span-1",
-    },
-    {
-      label: "OBC",
-      val: "18.30 L",
-      icon: <Users />, // Community representation
-      color: "bg-white",
-      span: "col-span-1",
-    },
-    {
-      label: "Minority",
-      val: "22.15 L",
-      icon: <HandHeart />, // Inclusion/Support representation
-      color: "bg-white",
-      span: "col-span-1",
-    },
-  ];
+  // 1. Fetch Dynamic Data on Mount
+  useEffect(() => {
+    const host = window.location.hostname;
+    const fetchStats = async () => {
+      try {
+        const response = await fetch(`http://${host}:8000/api/coverageMapData`);
+        const json = await response.json();
 
-  const districtsStats = {
-    bankura: { count: "4,20,500", growth: "+12%" },
-    kolkata: { count: "8,50,000", growth: "+22%" },
-    darjeeling: { count: "1,85,200", growth: "+8%" },
-    nadia: { count: "3,92,400", growth: "+10%" },
-    "purba medinipur": { count: "5,12,000", growth: "+15%" },
-    "paschim medinipur": { count: "4,90,000", growth: "+11%" },
-    howrah: { count: "6,15,000", growth: "+19%" },
-    hooghly: { count: "5,42,000", growth: "+14%" },
-    "north 24 parganas": { count: "9,25,000", growth: "+25%" },
-    "south 24 parganas": { count: "8,80,000", growth: "+21%" },
-    murshidabad: { count: "5,72,000", growth: "+13%" },
-    purulia: { count: "3,20,000", growth: "+9%" },
-    birbhum: { count: "3,85,000", growth: "+10%" },
-    malda: { count: "4,10,000", growth: "+12%" },
-    "uttar dinajpur": { count: "2,95,000", growth: "+7%" },
-    "dakshin dinajpur": { count: "2,75,000", growth: "+6%" },
-    "cooch behar": { count: "3,15,000", growth: "+8%" },
-    alipurduar: { count: "2,45,000", growth: "+5%" },
-    jalpaiguri: { count: "3,52,000", growth: "+9%" },
-    kalimpong: { count: "1,12,000", growth: "+4%" },
-    jhargram: { count: "2,18,000", growth: "+5%" },
-    "paschim bardhaman": { count: "4,65,000", growth: "+16%" },
-    "purba bardhaman": { count: "5,22,000", growth: "+14%" },
+        if (json.status === "success") {
+          const mappedData = {};
+          json.data.forEach((item) => {
+            // MATCHING: Use dist_id_pk from API
+            // Force to string to match GeoJSON format ("21" === "21")
+            const id = String(item.dist_id_pk);
+            mappedData[id] = {
+              name: item.district_name,
+              count: Number(item.overall_total).toLocaleString("en-IN"),
+            };
+          });
+          setDistrictsStats(mappedData);
+        }
+      } catch (err) {
+        console.error("API Fetch Error:", err);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  // 2. Helper to get ID from GeoJSON feature (Matches your file's "dist_id")
+  const getDistId = (feature) => {
+    return feature.properties.dist_id ? String(feature.properties.dist_id) : "";
   };
 
-  const getCleanName = (feature) => {
-    const raw =
-      feature.properties.district ||
-      feature.properties.DISTRICT ||
-      feature.properties.district_name ||
-      "";
-    return raw.toLowerCase().trim();
-  };
-
+  // 3. Dynamic Styling based on ID
   const getDistrictStyle = (feature) => {
-    const hasData = districtsStats[getCleanName(feature)];
+    const id = getDistId(feature);
+    const hasData = districtsStats[id];
+
     return {
       fillColor: hasData ? "#10b981" : "#cbd5e1",
       weight: 1.5,
@@ -121,10 +73,7 @@ const Coverage = () => {
     if (!wbDistData) return [];
     return wbDistData.features
       .map((feature) => {
-        const name =
-          feature.properties.district ||
-          feature.properties.DISTRICT ||
-          feature.properties.district_name;
+        const name = feature.properties.name || feature.properties.DISTRICT;
         try {
           const center = L.geoJSON(feature).getBounds().getCenter();
           return { name, center };
@@ -138,17 +87,16 @@ const Coverage = () => {
   const onEachDistrict = (feature, layer) => {
     layer.on({
       mouseover: (e) => {
+        const id = getDistId(feature);
+        const stats = districtsStats[id];
+
         const l = e.target;
-        const stats = districtsStats[getCleanName(feature)];
         l.setStyle({ fillOpacity: 0.9, fillColor: "#064e3b" });
         l.bringToFront();
+
         setHoveredData({
-          name:
-            feature.properties.district ||
-            feature.properties.DISTRICT ||
-            feature.properties.district_name,
+          name: feature.properties.name || feature.properties.DISTRICT,
           count: stats ? stats.count : "No Data",
-          growth: stats ? stats.growth : "N/A",
         });
       },
       mouseout: (e) => {
@@ -158,6 +106,79 @@ const Coverage = () => {
       },
     });
   };
+
+  useEffect(() => {
+    const host = window.location.hostname;
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `http://${host}:8000/api/impactAcrossAllPhase`,
+        );
+        const json = await response.json();
+        if (json.status === "success") {
+          setApiData(json.data);
+        }
+      } catch (error) {
+        console.error("Error fetching impact stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Function to format numbers into Indian Locale (e.g., 1,24,89,307)
+  const formatNum = (num) => {
+    return num ? parseInt(num).toLocaleString("en-IN") : "0";
+  };
+
+  // Define the structure, but pull "val" from apiData
+  const impactStats = apiData
+    ? [
+        {
+          label: "Total Distribution",
+          val: formatNum(apiData.total_distribution),
+          icon: <BarChart3 />,
+          color: "bg-emerald-600 text-white",
+          span: "col-span-2",
+        },
+        {
+          label: "Scheduled Caste",
+          val: formatNum(apiData.sc_total),
+          icon: <ShieldCheck />,
+          color: "bg-white",
+          span: "col-span-1",
+        },
+        {
+          label: "Scheduled Tribe",
+          val: formatNum(apiData.st_total),
+          icon: <Fingerprint />,
+          color: "bg-white",
+          span: "col-span-1",
+        },
+        {
+          label: "OBC",
+          val: formatNum(apiData.obc_total),
+          icon: <Users />,
+          color: "bg-white",
+          span: "col-span-1",
+        },
+        {
+          label: "Minority",
+          val: formatNum(apiData.mi_total),
+          icon: <HandHeart />,
+          color: "bg-white",
+          span: "col-span-1",
+        },
+        {
+          label: "General",
+          val: formatNum(apiData.gen_total),
+          icon: <Globe />,
+          color: "bg-white",
+          span: "col-span-1",
+        },
+      ]
+    : [];
 
   return (
     <section className="py-24 bg-white overflow-hidden">
@@ -179,30 +200,45 @@ const Coverage = () => {
               </p>
             </div>
 
-            {/* IMPACT STATS GRID */}
             <div className="grid grid-cols-2 gap-4">
               {impactStats.map((s, i) => (
                 <div
                   key={i}
-                  className={`relative overflow-hidden p-6 rounded-[2rem] border transition-transform duration-300 hover:scale-[1.02] ${s.span} ${s.color.includes("emerald-600") ? "bg-emerald-600 border-emerald-500 text-white shadow-lg" : "bg-white border-slate-100 shadow-sm"}`}
+                  className={`relative overflow-hidden p-6 rounded-[2rem] border transition-transform duration-300 hover:scale-[1.02] ${s.span} ${
+                    s.color.includes("emerald-600")
+                      ? "bg-emerald-600 border-emerald-500 text-white shadow-lg"
+                      : "bg-white border-slate-100 shadow-sm"
+                  }`}
                 >
                   <div className="flex items-center justify-between z-10 relative">
                     <div>
                       <p
-                        className={`text-[10px] font-black uppercase tracking-widest mb-1 ${s.color.includes("emerald-600") ? "text-emerald-100" : "text-slate-400"}`}
+                        className={`text-[10px] font-black uppercase tracking-widest mb-1 ${
+                          s.color.includes("emerald-600")
+                            ? "text-emerald-100"
+                            : "text-slate-400"
+                        }`}
                       >
                         {s.label}
                       </p>
                       <h3 className="text-2xl font-black">{s.val}</h3>
                     </div>
                     <div
-                      className={`p-3 rounded-xl shadow-md ${s.color.includes("emerald-600") ? "bg-white/20 text-white" : "bg-[#065f46] text-white"}`}
+                      className={`p-3 rounded-xl shadow-md ${
+                        s.color.includes("emerald-600")
+                          ? "bg-white/20 text-white"
+                          : "bg-[#065f46] text-white"
+                      }`}
                     >
                       {React.cloneElement(s.icon, { size: 20 })}
                     </div>
                   </div>
                   <div
-                    className={`absolute -bottom-6 -right-6 opacity-[0.05] ${s.color.includes("emerald-600") ? "text-white" : "text-slate-900"}`}
+                    className={`absolute -bottom-6 -right-6 opacity-[0.05] ${
+                      s.color.includes("emerald-600")
+                        ? "text-white"
+                        : "text-slate-900"
+                    }`}
                   >
                     {React.cloneElement(s.icon, { size: 110 })}
                   </div>
@@ -213,9 +249,13 @@ const Coverage = () => {
 
           {/* RIGHT: MAP BOX */}
           <div className="lg:col-span-7 bg-white/80 backdrop-blur-sm p-4 rounded-[3.5rem] border border-white shadow-2xl h-[750px] relative z-[1] overflow-hidden">
-            {/* FIX 2: HOVER OVERLAY HEADER (Floats inside map card when active) */}
+            {/* HOVER OVERLAY HEADER */}
             <div
-              className={`absolute top-6 left-1/2 -translate-x-1/2 z-[1000] transition-all duration-500 ease-in-out ${hoveredData ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"}`}
+              className={`absolute top-6 left-1/2 -translate-x-1/2 z-[1000] transition-all duration-500 ease-in-out ${
+                hoveredData
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 -translate-y-4 pointer-events-none"
+              }`}
             >
               <div className="bg-slate-900/95 backdrop-blur-xl px-8 py-4 rounded-full border border-white/20 shadow-2xl flex items-center gap-6">
                 <div className="flex items-center gap-2 border-r border-white/10 pr-6">
@@ -224,23 +264,13 @@ const Coverage = () => {
                     {hoveredData?.name}
                   </span>
                 </div>
-                <div className="flex items-center gap-6">
-                  <div className="flex flex-col">
-                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
-                      Distributed
-                    </span>
-                    <span className="text-emerald-400 font-black leading-none">
-                      {hoveredData?.count}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
-                      Growth
-                    </span>
-                    <span className="text-yellow-400 font-black leading-none">
-                      {hoveredData?.growth}
-                    </span>
-                  </div>
+                <div className="flex flex-col">
+                  <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                    Distributed
+                  </span>
+                  <span className="text-emerald-400 font-black leading-none">
+                    {hoveredData?.count}
+                  </span>
                 </div>
               </div>
             </div>
@@ -255,6 +285,8 @@ const Coverage = () => {
               scrollWheelZoom={false}
             >
               <GeoJSON
+                // FIX: Force update when data is loaded into districtsStats
+                key={Object.keys(districtsStats).length}
                 data={wbDistData}
                 style={getDistrictStyle}
                 onEachFeature={onEachDistrict}
