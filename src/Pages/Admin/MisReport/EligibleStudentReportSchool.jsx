@@ -72,8 +72,8 @@ function EligibleStudentReportSchool() {
     try {
       const response = await callApi(
         "POST",
-        `repo-schoolwise-eligible-student-download`,
-        { phaseId, id },
+        `studentEligibiltyRoport`,
+        { download: true, phaseId: phaseId, blockId: id },
         { responseType: "blob" },
       );
 

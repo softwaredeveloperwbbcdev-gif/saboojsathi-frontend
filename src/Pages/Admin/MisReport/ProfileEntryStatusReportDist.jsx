@@ -87,8 +87,8 @@ const ProfileEntryStatusReportDist = () => {
     try {
       const response = await callApi(
         "POST",
-        `profile-entry-status-report-district-download`,
-        { phaseId },
+        `profileEntryStatusReport`,
+        { download: true, phaseId: phaseId },
         { responseType: "blob" },
       );
       if (!response.error) {

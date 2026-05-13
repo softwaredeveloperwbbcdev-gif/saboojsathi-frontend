@@ -73,8 +73,8 @@ function EligibleStudentReportBlock() {
     try {
       const response = await callApi(
         "POST",
-        `repo-blockwise-eligible-student-download`,
-        { phaseId, id },
+        `studentEligibiltyRoport`,
+        { download: true, phaseId: phaseId, distId: id },
         { responseType: "blob" },
       );
 

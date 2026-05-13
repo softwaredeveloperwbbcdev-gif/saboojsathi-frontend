@@ -118,7 +118,7 @@ export default function Sidebar({
           {menuData.map((item) => {
             const hasSub = item.submenu && item.submenu.length > 0;
             const isOpen = openMenus[item.id] && sidebarOpen;
-            const Icon = item.label === "Dashboard" ? LayoutDashboard : Layers;
+            const Icon = item.icon || Layers;
 
             return (
               <div key={item.id}>

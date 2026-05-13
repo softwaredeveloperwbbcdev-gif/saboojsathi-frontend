@@ -36,6 +36,7 @@ function UpdatePasswordForm() {
 
   // FETCH CAPTCHA
   const fetchCaptcha = useCallback(async () => {
+    const host = window.location.hostname;
     setFetchingCaptcha(true);
     try {
       const response = await axios.post(`http://${host}:8000/api/captcha`, {
@@ -104,6 +105,7 @@ function UpdatePasswordForm() {
     };
 
     try {
+      const host = window.location.hostname;
       const response = await axios.post(
         `http://${host}:8000/api/resetPassword`,
         finalData,
