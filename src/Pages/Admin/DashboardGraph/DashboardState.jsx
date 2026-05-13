@@ -35,6 +35,7 @@ import {
   phaseYearId,
   defaultPhaseYear,
 } from "../../../Utils/Constants/Constants";
+import DashboardActionLinks from "../../../Components/StateComponent/DashboardActionLinks";
 
 ChartJS.register(
   ArcElement,
@@ -47,10 +48,14 @@ ChartJS.register(
 
 const DashboardState = ({ graphData, setLoading }) => {
   const phaseId = usePhaseStore((state) => state.phaseId);
+  const user = JSON.parse(atob(localStorage.getItem("user")));
+  const stake_cd = user.stake_cd;
   const [showData, setShowData] = useState([]);
   const navigate = useNavigate();
   const phaseDetails = phaseYearId[phaseId] || defaultPhaseYear;
-  const encodedPhaseId = btoa(phaseId);
+  // const encodedPhaseId = btoa(phaseId);
+
+  const links = DashboardActionLinks();
 
   useEffect(() => {
     if (graphData) setShowData(graphData);
@@ -203,85 +208,23 @@ const DashboardState = ({ graphData, setLoading }) => {
           State Report Console
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          <ActionCard
-            title="Eligible Student Report"
-            subText="District Wise Eligibility"
-            icon={UserCheck}
-            colorClass="from-blue-500 to-blue-700"
-            onClick={() => navigate(`/EligibleStudentReportDistrict`)}
-          />
-          <ActionCard
-            title="District Wise Report"
-            subText="Overall Profile Summary"
-            icon={PieChart}
-            colorClass="from-indigo-500 to-indigo-700"
-            onClick={() => navigate(`/ProfileEntryDistrictReport`)}
-          />
-          <ActionCard
-            title="Profile Entry Status"
-            subText="Data Entry Tracking"
-            icon={Activity}
-            colorClass="from-purple-500 to-purple-700"
-            onClick={() => navigate(`/ProfileEntryStatusReportDist`)}
-          />
-          <ActionCard
-            title="Distribution Detail Report"
-            subText="Cycle Delivery Progress"
-            icon={Truck}
-            colorClass="from-emerald-500 to-emerald-700"
-            onClick={() => navigate(`/DistributionReportDistrict`)}
-          />
-          <ActionCard
-            title="District Tagging Report"
-            subText="Mapping & Verification"
-            icon={Tags}
-            colorClass="from-amber-500 to-amber-700"
-            onClick={() => navigate(`/TaggingDetailsReport`)}
-          />
-          <ActionCard
-            title="Challan MIS"
-            subText="Phase Specific Management"
-            icon={ClipboardCheck}
-            colorClass="from-rose-500 to-rose-700"
-            onClick={() => navigate(`/DistrictChallanReport`)}
-          />
-          <ActionCard
-            title="Challan Generation"
-            subText="Batch Process Tracking"
-            icon={FileText}
-            colorClass="from-cyan-500 to-cyan-700"
-            onClick={() => navigate(`/ChallanGenerationReport`)}
-          />
-          <ActionCard
-            title="Challan View"
-            subText="Detailed Particulars"
-            icon={Eye}
-            colorClass="from-slate-600 to-slate-800"
-            onClick={() =>
-              navigate(`/ChallanParticularsView/${encodedPhaseId}`)
-            }
-          />
-          <ActionCard
-            title="Allocation Status"
-            subText="Challan/Bicycle Mapping"
-            icon={ListChecks}
-            colorClass="from-teal-500 to-teal-700"
-            onClick={() => navigate(`/ChallanAllocationStatusReport`)}
-          />
-          <ActionCard
-            title="Invoice View"
-            subText="Billing & Records"
-            icon={Receipt}
-            colorClass="from-pink-500 to-pink-700"
-            onClick={() => navigate(`/InvoiceViewReport`)}
-          />
-          <ActionCard
-            title="Challan Payment"
-            subText="Settlement & Finance"
-            icon={CreditCard}
-            colorClass="from-orange-500 to-orange-700"
-            onClick={() => navigate(`/ChallanPaymentReport/${encodedPhaseId}`)}
-          />
+          {links.map((link, index) => (
+            <ActionCard
+              key={index}
+              title={link.title}
+              subText={link.subText}
+              icon={link.icon}
+              colorClass={link.colorClass}
+              onClick={() => {
+                // If the path already has a slash at the end or specific logic,
+                // ensure you append phaseId correctly
+                const finalPath = link.path.includes(phaseId)
+                  ? link.path
+                  : `${link.path}`;
+                navigate(finalPath);
+              }}
+            />
+          ))}
         </div>
       </div>
 

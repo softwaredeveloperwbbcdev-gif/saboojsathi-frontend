@@ -80,8 +80,8 @@ const DistributionReportDistrict = () => {
     try {
       const response = await callApi(
         "POST",
-        `distwise_distribution_report_download`,
-        { phaseId },
+        `distributionDetailsReport`,
+        { download: true, phaseId: phaseId },
         { responseType: "blob" },
       );
       if (response.error) {

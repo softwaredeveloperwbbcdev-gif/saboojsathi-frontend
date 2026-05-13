@@ -1,9 +1,17 @@
 // src/layouts/Admin/sideMenus/stateMenu.js
 
+import {
+  LayoutDashboard,
+  FileText,
+  Lock,
+  MessageSquare,
+  Truck,
+} from "lucide-react";
+
 export const getStateSideMenu = () => {
   // Configuration for phases. Add new phases at the top.
   const phases = [
-    { id: btoa(14), label: "Phase XIII AY 2027" },
+    // { id: btoa(14), label: "Phase XIII AY 2027" },
     { id: btoa(13), label: "Phase XII AY 2026" },
     { id: btoa(12), label: "Phase XI AY 2025" },
     { id: btoa(11), label: "Phase X AY 2024" },
@@ -52,6 +60,7 @@ export const getStateSideMenu = () => {
       {
         id: 1,
         label: "CS Dashboard",
+        icon: LayoutDashboard,
         submenu: [
           { id: 11, label: "Distribution Wise Form", to: "Admin.dashboard" },
           { id: 12, label: "Social Wise Form", to: "Admin.dashboard" },
@@ -60,6 +69,7 @@ export const getStateSideMenu = () => {
       {
         id: 2,
         label: "Reports",
+        icon: FileText,
         submenu: [
           // Dynamic Phases (Phase VII to XI)
           ...phases.map((phase, index) => generatePhaseReports(phase, index)),
@@ -97,6 +107,7 @@ export const getStateSideMenu = () => {
       {
         id: 3,
         label: "Access Control",
+        icon: Lock,
         submenu: [
           { id: 31, label: "Notice List", to: "Admin.dashboard" },
           { id: 32, label: "Reset Password", to: "/ResetPasswordState" },
@@ -106,11 +117,13 @@ export const getStateSideMenu = () => {
       {
         id: 4,
         label: "Manage Grievances",
-        submenu: [{ id: 41, label: "Grievance List", to: "Admin.dashboard" }],
+        icon: MessageSquare,
+        submenu: [{ id: 41, label: "Grievance List", to: "/GrievanceList" }],
       },
       {
         id: 5,
         label: "Consignment Management",
+        icon: Truck,
         submenu: [{ id: 51, label: "Dashboard", to: "Admin.dashboard" }],
       },
     ],

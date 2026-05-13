@@ -72,8 +72,8 @@ function EligibleStudentReport() {
     try {
       const response = await callApi(
         "POST",
-        `repo-eligible-student-download`,
-        { phaseId },
+        `studentEligibiltyRoport`,
+        { download: true, phaseId: phaseId },
         { responseType: "blob" },
       );
 

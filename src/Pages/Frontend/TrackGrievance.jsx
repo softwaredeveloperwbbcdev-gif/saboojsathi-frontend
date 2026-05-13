@@ -33,9 +33,13 @@ const TrackGrievance = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post(`/api/checkGrievanceStatus`, {
-        trackingNo: ticketNo,
-      });
+      const host = window.location.hostname;
+      const response = await axios.post(
+        `http://${host}:8000/api/checkGrievanceStatus`,
+        {
+          trackingNo: ticketNo,
+        },
+      );
       if (response.data.status) {
         setStatusData(response.data.data);
       } else {
@@ -51,9 +55,10 @@ const TrackGrievance = () => {
   const handleDownloadZip = async (grievanceId) => {
     setDownloading(true);
     try {
+      const host = window.location.hostname;
       const encodedId = btoa(grievanceId.toString());
       const response = await axios({
-        url: `/api/downloadAllAttachments`,
+        url: `http://${host}:8000/api/downloadAllAttachments`,
         method: "POST",
         data: { grievanceId: encodedId },
         responseType: "blob",
