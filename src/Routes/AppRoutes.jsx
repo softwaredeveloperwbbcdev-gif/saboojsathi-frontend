@@ -1,5 +1,7 @@
+// Path: src/Routes/AppRoutes.jsx
 //packages
 import { Router, Routes, Route, Outlet } from "react-router-dom";
+
 //Middleware (custome hook)
 import AuthGuard from "../Components/AuthGuard";
 
@@ -31,8 +33,9 @@ import LoginForm from "../Pages/Frontend/LoginForm.jsx";
 import UpdatePasswordForm from "../Pages/Frontend/UpdatePasswordForm.jsx";
 
 //Admin Pages
-import Dashboard_ from "../Pages/Frontend/Test/Dashboard_.jsx";
 import Dashboard from "../Pages/Admin/Dashboard.jsx";
+
+//School Pages
 import StudentAdd from "../Pages/Admin/Student/StudentAdd.jsx";
 import ViewProfile from "../Pages/Admin/School/ViewProfile.jsx";
 import StudentEdit from "../Pages/Admin/Student/StudentEdit.jsx";
@@ -101,9 +104,10 @@ import ChallanIssuedMis from "../Pages/Admin/MisReport/ChallanIssuedMis.jsx";
 import ChangePassword from "../Pages/ChangePassword.jsx";
 import ResetFinalize from "../Pages/Admin/State/ResetFinalize.jsx";
 import ResetPasswordState from "../Pages/Admin/State/ResetPasswordState.jsx";
+import GrievanceList from "../Pages/Admin/State/GrievanceList.jsx";
 ///////////////////////////////////////////////////////////////////////////////////////////
 import CmsDashboard from "../Pages/Admin/Cms/CmsDashboard.jsx";
-///////////////////////////////////// 16-09-25
+///////////////////////////////////////////////////////////////////////////////////////////
 import ConsignmentAdd from "../Pages/Admin/Cms/ConsignmentAdd.jsx";
 import ConsignmentView from "../Pages/Admin/Cms/ConsignmentView.jsx";
 import ConsignmentEdit from "../Pages/Admin/Cms/ConsignmentEditCopy.jsx";
@@ -119,13 +123,14 @@ import InvoiceAdd from "../Pages/Admin/Cms/InvoiceAddCopy.jsx";
 import InvoiceLinkChallan from "../Pages/Admin/Cms/InvoiceLinkChallan.jsx";
 import InvoiceView from "../Pages/Admin/Cms/InvoiceView.jsx";
 import ChallanViewFilterDeo from "../Pages/Admin/Cms/ChallanViewFilterDeo.jsx";
+import AccessDeniedPage from "../Components/AccessDeniedPage.jsx";
+////////////////////////////////////////-- Test Routes --///////////////////////////////////////////////////
+import Dashboard_ from "../Pages/Frontend/Test/Dashboard_.jsx";
 import AppsTest from "../Pages/Test/AppsTest.jsx";
 import AppsTestTwo from "../Pages/Test/AppsTestTwo.jsx";
-import AccessDeniedPage from "../Components/AccessDeniedPage.jsx";
+///////////////////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////// 16-09-25
-
-//A Component which defines the layout of all the publi routes
+//A Component which defines the layout of all the public routes
 const PublicLayout = () => (
   <div className="min-h-screen bg-white">
     <Header />
@@ -141,71 +146,96 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
-      {/* ================= PUBLIC ROUTES (With Header/Footer) ================= */}
+
+      {/* ================= PUBLIC ROUTES (Without Header/Footer) ================= */}
       <Route element={<PublicLayout />}>
-        <Route path="/" element={<HomePage />} />
         {/* Welcome or landing page */}
-        <Route path="/about" element={<AboutPage />} />
+        <Route path="/" element={<HomePage />} />
+
         {/* About Sabooj Sathi Scheme */}
+        <Route path="/about" element={<AboutPage />} />
 
         {/* Tender Documents routes */}
 
-        <Route path="/tenders/enit" element={<ENit />} />
         {/* e-Notice inviting tender*/}
-        <Route path="/tenders/pre-bid-minutes" element={<PreBidMinutes />} />
+        <Route path="/tenders/enit" element={<ENit />} />
+
         {/* Minutes for Pre-bid Meetings */}
+        <Route path="/tenders/pre-bid-minutes" element={<PreBidMinutes />} />
+
+        {/* Minutes for Technical Bid Evaluation */}
         <Route
           path="/tenders/technical-bid-evaluation"
           element={<TechnicalEvaluation />}
         />
-        {/* Minutes for Technical Bid Evaluation */}
+
+        {/* Minutes for Financial Bid Evaluation */}
         <Route
           path="/tenders/financial-bid-evaluation"
           element={<FinancialEvaluation />}
         />
-        {/* Minutes for Financial Bid Evaluation */}
 
         {/* Tender Documents routes */}
 
         {/* Public reporting for RTI (Since inception of Scheme) */}
-        <Route path="/reports/synoptic" element={<SynopticReport />} />
-        {/* Year wise Synpotic Report */}
-        <Route path="/reports/district-wise" element={<DistrictWiseReport />} />
-        {/* District wise report since inception of scheme */}
 
-        <Route path="/reports/gender-wise" element={<GenderWiseReport />} />
+        {/* Year wise Synpotic Report */}
+        <Route path="/reports/synoptic" element={<SynopticReport />} />
+
+        {/* District wise report since inception of scheme */}
+        <Route path="/reports/district-wise" element={<DistrictWiseReport />} />
+
         {/* Gender wise report since inception of scheme*/}
+        <Route path="/reports/gender-wise" element={<GenderWiseReport />} />
+
+        {/* Social Group wise report since inception of scheme*/}
         <Route
           path="/reports/social-group-wise"
           element={<SocialGroupReport />}
         />
-        {/* Social Group wise report since inception of scheme*/}
+
+        {/* Beneficiary Search for individual beneficiary over the Years */}
         <Route
           path="/reports/search-beneficiary"
           element={<SearchBeneficiary />}
         />
-        {/* Beneficiary Search for individual beneficiary over the Years */}
+
         {/* Public reporting for RTI (Since inception of Scheme) */}
 
         {/* contact us  */}
         <Route path="/contact" element={<ContactUs />} />
+
+        {/* Grievance For Student and General Public (lodge Grievnace) */}
         <Route path="/grievance" element={<GrievancePage />} />
+
+        {/* Grievance For Student and General Public (Track Grievnace) */}
         <Route path="/track-grievance" element={<TrackGrievance />} />
+
+        {/* Student Login to Track Grievances */}
         <Route path="/student-login" element={<StudentLogin />} />
       </Route>
       {/* ================= PUBLIC ROUTES (Without Header/Footer) ================= */}
-      <Route path="/cms" element={<LoginFormCms />} />
+
+      {/* Administrative Login (SPMU, DPMU, BDO/SDO, SI, HOI) */}
       <Route path="/Login" element={<LoginForm />} />
+
+      {/* CMS Login (Supplier and State Billing Agent) */}
+      <Route path="/cms" element={<LoginFormCms />} />
+
+      {/* Update password page (Change password encryption from old to new) */}
       <Route path="/update-password" element={<UpdatePasswordForm />} />
+
       {/* Public Routes */}
-      {/* //////////////////////////////////////////////////////////////////////////////////////////////////// */}
+
       {/* Test Routes */}
       <Route path="/Test" element={<AppsTest />} />
       <Route path="/TestTwo" element={<AppsTestTwo />} />
+
+      {/* //////////////////////////////////////////////////////////////////////////////////////////////////// */}
+
       {/* Protected Routes */}
       <Route element={<AuthGuard />}>
         <Route path="/Dashboard" element={<Dashboard />} />
-        <Route path="/Dashboard_" element={<Dashboard_ />} />
         <Route path="/DashboardTagging" element={<DashboardTagging />} />
         <Route path="/DashboardChallan" element={<DashboardChallan />} />
         <Route path="/Admin" element={<Dashboard />} />
@@ -473,6 +503,7 @@ const AppRoutes = () => {
         />
         <Route path="/ResetFinalize" element={<ResetFinalize />} />
         <Route path="/AccessDeniedPage" element={<AccessDeniedPage />} />
+        <Route path="/GrievanceList" element={<GrievanceList />} />
       </Route>
     </Routes>
   );

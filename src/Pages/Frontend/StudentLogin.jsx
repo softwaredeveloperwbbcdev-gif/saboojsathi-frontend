@@ -25,9 +25,12 @@ const StudentLogin = () => {
   });
 
   const fetchCaptcha = async () => {
+    const host = window.location.hostname;
     try {
       setCaptcha("....");
-      const response = await axios.post("/api/captcha", { type: "applicant" });
+      const response = await axios.post(`http://${host}:8000/api/captcha`, {
+        type: "applicant",
+      });
       if (response.data) {
         const fullQuestion = response.data.question;
         const codeOnly = fullQuestion.split(": ")[1] || fullQuestion;
