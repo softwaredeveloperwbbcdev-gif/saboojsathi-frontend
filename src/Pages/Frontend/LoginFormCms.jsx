@@ -1,19 +1,38 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
-import TextInput from "../../Components/TextInput";
-import InputError from "../../Components/InputError";
-import InputLabel from "../../Components/InputLabel";
-import PrimaryButton from "../../Components/PrimaryButton";
-import { useNavigate } from "react-router-dom";
-import Loader from "../../Components/Loader";
-import { useContext } from "react";
-import { TokenContext } from "../../ContextProvider/TokenContext";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import MD5 from "crypto-js/md5";
-import { User, Lock, Hash, RefreshCw, LogIn } from "lucide-react";
+import {
+  FaHome,
+  FaSun,
+  FaMoon,
+  FaUser,
+  FaLock,
+  FaSignInAlt,
+  FaSync,
+  FaShieldAlt,
+  FaBicycle,
+  FaExclamationCircle,
+} from "react-icons/fa";
+
+// Context & Stores
+import { TokenContext } from "../../ContextProvider/TokenContext";
+import { useThemeStore } from "../../Store/themeStore";
+
+// Assets & Components
+import LoginBg from "../../assets/images/login_bg.jpg";
+import Loader from "../../Components/Loader";
 
 const LoginFormCms = () => {
+  const [loading, setLoading] = useState(false);
+  const [captch, setCaptcha] = useState("");
+  const [captchaKey, setCaptchaKey] = useState("");
+  const navigate = useNavigate();
+  const { login } = useContext(TokenContext);
+  const { darkMode, toggleTheme } = useThemeStore();
+
   const {
     register,
     handleSubmit,
@@ -21,66 +40,37 @@ const LoginFormCms = () => {
     formState: { errors },
   } = useForm();
 
-  const [loading, setLoading] = useState(false);
-  const [backendErrors, setBackendErrors] = useState("");
-  const [captch, setCaptcha] = useState();
-  const [captchaKey, setCaptchaKey] = useState();
-  const navigate = useNavigate();
+  // const handleHash = (password) => MD5(password).toString();
 
-  const handleHash = (password) => {
-    const hash = MD5(password).toString();
-    return hash;
-  };
-
-  const { login } = useContext(TokenContext); // ⬅️ get the login function
-
-  // 👇 Captcha reload function
-  const handleReloadCaptcha = async () => {
-    fetchData();
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const host = window.location.hostname;
+      const response = await axios.post(`http://${host}:8000/api/captcha`, {
+        type: "cms",
+      });
+      if (response.data) {
+        setCaptcha(response.data.question);
+        setCaptchaKey(response.data.key);
+      }
+    } catch (error) {
+      toast.error("Security service connectivity issue.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const host = window.location.hostname;
-      const response = await axios.get(`http://${host}:8000/api/captcha_`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      // ✅ Check and set captcha
-      if (response.data) {
-        console.log(JSON.stringify(response.data));
-        setCaptcha(response.data.question);
-        setCaptchaKey(response.data.key);
-      } else {
-        toast("Failed to fetch data: Empty response");
-      }
-    } catch (error) {
-      toast(
-        `Failed to fetch data: ${
-          error.response?.data?.message || error.message || "Unknown error"
-        }`
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-  ////////////////////////////////////////////////
-
   const onSubmit = async (data) => {
     setLoading(true);
-
     const payload = {
       user_id: data.user_id,
-      password: handleHash(data.password), // hash password before sending
+      password: data.password,
       captcha: data.captcha,
-      captcha_key: captchaKey, // 👈 must send this back
+      captcha_key: captchaKey,
     };
 
     try {
@@ -88,179 +78,199 @@ const LoginFormCms = () => {
       const response = await axios.post(
         `http://${host}:8000/api/login_cms`,
         payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
       );
 
-      // ✅ If login successful
-      if (response.data && response.data.status) {
+      const resData = response.data;
+
+      // 1. Check for the "update" status code first
+      if (resData.status === "success" && resData.verification_type === "cms") {
+        toast.info("Verification required. Please update your password.");
+
+        // Redirect to Update Password page and pass the data via state
+        navigate("/update-password", {
+          state: {
+            userData: resData.data,
+            verificationType: resData.verification_type,
+          },
+        });
+        return;
+      }
+
+      if (response.data?.status) {
         login(response.data.data.token, response.data.data.user);
         localStorage.setItem("cms_menu", response.data.data.cms_menu);
+        toast.success("CMS Access Granted");
         navigate("/cmsdashboard");
       } else {
-        toast(`Login failed: ${response.data?.message || "Unknown error"}`);
+        toast.error(response.data?.message || "Access Denied");
+        fetchData();
       }
     } catch (error) {
-      // ❌ Validation error (422)
-      if (error.response && error.response.status === 422) {
-        setBackendErrors(error.response.data.errors);
-        for (const field in backendErrors) {
-          if (Object.prototype.hasOwnProperty.call(backendErrors, field)) {
-            setError(field, {
-              type: "server",
-              message: backendErrors[field][0],
-            });
-          }
-        }
-      } else {
-        // ❌ Other errors
-        toast(
-          `Login failed: ${error.response?.data?.message || error.message}`
-        );
+      if (error.response?.status === 422) {
+        const serverErrors = error.response.data.errors;
+        Object.keys(serverErrors).forEach((field) => {
+          setError(field, { type: "server", message: serverErrors[field][0] });
+        });
       }
+      fetchData();
     } finally {
       setLoading(false);
-      fetchData(); // Refresh captcha after each attempt
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-100 dark:bg-gray-900 bg-[linear-gradient(to_right_top,_#0f9dd1,_#00b4d4,_#00c9c7,_#00dcb0,_#0bdeb7)]">
-      {loading && <Loader />}
+    <div
+      className="min-h-screen w-full bg-cover bg-center bg-no-repeat flex items-center justify-center relative transition-colors duration-300 font-sans"
+      style={{ backgroundImage: `url(${LoginBg})` }}
+    >
+      <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"></div>
 
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <b className="text-4xl font-bold text-white drop-shadow-md">
-            Sabooj Sathi
-          </b>
-          <p className="text-lg font-medium text-white/90 drop-shadow-sm">
-            Consignment Management System
-          </p>
-        </div>
+      {/* Navbar */}
+      <div className="absolute top-0 w-full p-4 flex justify-between items-center z-10">
+        <Link
+          to="/"
+          className="flex items-center gap-2 px-4 py-2 bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg text-gray-700 dark:text-gray-200 hover:bg-green-600 hover:text-white transition-all duration-300 font-medium"
+        >
+          <FaHome /> <span className="hidden sm:inline">Home</span>
+        </Link>
 
-        {/* Form Card */}
-        <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-2xl">
-          <p className="text-center text-gray-600 dark:text-gray-300 font-medium mb-6">
-            Sign in to start your session
-          </p>
+        <button
+          onClick={toggleTheme}
+          className="p-3 rounded-full bg-white/90 dark:bg-gray-800/90 text-yellow-500 dark:text-blue-300 shadow-lg hover:scale-110 transition-transform"
+        >
+          {darkMode ? <FaMoon /> : <FaSun />}
+        </button>
+      </div>
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            autoComplete="off"
-            className="space-y-6"
-            noValidate
-          >
+      <div className="relative z-10 w-full max-w-md mx-4">
+        <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden p-8 border border-white/20 dark:border-gray-700 transition-all duration-300">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-600 rounded-2xl shadow-lg mb-4 text-white">
+              <FaBicycle size={32} />
+            </div>
+            <h1 className="text-4xl font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-500 dark:from-green-400 dark:to-teal-300 mb-2">
+              SABOOJSATHI
+            </h1>
+            <p className="text-xs font-semibold tracking-[0.2em] text-gray-600 dark:text-gray-400 uppercase">
+              CMS Login
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Username */}
-            <div className="relative">
-              <TextInput
+            <div className="relative group">
+              <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase ml-1 mb-1 tracking-widest">
+                Username
+              </label>
+              <div className="absolute left-3 top-[34px] text-gray-400 group-focus-within:text-green-500 transition-colors">
+                <FaUser />
+              </div>
+              <input
                 type="text"
-                id="user_id"
-                name="user_id"
-                placeholder="User ID"
-                Icon={User}
-                {...register("user_id", {
-                  required: "Username is required",
-                  minLength: {
-                    value: 2,
-                    message: "Minimum 2 characters required",
-                  },
-                  pattern: {
-                    value: /^[A-Za-z0-9_-]+$/,
-                    message: "Only letters, numbers, _ and - are allowed",
-                  },
-                })}
-                error={errors.user_id}
+                {...register("user_id", { required: "Username is required" })}
+                className={`w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700/50 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-gray-700 dark:text-gray-200 transition-all ${errors.user_id ? "border-red-500" : "border-gray-200 dark:border-gray-600"}`}
+                placeholder="Enter CMS ID"
               />
-              <InputLabel htmlFor="user_id" value="User ID" mandatory={true} />
-              <InputError message={errors.user_id?.message} />
+              {errors.user_id && (
+                <span className="text-red-500 text-[10px] mt-1 flex items-center gap-1 font-bold">
+                  <FaExclamationCircle /> {errors.user_id.message}
+                </span>
+              )}
             </div>
 
             {/* Password */}
-            <div className="relative">
-              <TextInput
-                type="password"
-                id="password"
-                name="password"
-                placeholder="Password"
-                Icon={Lock}
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Minimum 6 characters required",
-                  },
-                })}
-                error={errors.password}
-              />
-              <InputLabel
-                htmlFor="password"
-                value="Password"
-                mandatory={true}
-              />
-              <InputError message={errors.password?.message} />
-            </div>
-
-            {/* CAPTCHA */}
-            <div>
-              <div className="flex items-start gap-3">
-                <div className="relative flex-grow">
-                  <TextInput
-                    type="text"
-                    id="captcha"
-                    placeholder="Captcha"
-                    Icon={Hash}
-                    autoComplete="off"
-                    {...register("captcha", {
-                      required: "Answer is required",
-                      pattern: {
-                        value: /^[0-9]+$/,
-                        message: "Only numbers allowed",
-                      },
-                    })}
-                    error={errors.captcha}
-                  />
-                  <InputLabel
-                    htmlFor="captcha"
-                    value="Captcha"
-                    mandatory={true}
-                  />
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleReloadCaptcha}
-                  title="Reload Captcha"
-                  className="p-3 h-12 mt-1 flex-shrink-0 text-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                >
-                  <RefreshCw className="h-5 w-5" />
-                </button>
-
-                <div className="flex-shrink-0 h-12 mt-1 bg-gray-700 dark:bg-gray-900 text-white text-lg font-mono flex items-center justify-center px-4 py-2 rounded-lg select-none">
-                  {captch}
-                </div>
+            <div className="relative group">
+              <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase ml-1 mb-1 tracking-widest">
+                Password
+              </label>
+              <div className="absolute left-3 top-[34px] text-gray-400 group-focus-within:text-green-500 transition-colors">
+                <FaLock />
               </div>
-              <InputError message={errors.captcha?.message} className="mt-2" />
+              <input
+                type="password"
+                {...register("password", { required: "Password is required" })}
+                className={`w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700/50 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-gray-700 dark:text-gray-200 transition-all ${errors.password ? "border-red-500" : "border-gray-200 dark:border-gray-600"}`}
+                placeholder="••••••••"
+              />
+              {errors.password && (
+                <span className="text-red-500 text-[10px] mt-1 flex items-center gap-1 font-bold">
+                  <FaExclamationCircle /> {errors.password.message}
+                </span>
+              )}
             </div>
 
-            {/* Submit Button */}
-            <div className="pt-2">
-              <PrimaryButton
-                type="submit"
-                disabled={loading}
-                className="w-full justify-center"
-              >
-                <LogIn size={20} />
-                <span>{loading ? "Signing In..." : "Sign In"}</span>
-              </PrimaryButton>
+            {/* Captcha Block with Full Validation */}
+            <div className="p-4 bg-gray-100 dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-gray-700 space-y-3">
+              <div className="flex items-center gap-2 text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                <FaShieldAlt className="text-green-500" /> Security Verification
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1 flex items-center justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 h-11">
+                  <span className="font-mono font-bold text-green-600 dark:text-green-400 italic">
+                    {captch || "Loading..."}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={fetchData}
+                    className="text-gray-400 hover:text-green-500 transition-colors"
+                  >
+                    <FaSync className={loading ? "animate-spin" : ""} />
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  {...register("captcha", {
+                    required: "Required",
+                    pattern: {
+                      value: /^[0-9]+$/,
+                      message: "Digits only",
+                    },
+                  })}
+                  className={`w-20 text-center bg-white dark:bg-gray-800 border rounded-lg text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-green-500 outline-none ${errors.captcha ? "border-red-500" : "border-gray-200 dark:border-gray-700"}`}
+                  placeholder="Ans"
+                />
+              </div>
+              {errors.captcha && (
+                <span className="text-red-500 text-[10px] mt-1 flex items-center gap-1 font-bold justify-end">
+                  <FaExclamationCircle /> {errors.captcha.message}
+                </span>
+              )}
             </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex justify-center items-center gap-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white py-3 rounded-lg font-bold text-lg shadow-lg transform active:scale-95 transition-all duration-200 disabled:opacity-50"
+            >
+              {loading ? (
+                "Authenticating..."
+              ) : (
+                <>
+                  <FaSignInAlt /> CMS Login
+                </>
+              )}
+            </button>
           </form>
+
+          <div className="mt-6 text-center">
+            <Link
+              to="/login"
+              className="text-sm text-blue-600 dark:text-blue-400 hover:underline transition-colors"
+            >
+              Not a Consignment Manager? Administrative Login
+            </Link>
+          </div>
+
+          {loading && (
+            <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 flex items-center justify-center z-50 backdrop-blur-sm rounded-2xl">
+              <Loader />
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
+
 export default LoginFormCms;

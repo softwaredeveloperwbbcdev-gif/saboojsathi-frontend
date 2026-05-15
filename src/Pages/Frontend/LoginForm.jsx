@@ -58,12 +58,6 @@ function LoginForm() {
     }
   };
 
-  // Password Hashing Helper
-  // const handleHash = (password) => {
-  //   const hash = MD5(password).toString();
-  //   return hash;
-  // };
-
   // Submit Logic
   const onSubmit = async (data) => {
     setLoading(true);
@@ -86,11 +80,19 @@ function LoginForm() {
       const resData = response.data;
 
       // 1. Check for the "update" status code first
-      if (resData.status === "success" && resData.status_code === "update") {
+      if (
+        resData.status === "success" &&
+        resData.verification_type === "stakeholder"
+      ) {
         toast.info("Verification required. Please update your password.");
 
         // Redirect to Update Password page and pass the data via state
-        navigate("/update-password", { state: { userData: resData.data } });
+        navigate("/update-password", {
+          state: {
+            userData: resData.data,
+            verificationType: resData.verification_type,
+          },
+        });
         return;
       }
 
@@ -300,7 +302,7 @@ function LoginForm() {
               to="/cms"
               className="text-sm text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-500 transition-colors"
             >
-              Are you an Admin? Go to CMS Login
+              Are you an Administrator? Go to CMS Login
             </Link>
           </div>
 
