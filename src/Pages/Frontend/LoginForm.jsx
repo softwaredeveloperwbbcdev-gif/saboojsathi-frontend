@@ -17,6 +17,8 @@ import MD5 from "crypto-js/md5"; // Import MD5
 import { useForm } from "react-hook-form"; // Import Hook Form
 import { TokenContext } from "../../ContextProvider/TokenContext"; // Import Context
 import { useThemeStore } from "../../Store/themeStore";
+import { usePhaseStore } from "../../Store/phaseStore";
+import { defaultPhaseYear } from "../../Utils/Constants/Constants";
 
 function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -99,6 +101,8 @@ function LoginForm() {
       // 2. Handle standard successful login
       if (resData.status) {
         login(resData.data.token, resData.data.user);
+        const setPhaseId = usePhaseStore((state) => state.setPhaseId);
+        setPhaseId(defaultPhaseYear.key);
         toast.success("Login Successful!");
         navigate("/Dashboard");
       }

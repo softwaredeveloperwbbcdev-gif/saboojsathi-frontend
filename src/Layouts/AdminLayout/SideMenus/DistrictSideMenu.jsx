@@ -5,7 +5,7 @@ export const getDistrictSideMenu = () => {
     { id: btoa(11), label: "Phase X AY 2024" },
     { id: btoa(12), label: "Phase XI AY 2025" },
     { id: btoa(13), label: "Phase XII AY 2026" },
-    { id: btoa(14), label: "Phase XIII AY 2027" },
+    // { id: btoa(14), label: "Phase XIII AY 2027" },
   ];
 
   return {
