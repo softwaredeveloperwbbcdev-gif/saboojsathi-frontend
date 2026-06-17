@@ -31,12 +31,13 @@ function UpdatePasswordForm() {
   // Access theme store
   const { darkMode, toggleTheme } = useThemeStore();
 
+  // 1. Extract both userData and verificationType from location state
   const userData = location.state?.userData;
+  const verificationType = location.state?.verificationType; // "cms" or "stakeholder"
   const host = window.location.hostname;
 
   // FETCH CAPTCHA
   const fetchCaptcha = useCallback(async () => {
-    const host = window.location.hostname;
     setFetchingCaptcha(true);
     try {
       const response = await axios.post(`http://${host}:8000/api/captcha`, {
@@ -54,15 +55,16 @@ function UpdatePasswordForm() {
     } finally {
       setFetchingCaptcha(false);
     }
-  }, [host]);
+  }, []);
 
   useEffect(() => {
-    if (!userData) {
+    // Redirect if someone tries to access this page directly without state
+    if (!userData || !verificationType) {
       navigate("/login");
     } else {
       fetchCaptcha();
     }
-  }, [userData, navigate, fetchCaptcha]);
+  }, [userData, verificationType, navigate, fetchCaptcha]);
 
   const {
     register,
@@ -93,26 +95,34 @@ function UpdatePasswordForm() {
   // Security Handler for Captcha
   const preventCopyPaste = (e) => {
     e.preventDefault();
-    toast.warning("Manual typing required for verification");
+    toast.warning("Manual typing required");
   };
 
   const onSubmit = async (data) => {
     setLoading(true);
+
+    // 2. Build the payload including the verificationType
     const finalData = {
       ...data,
+      verification_type: verificationType, // This tells backend which table to update
       captcha_key: captchaData.key,
-      internal_code: data.internal_code.toString(),
+      // Ensure internal_code is passed correctly if it exists (for stakeholders)
+      internal_code: data.internal_code ? data.internal_code.toString() : null,
     };
 
     try {
-      const host = window.location.hostname;
       const response = await axios.post(
         `http://${host}:8000/api/resetPassword`,
         finalData,
       );
+
       if (response.data.status === "success" || response.data.status === true) {
         toast.success("Password Changed Successfully!");
-        navigate("/login");
+        if (verificationType === "stakeholder") {
+          navigate("/login");
+        } else {
+          navigate("/cms");
+        }
       } else {
         toast.error(response.data.message || "Update failed");
         fetchCaptcha();
@@ -124,7 +134,7 @@ function UpdatePasswordForm() {
           setError(field, { type: "server", message: backendErrors[field][0] });
         }
       } else {
-        toast.error("An error occurred.");
+        toast.error("An error occurred during update.");
       }
       fetchCaptcha();
     } finally {
@@ -162,7 +172,8 @@ function UpdatePasswordForm() {
               Update Password
             </h1>
             <div className="mt-2 p-2 bg-green-100 dark:bg-green-900/30 rounded text-xs font-bold text-green-700 dark:text-green-400">
-              User: {userData.name} ({userData.login_cd})
+              Updating {verificationType === "cms" ? "CMS" : "Stakeholder"}{" "}
+              Account: {userData.name}
             </div>
           </div>
 

@@ -8,6 +8,8 @@ import {
   FaLock,
   FaBuilding,
   FaSignInAlt,
+  FaEye,
+  FaEyeSlash,
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -25,6 +27,8 @@ function LoginForm() {
   const [loginLevels, setLoginLevels] = useState([]);
   const navigate = useNavigate();
   const { login } = useContext(TokenContext); // Access Login Context
+  const [showPassword, setShowPassword] = useState(false);
+  const setPhaseId = usePhaseStore((state) => state.setPhaseId);
 
   // React Hook Form setup
   const {
@@ -101,7 +105,6 @@ function LoginForm() {
       // 2. Handle standard successful login
       if (resData.status) {
         login(resData.data.token, resData.data.user);
-        const setPhaseId = usePhaseStore((state) => state.setPhaseId);
         setPhaseId(defaultPhaseYear.key);
         toast.success("Login Successful!");
         navigate("/Dashboard");
@@ -111,12 +114,12 @@ function LoginForm() {
       if (error.response && error.response.status === 422) {
         const backendErrors = error.response.data.errors;
         for (const field in backendErrors) {
-          if (Object.prototype.hasOwnProperty.call(backendErrors, field)) {
-            setError(field, {
-              type: "server",
-              message: backendErrors[field][0],
-            });
-          }
+          // if (Object.prototype.hasOwnProperty.call(backendErrors, field)) {
+          setError(field, {
+            type: "server",
+            message: backendErrors[field][0],
+          });
+          //}
         }
         toast.error("Please correct the errors.");
       } else {
@@ -257,11 +260,13 @@ function LoginForm() {
 
             {/* 3. Password Input */}
             <div className="relative group">
+              {/* Left Lock Icon */}
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none top-0 h-[50px]">
                 <FaLock className="text-gray-400 group-focus-within:text-green-500 transition-colors" />
               </div>
+
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="password"
                 placeholder="Password"
                 {...register("password", {
@@ -271,12 +276,26 @@ function LoginForm() {
                     message: "Minimum 6 characters required",
                   },
                 })}
-                className={`w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700/50 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none text-gray-700 dark:text-gray-200 transition-all placeholder-gray-400 ${
+                className={`w-full pl-10 pr-12 py-3 bg-gray-50 dark:bg-gray-700/50 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none text-gray-700 dark:text-gray-200 transition-all placeholder-gray-400 ${
                   errors.password
                     ? "border-red-500"
                     : "border-gray-200 dark:border-gray-600"
                 }`}
               />
+
+              {/* Eye Icon */}
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center top-0 h-[50px] text-gray-400 hover:text-green-500 transition-colors"
+                onMouseDown={() => setShowPassword(true)}
+                onMouseUp={() => setShowPassword(false)}
+                onMouseLeave={() => setShowPassword(false)}
+                onTouchStart={() => setShowPassword(true)}
+                onTouchEnd={() => setShowPassword(false)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+
               {errors.password && (
                 <span className="text-red-500 text-xs mt-1 block pl-1">
                   {errors.password.message}
