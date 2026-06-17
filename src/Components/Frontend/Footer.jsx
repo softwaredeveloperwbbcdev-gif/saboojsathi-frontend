@@ -1,8 +1,19 @@
 import React from "react";
 import { Mail, Phone, MapPin, ExternalLink, Users } from "lucide-react";
 import SaboojLogo from "../../assets/images/sabooj_sathi_logo_icon.jpg";
+import { useNavigate } from "react-router-dom";
+import impact from "../../assets/downloads/frontend/impactStudy/Final_Sabooj_sathi_Pratichi_22_09_17.pdf";
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = impact;
+    link.download = "Impact-Study.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   return (
     <footer className="bg-[#065f46] text-emerald-50">
       {/* Main Footer Area */}
@@ -39,22 +50,25 @@ const Footer = () => {
             </h3>
             <ul className="grid grid-cols-1 gap-4 text-sm font-bold uppercase tracking-wide">
               {[
-                "Home",
-                "About Scheme",
-                "Impact Study",
-                "Tenders",
-                "FAQ", // Reports removed, FAQ added
-                "Downloads",
+                { name: "Home", path: "/" },
+                { name: "About Scheme", path: "/about" },
+                { name: "Impact Study", action: handleDownload },
+                { name: "Tenders", path: "/" },
+                //{ name: "FAQ", path: "/" },
+                { name: "Downloads", path: "/" },
               ].map((link) => (
                 <li
-                  key={link}
+                  key={link.name}
+                  onClick={() =>
+                    link.action ? link.action() : navigate(link.path)
+                  }
                   className="hover:text-yellow-400 transition-colors flex items-center gap-2 cursor-pointer group"
                 >
                   <ExternalLink
                     size={14}
                     className="opacity-50 group-hover:opacity-100"
                   />
-                  {link}
+                  {link.name}
                 </li>
               ))}
             </ul>
